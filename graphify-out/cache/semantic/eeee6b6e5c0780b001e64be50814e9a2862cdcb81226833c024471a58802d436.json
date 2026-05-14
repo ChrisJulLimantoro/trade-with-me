@@ -1,0 +1,1 @@
+{"nodes": [{"id": "ats_cli", "label": "ATS CLI Entrypoint", "file_type": "code", "source_file": "src/ats/cli.py"}], "edges": [{"source": "ats_cli", "target": "ats_package", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "src/ats/cli.py"}], "hyperedges": []}

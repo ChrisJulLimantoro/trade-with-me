@@ -1,0 +1,352 @@
+{
+  "nodes": [
+    {
+      "id": "tests_init_py",
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "tests/__init__.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_ats_init_py",
+      "label": "__init__.py",
+      "file_type": "code",
+      "source_file": "src/ats/__init__.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "ats_init_rationale_1",
+      "label": "Agentic Trading System.  See `architecture.md` at the repo root for the high-lev",
+      "file_type": "rationale",
+      "source_file": "src/ats/__init__.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "src_ats_cli_py",
+      "label": "cli.py",
+      "file_type": "code",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "ats_cli_version_cb",
+      "label": "_version_cb()",
+      "file_type": "code",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L26"
+    },
+    {
+      "id": "ats_cli_main_callback",
+      "label": "main_callback()",
+      "file_type": "code",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L33"
+    },
+    {
+      "id": "ats_cli_rationale_1",
+      "label": "ATS CLI — baseline entrypoint.  Each phase extends this module with its own comm",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L1"
+    },
+    {
+      "id": "ats_cli_rationale_44",
+      "label": "No-op root callback; phase commands are registered here.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L44"
+    },
+    {
+      "id": "architecture_document",
+      "label": "Architecture Document",
+      "file_type": "document",
+      "source_file": "architecture.md"
+    },
+    {
+      "id": "readme_document",
+      "label": "README Document",
+      "file_type": "document",
+      "source_file": "README.md"
+    },
+    {
+      "id": "specs_00_overview",
+      "label": "Specs Overview",
+      "file_type": "document",
+      "source_file": "specs/00-overview.md"
+    },
+    {
+      "id": "specs_01_data_collection",
+      "label": "Phase 1: Data Collection",
+      "file_type": "document",
+      "source_file": "specs/01-data-collection.md"
+    },
+    {
+      "id": "specs_02_data_processing",
+      "label": "Phase 2: Data Processing",
+      "file_type": "document",
+      "source_file": "specs/02-data-processing.md"
+    },
+    {
+      "id": "specs_03_orchestration",
+      "label": "Phase 3: Orchestration",
+      "file_type": "document",
+      "source_file": "specs/03-orchestration.md"
+    },
+    {
+      "id": "specs_04_deep_analysis",
+      "label": "Phase 4: Deep Analysis",
+      "file_type": "document",
+      "source_file": "specs/04-deep-analysis.md"
+    },
+    {
+      "id": "specs_05_learning",
+      "label": "Phase 5: Learning",
+      "file_type": "document",
+      "source_file": "specs/05-learning.md"
+    },
+    {
+      "id": "specs_06_ui",
+      "label": "Phase 6: UI",
+      "file_type": "document",
+      "source_file": "specs/06-ui.md"
+    },
+    {
+      "id": "specs_07_skills_and_mcp",
+      "label": "Phase 7: Skills & MCP",
+      "file_type": "document",
+      "source_file": "specs/07-skills-and-mcp.md"
+    },
+    {
+      "id": "ats_cli",
+      "label": "ATS CLI Entrypoint",
+      "file_type": "code",
+      "source_file": "src/ats/cli.py"
+    },
+    {
+      "id": "ats_package",
+      "label": "ATS Package",
+      "file_type": "code",
+      "source_file": "src/ats/__init__.py"
+    },
+    {
+      "id": "skill_cycle_now",
+      "label": "/cycle-now Skill",
+      "file_type": "concept",
+      "source_file": "specs/03-orchestration.md"
+    },
+    {
+      "id": "skill_analyze_symbol",
+      "label": "/analyze-symbol Skill",
+      "file_type": "concept",
+      "source_file": "specs/04-deep-analysis.md"
+    },
+    {
+      "id": "skill_post_mortem",
+      "label": "/post-mortem Skill",
+      "file_type": "concept",
+      "source_file": "specs/05-learning.md"
+    },
+    {
+      "id": "skill_weekly_reflection",
+      "label": "/weekly-reflection Skill",
+      "file_type": "concept",
+      "source_file": "specs/05-learning.md"
+    },
+    {
+      "id": "mcp_server",
+      "label": "MCP Server",
+      "file_type": "code",
+      "source_file": "specs/06-ui.md"
+    }
+  ],
+  "edges": [
+    {
+      "source": "ats_init_rationale_1",
+      "target": "src_ats_init_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/__init__.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ats_cli_py",
+      "target": "typer",
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L10",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ats_cli_py",
+      "target": "ats",
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L12",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ats_cli_py",
+      "target": "ats_cli_version_cb",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L26",
+      "weight": 1.0
+    },
+    {
+      "source": "src_ats_cli_py",
+      "target": "ats_cli_main_callback",
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L33",
+      "weight": 1.0
+    },
+    {
+      "source": "ats_cli_rationale_1",
+      "target": "src_ats_cli_py",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L1",
+      "weight": 1.0
+    },
+    {
+      "source": "ats_cli_rationale_44",
+      "target": "ats_cli_main_callback",
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli.py",
+      "source_location": "L44",
+      "weight": 1.0
+    },
+    {
+      "source": "readme_document",
+      "target": "architecture_document",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md"
+    },
+    {
+      "source": "readme_document",
+      "target": "specs_00_overview",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "README.md"
+    },
+    {
+      "source": "architecture_document",
+      "target": "specs_00_overview",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "architecture.md"
+    },
+    {
+      "source": "specs_00_overview",
+      "target": "specs_01_data_collection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/00-overview.md"
+    },
+    {
+      "source": "specs_02_data_processing",
+      "target": "specs_01_data_collection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/02-data-processing.md"
+    },
+    {
+      "source": "specs_03_orchestration",
+      "target": "specs_02_data_processing",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/03-orchestration.md"
+    },
+    {
+      "source": "specs_04_deep_analysis",
+      "target": "specs_03_orchestration",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/04-deep-analysis.md"
+    },
+    {
+      "source": "specs_05_learning",
+      "target": "specs_04_deep_analysis",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/05-learning.md"
+    },
+    {
+      "source": "specs_06_ui",
+      "target": "specs_05_learning",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/06-ui.md"
+    },
+    {
+      "source": "specs_07_skills_and_mcp",
+      "target": "specs_06_ui",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/07-skills-and-mcp.md"
+    },
+    {
+      "source": "ats_cli",
+      "target": "ats_package",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "src/ats/cli.py"
+    },
+    {
+      "source": "skill_cycle_now",
+      "target": "ats_cli",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "specs/03-orchestration.md"
+    },
+    {
+      "source": "skill_analyze_symbol",
+      "target": "ats_cli",
+      "relation": "calls",
+      "confidence": "INFERRED",
+      "confidence_score": 0.9,
+      "source_file": "specs/04-deep-analysis.md"
+    },
+    {
+      "source": "mcp_server",
+      "target": "specs_06_ui",
+      "relation": "implements",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/06-ui.md"
+    },
+    {
+      "source": "specs_05_learning",
+      "target": "specs_01_data_collection",
+      "relation": "references",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "specs/05-learning.md"
+    }
+  ],
+  "hyperedges": [],
+  "input_tokens": 36877,
+  "output_tokens": 2190
+}

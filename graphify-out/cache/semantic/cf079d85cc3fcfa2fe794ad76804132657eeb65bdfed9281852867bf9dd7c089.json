@@ -1,0 +1,1 @@
+{"nodes": [{"id": "specs_00_overview", "label": "Specs Overview", "file_type": "document", "source_file": "specs/00-overview.md"}], "edges": [{"source": "specs_00_overview", "target": "specs_01_data_collection", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "specs/00-overview.md"}], "hyperedges": []}

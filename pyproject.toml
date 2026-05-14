@@ -1,0 +1,55 @@
+[project]
+name = "ats"
+version = "0.2.0"
+description = "Agentic Trading System — crypto perpetuals signal engine. See architecture.md."
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    # Phase 0 baseline only. Each phase adds its own deps; see specs/00-overview.md.
+    "typer[all]>=0.12",
+    "pydantic>=2.7",
+    "pydantic-settings>=2.3",
+    "structlog>=24.2",
+    "rich>=13.7",
+]
+
+[project.scripts]
+ats = "ats.cli:app"
+
+[build-system]
+requires = ["hatchling"]
+build-backend = "hatchling.build"
+
+[tool.hatch.build.targets.wheel]
+packages = ["src/ats"]
+
+[tool.ruff]
+line-length = 100
+target-version = "py312"
+src = ["src"]
+
+[tool.ruff.lint]
+select = ["E", "F", "I", "N", "UP", "B", "SIM"]
+
+[tool.ruff.lint.isort]
+known-first-party = ["ats"]
+
+[tool.mypy]
+python_version = "3.12"
+strict = true
+ignore_missing_imports = true
+warn_return_any = false
+files = ["src"]
+
+[tool.pytest.ini_options]
+asyncio_mode = "auto"
+testpaths = ["tests"]
+pythonpath = ["src"]
+
+[dependency-groups]
+dev = [
+    "ruff>=0.4",
+    "mypy>=1.10",
+    "pytest>=8.2",
+    "pytest-asyncio>=0.23",
+]

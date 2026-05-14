@@ -1,0 +1,54 @@
+{
+  "/Users/ceje/development/personal/agent-orchestration/tests/__init__.py": {
+    "mtime": 1778602035.703931,
+    "hash": "d41d8cd98f00b204e9800998ecf8427e"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/src/ats/__init__.py": {
+    "mtime": 1778604252.8082604,
+    "hash": "776cea4c5bb3ec7889f9d32303fb7172"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/src/ats/cli.py": {
+    "mtime": 1778604259.4128733,
+    "hash": "0c46bc7c1cff3d9cbafe490e005a8bae"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/architecture.md": {
+    "mtime": 1778638459.5958464,
+    "hash": "b2a606d04efca27dfef6e47184fc5593"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/README.md": {
+    "mtime": 1778604289.753976,
+    "hash": "a620e0f6ecf327f43999eb60d0571aaa"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/00-overview.md": {
+    "mtime": 1778638513.7461824,
+    "hash": "4aa3f3a5d4faa06e859f9750b283fa38"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/03-orchestration.md": {
+    "mtime": 1778638678.8043177,
+    "hash": "e695920ed46012caf03aa612e8e48e4c"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/07-skills-and-mcp.md": {
+    "mtime": 1778638955.9156854,
+    "hash": "df74102972ee06fccd07539a72b1e37b"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/04-deep-analysis.md": {
+    "mtime": 1778638811.5710049,
+    "hash": "ed5dfd0ad612085bba6a07c0f7ad616f"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/05-learning.md": {
+    "mtime": 1778638845.2635126,
+    "hash": "3c709b329b23d1c4afc64a6f22dd0120"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/02-data-processing.md": {
+    "mtime": 1778638621.9790947,
+    "hash": "3cbc845bd3bcea686458e4b705750a93"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/06-ui.md": {
+    "mtime": 1778639496.6731257,
+    "hash": "1fe3b0e599930b29f7a02f2ddbbf2a9c"
+  },
+  "/Users/ceje/development/personal/agent-orchestration/specs/01-data-collection.md": {
+    "mtime": 1778638591.6323164,
+    "hash": "e7cf76ecef5ca7798642a2c5d8c5915c"
+  }
+}
