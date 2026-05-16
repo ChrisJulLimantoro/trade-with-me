@@ -32,7 +32,7 @@ We build in this order because each spec produces inputs the next consumes.
 | 1 | [01-data-collection.md](01-data-collection.md) | M1 | Binance REST + RSS ingestion over ~5 majors. |
 | 2 | [02-data-processing.md](02-data-processing.md) | M1 | Indicators + percentile-rank normalization + regime detection. |
 | 3 | [03-orchestration.md](03-orchestration.md) | M1 | Attention scoring, signal lifecycle, outcome reconciliation. |
-| 4 | [04-deterministic-signal.md](04-deterministic-signal.md) | M1 | Four deterministic agents + synthesizer → structured signal. |
+| 4 | [04-deterministic-signal.md](04-deterministic-signal.md) | M1 | Eight deterministic agents (Structure / Momentum / Funding / Liquidity / PriceAction / CrossVenueFlow / Basis / CVD) + synthesizer → structured signal. |
 | 5 | [05-replay-harness.md](05-replay-harness.md) | M1 | Run the pipeline over 90d of history → hit-rate report. |
 | 6 | [06-decision-gate.md](06-decision-gate.md) | M1 | Numeric go/no-go: does the signal have edge? |
 | 7 | [07-llm-layer.md](07-llm-layer.md) | M2 | LLM agents, ±0.20 hybrid deltas, vision, universe expansion + diversity. |
@@ -67,7 +67,7 @@ M1–M3 run the same code without them.
 | After spec | Python deps added | Infra added | Tables added | CLI / skills added |
 |---|---|---|---|---|
 | 0 (baseline) | `typer`, `pydantic`, `pydantic-settings`, `structlog`, `rich` | — | — | `ats --version`, `ats --help` |
-| 1 | `sqlalchemy[asyncio]`, `asyncpg`, `alembic`, `python-binance`, `httpx`, `feedparser` | Postgres + TimescaleDB + pgvector (local / Neon free / Supabase free) | `candles`, `funding_rates`, `open_interest`, `mark_prices_1m` **[M4]**, `liquidations` **[M4]**, `media_items`, `heartbeats` | `ats db migrate`, `ats ingest backfill`, `ats ingest media-pull`, `ats data status` |
+| 1 | `sqlalchemy[asyncio]`, `asyncpg`, `alembic`, `python-binance`, `httpx`, `feedparser` | Postgres + TimescaleDB + pgvector (local / Neon free / Supabase free) | `candles` (+`taker_buy_vol`), `funding_rates`, `funding_rates_xvenue`, `basis`, `open_interest`, `mark_prices_1m` **[M4]**, `liquidations` **[M4]**, `media_items`, `heartbeats` | `ats db migrate`, `ats ingest backfill`, `ats ingest xvenue-funding`, `ats ingest media-pull`, `ats data status` |
 | 2 | `pandas`, `numpy`, `pandas-ta` | — | `features`, `regimes` | `ats process run/backfill`, `ats regime show` |
 | 3 | — | — | `top_picks`, `signals` | `ats screen run/top/replay`, `ats signal list/show/close`, `ats cycle run --now`, `ats session run` |
 | 4 | — | — | `signals` extended (direction/entry/sl/tp/…), `agent_runs` | `ats analyze`, `ats agent <name> run`, `ats cycle run` |
@@ -82,10 +82,10 @@ M1–M3 run the same code without them.
 
 | Spec | Tier 1 (session, $0 idle) | Tier 2 (scheduled) | Tier 3 (live daemons) |
 |---|---|---|---|
-| 1 — Data collection | REST backfill on session start | Cron → REST backfill | WS streaming + freshness watchdog |
+| 1 — Data collection | REST backfill on session start (Binance + Bybit/OKX/Hyperliquid xvenue funding + premiumIndex) | Cron → REST backfill | WS streaming + freshness watchdog |
 | 2 — Processing | Synchronous in-session compute | Same as Tier 1 | Event-driven on candle-close |
 | 3 — Orchestration | `ats session run` reconciles + cycles in one shot | Cron → `ats session run` | arq worker on candle-close |
-| 4 — Deterministic signal | Inside `session run`; agents called directly | Same as Tier 1 | Same code; queued per top-pick |
+| 4 — Deterministic signal | Inside `session run`; eight agents called directly | Same as Tier 1 | Same code; queued per top-pick |
 | 5 — Replay harness | One-shot `ats replay run` over history | n/a (a validation tool) | n/a |
 | 6 — Decision gate | One-shot `ats gate check` | n/a | n/a |
 | 7 — LLM layer | Inside `session run` | Same as Tier 1 | Queued per top-pick |

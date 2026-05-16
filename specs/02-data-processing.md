@@ -18,7 +18,9 @@
 
 For every closed candle on every supported timeframe:
 
-1. Compute deterministic indicators (ATR, RSI, MACD, EMA, OBV, volume z-score, OI delta, funding z-score, realized vol)
+1. Compute deterministic indicators (ATR, RSI, MACD, EMA, OBV, volume z-score,
+   OI delta, funding z-score, realized vol, **CVD**, **funding divergence**,
+   **basis premium**)
 2. Normalize each component to `[0, 1]` via rolling percentile rank within the symbol
 3. Persist to `features` keyed on `(symbol, timeframe, open_time)`
 
@@ -46,9 +48,11 @@ percentile → 6 cells) and persist to `regimes`.
 
 ## Dependencies on prior phases
 
-- **Phase 1**: `candles`, `funding_rates`, and `open_interest` populated.
-  Feature backfill requires at least 90 days of `candles` per symbol for
-  percentile-rank windows to be meaningful.
+- **Phase 1**: `candles` (incl. `taker_buy_vol`), `funding_rates`,
+  `funding_rates_xvenue`, `open_interest`, and `basis` populated. Feature
+  backfill requires at least 90 days of `candles` per symbol for percentile-rank
+  windows to be meaningful, and at least 30d of `funding_rates_xvenue` /
+  `basis` for the divergence z-scores to be meaningful.
 
 ---
 
@@ -88,6 +92,16 @@ CREATE TABLE features (
   funding_rate         NUMERIC,
   funding_z_30d        NUMERIC,
   realized_vol_30d     NUMERIC,
+  -- order-flow (CVD agent)
+  cvd_30               NUMERIC,                  -- cumulative sum over last 30 closed bars of (2*taker_buy_vol - volume)
+  cvd_slope_10         NUMERIC,                  -- linear-regression slope of cvd_30 over last 10 bars
+  -- cross-venue funding (CrossVenueFlow agent)
+  funding_divergence       NUMERIC,              -- binance_rate - median(peer_rates) at last 8h boundary
+  funding_divergence_z_30d NUMERIC,              -- z-score of funding_divergence over 30d
+  funding_peer_count       INT,                  -- number of non-null peers used (≥2 for the agent to fire)
+  -- perp basis (Basis agent)
+  basis_premium        NUMERIC,                  -- latest premium_index from basis table
+  basis_z_30d          NUMERIC,                  -- z-score of basis_premium over 30d
   -- composite (deterministic)
   momentum_composite   NUMERIC,                  -- blend of RSI/MACD/ROC
   -- normalized: percentile rank within symbol over the last 30d
@@ -97,6 +111,7 @@ CREATE TABLE features (
   pr_oi_delta          NUMERIC,
   pr_funding_imbalance NUMERIC,
   pr_momentum          NUMERIC,
+  pr_cvd_divergence    NUMERIC,                  -- percentile rank of |cvd_slope - price_slope| over 30d
   -- metadata
   computed_at          TIMESTAMPTZ NOT NULL DEFAULT now(),
   feature_version      INT NOT NULL DEFAULT 1,
@@ -126,7 +141,9 @@ CREATE TABLE regimes (
 
 | Path | Responsibility |
 |---|---|
-| `src/ats/processing/indicators.py` | Pure functions: `atr(df, n=14)`, `rsi(df, n=14)`, `macd(df)`, `ema(df, n)`, `obv(df)`, `realized_vol(df, n=30)`. All take a DataFrame, return a Series. No DB. |
+| `src/ats/processing/indicators.py` | Pure functions: `atr(df, n=14)`, `rsi(df, n=14)`, `macd(df)`, `ema(df, n)`, `obv(df)`, `realized_vol(df, n=30)`, **`cvd(df, n=30)`** (cumulative `2*taker_buy_vol - volume`). All take a DataFrame, return a Series. No DB. |
+| `src/ats/processing/xvenue.py` | `funding_divergence(symbol, ts)` — pulls latest peer rates at the ≤ ts 8h boundary, returns `(divergence, peer_count)`; `funding_divergence_z(symbol)` — rolling 30d z-score |
+| `src/ats/processing/basis.py` | `basis_premium(symbol, ts)` — latest pre-ts `premium_index`; `basis_z(symbol)` — rolling 30d z-score |
 | `src/ats/processing/normalize.py` | `percentile_rank(series, lookback)` — robust to fat tails; uses `closed` window only |
 | `src/ats/processing/composite.py` | `momentum_composite(features_row) -> float` blending RSI/MACD/ROC |
 | `src/ats/processing/features.py` | Orchestrator: for `(symbol, tf, open_time)` read candles+derived → compute → upsert features row |
@@ -163,6 +180,32 @@ def momentum_composite(rsi: float, macd_hist: float, roc_5: float) -> float:
     roc_n = 0.5 + 0.5 * np.tanh(roc_5 * 10)
     return 0.5*rsi_n + 0.3*macd_n + 0.2*roc_n
 ```
+
+### New derived features (M1 additions)
+
+All use `closed='left'` rolling — same look-ahead safety rule as the existing
+features. The pytest `tests/test_percentile_rank.py` is extended to cover them.
+
+| Feature | Formula | Lookback | Source |
+|---|---|---|---|
+| `cvd_30` | `cumsum(2*taker_buy_vol - volume)` over last 30 closed bars | 30 bars on each TF | `candles.taker_buy_vol` |
+| `cvd_slope_10` | linear-regression slope of `cvd_30` over last 10 bars | 10 bars | derived from `cvd_30` |
+| `funding_divergence` | `binance_rate - median(peer_rates)` at the last 8h funding boundary ≤ `open_time` | snapshot | `funding_rates_xvenue` |
+| `funding_divergence_z_30d` | z-score of `funding_divergence` over the last 30 days of 8h boundaries | 30d (≈ 90 samples) | derived |
+| `funding_peer_count` | number of non-null peers (Bybit / OKX / Hyperliquid) at the boundary | snapshot | derived |
+| `basis_premium` | most recent `premium_index` from `basis` with `ts ≤ open_time` | snapshot | `basis.premium_index` |
+| `basis_z_30d` | z-score of `basis_premium` over the last 30 days | 30d (≈ 8640 samples @ 5m cadence) | derived |
+| `pr_cvd_divergence` | percentile rank of `\|cvd_slope_10 - price_slope_10\|` over last 30d | 30d | derived |
+
+Special-case rules:
+
+- **`funding_peer_count < 2`** → both `funding_divergence` and
+  `funding_divergence_z_30d` are written as NULL for that bar; CrossVenueFlow
+  (spec 04) treats NULL as "agent returns score=0, direction=neutral, abstain".
+- **`basis` has no row with `ts ≤ open_time`** → `basis_premium` and
+  `basis_z_30d` are NULL; Basis agent abstains the same way.
+- **`taker_buy_vol IS NULL` for any bar in the 30-bar window** → CVD-derived
+  features are NULL for that bar (do not silently zero-fill).
 
 ### Regime detection
 
@@ -221,6 +264,9 @@ regimes               rows: ~720     latest: bull-low  (slope +0.7%/d, vol pct 0
 - [ ] **Idempotent recompute**: `process backfill --since 30d` twice → 0 net new rows the second time
 - [ ] **Latency (Tier 3 only)**: features for a closed 15m bar are materialized within 10 seconds of close (test by reading `computed_at - open_time - 15min`)
 - [ ] **Tier parity**: running `ats process backfill --since 7d` (Tier 1 path) and the equivalent event-driven `ats process watch` runs over the same candles produce **byte-identical** feature rows (same `pr_*`, same composites). A test diffs two runs on a shared fixture.
+- [ ] **CVD identity**: on a 100-bar fixture, `cvd_30[i] == cvd_30[i-1] + (2*taker_buy_vol[i] - volume[i])` for every i where both are non-null.
+- [ ] **Cross-venue NULL semantics**: a fixture with only 1 peer venue → `funding_divergence_z_30d` is NULL for that bar; downstream agent (spec 04) treats NULL as abstain (not zero).
+- [ ] **Basis lookup is causal**: at any `open_time = T`, `basis_premium` resolves to the `basis` row with the largest `ts ≤ T` — no row with `ts > T` ever leaks in (covered by the look-ahead test).
 
 ### pytest
 
@@ -231,6 +277,9 @@ regimes               rows: ~720     latest: bull-low  (slope +0.7%/d, vol pct 0
 | `tests/test_composite.py` | edge inputs (rsi=30, macd=0) → expected boundary outputs |
 | `tests/test_regime.py` | fixture BTC bars → expected regime cell |
 | `tests/test_features_idempotency.py` | repeated upsert on the same key changes nothing material |
+| `tests/test_cvd.py` | fixture candles with known `taker_buy_vol` → expected `cvd_30` and `cvd_slope_10` |
+| `tests/test_funding_divergence.py` | fixture xvenue rates with 0/1/2/3 peers → expected `funding_divergence`, NULL when peer_count < 2 |
+| `tests/test_basis.py` | fixture `basis` rows → expected `basis_premium` and `basis_z_30d`; verify causal lookup at boundary timestamps |
 
 ### `ats process validate`
 

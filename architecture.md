@@ -15,11 +15,16 @@
 
 A signal generator for crypto perpetual futures.
 
-It ingests Binance market data and crypto media, turns the raw stream into
-normalized features, screens the universe for high-attention coins, runs a small
-swarm of narrow analyzers on the top picks, emits a paper-traded signal with
-entry / stop / target / confidence / reasoning, watches the outcome, and learns
-from it.
+It ingests Binance market data, **cross-venue derivatives data** (funding rates
+from Bybit / OKX / Hyperliquid, perp-vs-spot basis), and crypto media; turns the
+raw stream into normalized features; screens the universe for high-attention coins;
+runs a small swarm of narrow deterministic analyzers on the top picks; emits a
+paper-traded signal with entry / stop / target / confidence / reasoning; watches the
+outcome; and learns from it.
+
+The system **only trades on Binance**, but reads from multiple venues to detect
+asymmetric positioning (e.g. Binance funding ≫ Hyperliquid funding → Binance longs
+are crowded). Multi-venue execution is permanently out of scope.
 
 **It does not execute trades.** It is an attention engine and a structured
 signal producer that runs forward in paper mode while it earns trust.
@@ -107,12 +112,14 @@ boundary is load-bearing, so it is stated explicitly. A tempting wrong idea is
 break the system:
 
 - **The LLM never touches ingestion / data collection.** That path is
-  deterministic I/O: fetch from Binance, parse JSON, `INSERT ... ON CONFLICT`. An
-  LLM in that path can *hallucinate a candle*, adds latency and cost, and
-  destroys idempotency — which the replay harness (spec 05) and the decision gate
-  (spec 06) completely depend on. There is no judgment task here. The only LLM
-  contact with media is *classifying already-collected* `media_items` rows
-  (sentiment / narrative) — never the collection itself.
+  deterministic I/O: fetch from Binance / Bybit / OKX / Hyperliquid REST, parse
+  JSON, `INSERT ... ON CONFLICT`. An LLM in that path can *hallucinate a candle*
+  or a funding rate, adds latency and cost, and destroys idempotency — which the
+  replay harness (spec 05) and the decision gate (spec 06) completely depend on.
+  There is no judgment task here. The only LLM contact with media is *classifying
+  already-collected* `media_items` rows (sentiment / narrative) — never the
+  collection itself. The same rule applies to the new cross-venue funding,
+  `premiumIndex`, and `taker_buy_vol` feeds: pure REST, pure SQL, no LLM.
 
 - **The LLM is never the synthesizer.** The synthesizer is arithmetic over agent
   scores — direction vote, weighted mean, alignment penalty, regime modulation,
@@ -194,6 +201,44 @@ and DB writes always live in Python — a `SKILL.md` never contains math.
 
 ---
 
+## Agent inventory
+
+The deterministic signal (spec 04) is produced by **eight narrow agents**, each a
+pure-Python scoring function that takes structured inputs and emits a scalar score
++ direction. The synthesizer combines them with hand-set, version-controlled
+weights. No agent uses an LLM in M1.
+
+This table is the at-a-glance contract: what each agent reads, what it emits, how
+much it weighs in the synthesis, and where it shines. Full per-agent logic
+(pseudocode, invalidation rules, metadata) lives in `specs/04-deterministic-signal.md`.
+
+| Agent | Thesis (one line) | Inputs | Output | M1 weight | Regime affinity | Notes |
+|---|---|---|---|---|---|---|
+| **Structure** | Breakout/breakdown beyond N-bar high with volume confirmation | candles | score, direction | 0.25 | trend regimes | Existing core. M2 gains LLM ±0.20 delta on ambiguous cases (spec 07). |
+| **Momentum** | RSI + MACD on 4h confirms direction of the move | features | score, direction | 0.15 | trend regimes | Existing core. |
+| **Funding** | Extreme funding-z = the crowd is positioned → fade | funding rates, OI features | score, direction | 0.10 | any | Existing core. |
+| **Liquidity** | Volume-weighted swing clusters as proxy for stop pools | candles | score, direction | 0.05 | any | M1 proxy; full liquidation-cluster version requires the M4 WS feed. |
+| **PriceAction** *(new)* | Fresh Fair Value Gap aligned with direction; gap edges supply a refined entry zone | candles | score, direction, `fvg_zone` | 0.15 | any (best in trend) | The only agent that overrides the synthesizer's default entry zone. FVG hold-rate prior ~60% from published forex/index studies; treat as a starting hypothesis until ablation confirms. |
+| **CrossVenueFlow** *(new)* | Persistent funding divergence between Binance and peer CEXs reveals positioning asymmetry → bias against the crowded venue | Binance + Bybit + OKX + Hyperliquid funding REST | score, direction | 0.15 | any | The system's most distinctive data edge — the median retail trader doesn't pull cross-venue funding. REST-only, $0 idle. |
+| **Basis** *(new)* | Perp premium over spot index at a 30d percentile extreme → fade | Binance `premiumIndex` REST | score, direction | 0.10 | range / extremes | Cheap signal cousin of the spot-perp basis trade. |
+| **CVD** *(new)* | Price/CVD divergence (price NH, CVD doesn't) signals hidden distribution / accumulation | `candles.taker_buy_vol` (new column) | score, direction | 0.05 | any | Foundational crypto order-flow signal. Adds one column to `candles`. |
+
+Weights sum to **1.00** and live in `src/ats/orchestration/weights.py` as named
+constants. The **anti-tuning rule applies**: weights stay fixed across replay runs.
+The decision gate (spec 06) may *drop* an agent whose ablation contribution
+is ≤ 0 (per spec 05's ablation matrix), but it never *retunes* the survivors.
+
+When PriceAction's score is high and its direction matches the synthesized direction,
+the synthesizer replaces the default entry zone (current close ± ATR band) with the
+FVG zone edges. This is the only place a single agent influences signal *shape*
+rather than just *confidence*.
+
+The four new agents are deliberately deterministic and REST-only. None of them
+require WebSockets, always-on processes, or LLM calls, so they fit Tier 1
+(`$0` idle) without compromise.
+
+---
+
 ## Operating tiers
 
 The same code base supports three tiers. You start at Tier 1 and only promote
@@ -217,20 +262,24 @@ system). None of these block M1–M3.
 ## The pipeline
 
 ```text
-                   ┌───────────────────────┐
-                   │ Binance REST  (M1)    │ klines, funding, OI
-                   │ News RSS      (M1)    │ media items
-                   │ Binance WS    (M4)    │ + markPrice, liquidations
-                   │ X / Twitter   (M2)    │ + curated accounts
-                   └─────────┬─────────────┘
+                   ┌───────────────────────────────┐
+                   │ Binance REST       (M1)       │ klines (+taker_buy_vol),
+                   │                               │   funding, OI, premiumIndex
+                   │ Bybit / OKX /      (M1)       │ funding REST (cross-venue
+                   │   Hyperliquid REST            │   divergence signal)
+                   │ News RSS           (M1)       │ media items
+                   │ Binance WS         (M4)       │ + markPrice, liquidations
+                   │ X / Twitter        (M2)       │ + curated accounts
+                   └─────────┬─────────────────────┘
                              ▼  SPEC 01 — DATA COLLECTION
                    ┌───────────────────────┐
                    │ Postgres / Timescale  │
                    └─────────┬─────────────┘
                              ▼  SPEC 02 — DATA PROCESSING
                    ┌───────────────────────┐
-                   │ indicators · regime   │  ATR·RSI·MACD·EMA·OBV
-                   │ percentile-rank norm  │  BTC trend × vol percentile
+                   │ indicators · regime   │  ATR·RSI·MACD·EMA·OBV·CVD
+                   │ percentile-rank norm  │  funding_divergence_z · basis_z
+                   │                       │  BTC trend × vol percentile
                    └─────────┬─────────────┘
                              ▼  SPEC 03 — ORCHESTRATION
                    ┌───────────────────────┐
@@ -239,8 +288,11 @@ system). None of these block M1–M3.
                    └─────────┬─────────────┘
                              ▼  SPEC 04 — DETERMINISTIC SIGNAL
                    ┌───────────────────────┐
-                   │ structure · momentum  │  4 deterministic agents
-                   │ funding · liquidity   │  + synthesizer → signal
+                   │ 8 deterministic agents│  Structure · Momentum
+                   │ + synthesizer         │  Funding · Liquidity
+                   │                       │  PriceAction (FVG) · CrossVenueFlow
+                   │                       │  Basis · CVD
+                   │                       │  → entry/sl/tp/confidence
                    └─────────┬─────────────┘   { entry, sl, tp, confidence }
                              ▼  SPEC 05 — REPLAY HARNESS
                    ┌───────────────────────┐
@@ -283,7 +335,7 @@ system). None of these block M1–M3.
 | 1 | [Data Collection](specs/01-data-collection.md) | M1 | Binance REST + RSS ingestion over ~5 majors; hypertables |
 | 2 | [Data Processing](specs/02-data-processing.md) | M1 | per-bar normalized features + global regime tags |
 | 3 | [Orchestration](specs/03-orchestration.md) | M1 | attention ranking, signal state machine, outcome reconciliation |
-| 4 | [Deterministic Signal](specs/04-deterministic-signal.md) | M1 | four deterministic agents + synthesizer → structured signal |
+| 4 | [Deterministic Signal](specs/04-deterministic-signal.md) | M1 | eight deterministic agents (Structure / Momentum / Funding / Liquidity / PriceAction / CrossVenueFlow / Basis / CVD) + synthesizer → structured signal |
 | 5 | [Replay Harness](specs/05-replay-harness.md) | M1 | run the pipeline over 90d history → hit-rate report |
 | 6 | [Decision Gate](specs/06-decision-gate.md) | M1 | numeric go/no-go on whether the signal has edge |
 | 7 | [LLM Layer](specs/07-llm-layer.md) | M2 | LLM agents, ±0.20 hybrid deltas, vision, universe expansion + diversity |

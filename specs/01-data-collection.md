@@ -55,7 +55,10 @@ Persist time-series into Postgres / TimescaleDB tables. Expose ingestion health.
 **In (M1, Tier 1, default):**
 - Fixed ~5-symbol universe (`BTCUSDT, ETHUSDT, SOLUSDT` + 2) hard-coded in
   `seeds/universe_m1.yaml` — no dynamic resolver yet
-- Binance Futures REST: kline backfill (15m, 1h, 4h), funding rates, open interest
+- Binance Futures REST: kline backfill (15m, 1h, 4h, **incl. `taker_buy_vol`**),
+  funding rates, open interest, **premium index** (perp vs spot)
+- **Cross-venue funding REST** from Bybit + OKX + Hyperliquid (free, no auth) for
+  the CrossVenueFlow agent (spec 04)
 - Media (single-pass at session start): RSS via feedparser
 - Persistence: TimescaleDB hypertables for time-series; regular tables for media items and heartbeats
 - `ats data status` as a one-shot CLI inspection command
@@ -112,8 +115,28 @@ Redis is **not** required in Phase 1 and is intentionally deferred to Phase 3.
 ### Binance REST
 - `GET /fapi/v1/fundingRate?symbol=...&limit=1000` — pull latest funding history per symbol every 30 min
 - `GET /fapi/v1/openInterest?symbol=...` — poll every 5 min per symbol
-- `GET /fapi/v1/klines?symbol=...&interval=...&startTime=...` — historical backfill on demand
+- `GET /fapi/v1/premiumIndex?symbol=...` — perp mark vs index spot; poll every 5 min per symbol (feeds the `basis` table and Basis agent)
+- `GET /fapi/v1/klines?symbol=...&interval=...&startTime=...` — historical backfill on demand. **The response field `taker_buy_base_asset_volume` is persisted into `candles.taker_buy_vol`** (feeds CVD agent in spec 04)
 - Rate-limit budget: stay under 1500 weight/min (Binance allows 2400) so we leave headroom
+
+### Cross-venue funding REST (M1)
+
+The CrossVenueFlow agent (spec 04) needs the same-symbol funding rate from peer
+CEXs at the same 8h settlement boundaries. All three endpoints are free, no auth,
+IP-rate-limited.
+
+| Exchange | Endpoint | Symbol form (BTC example) | Cadence |
+|---|---|---|---|
+| Bybit | `GET https://api.bybit.com/v5/market/funding/history?category=linear&symbol=...` | `BTCUSDT` | every 30 min |
+| OKX | `GET https://www.okx.com/api/v5/public/funding-rate-history?instId=...` | `BTC-USDT-SWAP` | every 30 min |
+| Hyperliquid | `POST https://api.hyperliquid.xyz/info` with `{"type":"fundingHistory","coin":"BTC"}` | `BTC` (bare) | every 30 min |
+
+A small `seeds/xvenue_symbols.yaml` maps the M1 universe symbols → per-exchange
+symbols. Missing or unreachable venues are recorded as `disabled` in
+`heartbeats`; the CrossVenueFlow agent runs with whatever peers are present, as
+long as ≥ 2 non-null peers exist for the cycle (otherwise it returns score=0).
+
+All rows land in the new `funding_rates_xvenue` table (see Data model below).
 
 ### Media — X/Twitter
 - Curated account list in `seeds/x_accounts.yaml` (~50 accounts: top crypto analysts, exchanges, project accounts)
@@ -140,12 +163,18 @@ CREATE TABLE candles (
   close          NUMERIC NOT NULL,
   volume         NUMERIC NOT NULL,
   quote_volume   NUMERIC NOT NULL,
+  taker_buy_vol  NUMERIC NOT NULL,        -- aggressive-buy base volume; sell = volume - taker_buy_vol. Feeds CVD agent.
   trades         INT,
   ingested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
   PRIMARY KEY (symbol, timeframe, open_time)
 );
 SELECT create_hypertable('candles', 'open_time', if_not_exists => TRUE);
 ```
+
+`taker_buy_vol` comes directly from the Binance kline payload field
+`taker_buy_base_asset_volume` — no additional REST call. Sell volume is derived
+(`volume - taker_buy_vol`), so the per-bar delta used by CVD is
+`delta = 2 * taker_buy_vol - volume`.
 
 ### funding_rates
 ```sql
@@ -169,6 +198,38 @@ CREATE TABLE open_interest (
   PRIMARY KEY (symbol, ts)
 );
 SELECT create_hypertable('open_interest', 'ts', if_not_exists => TRUE);
+```
+
+### funding_rates_xvenue
+```sql
+CREATE TABLE funding_rates_xvenue (
+  exchange       TEXT NOT NULL,            -- 'binance' | 'bybit' | 'okx' | 'hyperliquid'
+  symbol         TEXT NOT NULL,            -- canonical (BTCUSDT)
+  funding_time   TIMESTAMPTZ NOT NULL,     -- 8h boundary in UTC
+  rate           NUMERIC NOT NULL,
+  ingested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (exchange, symbol, funding_time)
+);
+CREATE INDEX idx_xvenue_funding_lookup
+  ON funding_rates_xvenue (symbol, funding_time DESC);
+```
+
+`binance` rows are duplicated into this table at write time so the CrossVenueFlow
+agent can run a single query against one table. The existing `funding_rates`
+table is preserved for backward compatibility with the M1 Funding agent.
+
+### basis (hypertable)
+```sql
+CREATE TABLE basis (
+  symbol         TEXT NOT NULL,
+  ts             TIMESTAMPTZ NOT NULL,
+  mark_price     NUMERIC NOT NULL,
+  index_price    NUMERIC NOT NULL,
+  premium_index  NUMERIC NOT NULL,         -- (mark - index) / index
+  ingested_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+  PRIMARY KEY (symbol, ts)
+);
+SELECT create_hypertable('basis', 'ts', if_not_exists => TRUE);
 ```
 
 ### liquidations
@@ -242,7 +303,8 @@ CREATE TABLE heartbeats (
 | `alembic/` | migrations; first migration creates all Phase 1 tables + hypertables |
 | `src/ats/ingestion/universe.py` | top-N USDT-perp symbol fetcher (REST); caches in memory |
 | `src/ats/ingestion/binance_ws.py` | WS client; async reconnect with expo backoff; dispatches to writers |
-| `src/ats/ingestion/binance_rest.py` | funding + OI poller; exchange-info refresher |
+| `src/ats/ingestion/binance_rest.py` | funding + OI + premiumIndex poller; exchange-info refresher; writes to `funding_rates`, `funding_rates_xvenue` (binance row), `open_interest`, `basis` |
+| `src/ats/ingestion/xvenue_funding.py` | Bybit + OKX + Hyperliquid funding pollers; writes peer rows to `funding_rates_xvenue` |
 | `src/ats/ingestion/x_poller.py` | tweepy poll; graceful when token absent |
 | `src/ats/ingestion/rss_poller.py` | feedparser poll |
 | `src/ats/ingestion/freshness.py` | heartbeat write helpers + `check_freshness()` |
@@ -265,7 +327,11 @@ CREATE TABLE heartbeats (
 | `kline_1h` | 61 min | `stale` |
 | `kline_4h` | 4h 1m | `stale` |
 | `funding` | 8h 30m | `stale` |
+| `funding_bybit` | 8h 30m | `stale` (or `disabled` if unreachable) |
+| `funding_okx` | 8h 30m | `stale` (or `disabled`) |
+| `funding_hyperliquid` | 8h 30m | `stale` (or `disabled`) |
 | `open_int` | 6 min | `stale` |
+| `basis` | 6 min | `stale` |
 | `mark_price` | 90 sec | `stale` |
 | `media_x` | 65 min | `stale` (or `disabled` if no token) |
 | `media_rss` | 35 min | `stale` |
@@ -280,7 +346,8 @@ budget (= `missing`).
 ```text
 ats db migrate                       # alembic upgrade head
 ats db downgrade --to <rev>          # rare; alembic downgrade
-ats ingest backfill --since 7d       # REST kline + funding + OI backfill (Tier 1: run on session start; defaults to 7d)
+ats ingest backfill --since 7d       # REST kline (+taker_buy_vol) + funding + OI + premiumIndex backfill (Tier 1)
+ats ingest xvenue-funding            # one-shot pull from Bybit + OKX + Hyperliquid (Tier 1: run on session start)
 ats ingest media-pull                # one-shot RSS + X(optional) pull (Tier 1: run on session start)
 ats ingest start                     # [Tier 3] WS + continuous pollers + freshness watchdog until SIGINT
 ats data status                      # heartbeats + row counts (one-shot)
@@ -305,25 +372,34 @@ the operator's process supervisor.
 uv run ats db migrate
 # 2. One-shot REST backfill — proves the entire Tier 1 ingestion path
 uv run ats ingest backfill --since 7d --symbols BTCUSDT,ETHUSDT
-# 3. One-shot media pull (RSS always, X if token set)
+# 3. One-shot cross-venue funding pull (Bybit + OKX + Hyperliquid)
+uv run ats ingest xvenue-funding --symbols BTCUSDT,ETHUSDT
+# 4. One-shot media pull (RSS always, X if token set)
 uv run ats ingest media-pull
-# 4. Inspect
+# 5. Inspect
 uv run ats data status
 ```
 
 Expected `data status` output (Tier 1):
 
 ```
-data_class      status   last_seen           rows_total
-kline_15m       ok       <session ago        ~672 (7d × 96)
-kline_1h        ok       <session ago        ~168
-kline_4h        ok       <session ago        ~42
-funding         ok       <session ago        ~21
-open_int        ok       <session ago        ~21    (REST snapshots at session)
-mark_price      n/a      —                   0       (Tier 3 only)
-media_rss       ok       <session ago        ≥10
-media_x         ok|disabled                  varies
+data_class              status         last_seen           rows_total
+kline_15m               ok             <session ago        ~672 (7d × 96)
+kline_1h                ok             <session ago        ~168
+kline_4h                ok             <session ago        ~42
+funding                 ok             <session ago        ~21
+funding_bybit           ok|disabled    <session ago        ~21
+funding_okx             ok|disabled    <session ago        ~21
+funding_hyperliquid     ok|disabled    <session ago        ~21
+open_int                ok             <session ago        ~21    (REST snapshots at session)
+basis                   ok             <session ago        ~21
+mark_price              n/a            —                   0       (Tier 3 only)
+media_rss               ok             <session ago        ≥10
+media_x                 ok|disabled                        varies
 ```
+
+The cross-venue funding rows may show `disabled` for any peer the symbol mapping
+or network can't reach — CrossVenueFlow handles partial peer sets (requires ≥ 2).
 
 ### Tier 3 smoke test — 30 min run (only after promoting)
 
@@ -347,6 +423,11 @@ Expected: every data-class in `ok` state with realistic ages (e.g., `kline_15m` 
 - [ ] **No daemons**: after `ats ingest backfill` exits, `ps aux | grep ats` shows nothing
 - [ ] **One-shot status**: `ats data status` runs without a background ingester and reports row counts from Postgres
 - [ ] **X graceful skip**: with `X_BEARER_TOKEN` unset, `ats ingest media-pull` completes successfully and reports `media_x: disabled` in the next `ats data status`
+- [ ] **taker_buy_vol persisted**: after backfill, `SELECT COUNT(*) FROM candles WHERE taker_buy_vol IS NULL OR taker_buy_vol > volume` returns 0
+- [ ] **Cross-venue funding pulled**: after `ats ingest xvenue-funding`, `SELECT COUNT(DISTINCT exchange) FROM funding_rates_xvenue WHERE symbol='BTCUSDT'` returns ≥ 2 (at least 2 peer venues reachable) plus 1 for `binance`
+- [ ] **Cross-venue graceful skip**: blocking Hyperliquid at the network layer → `funding_hyperliquid` heartbeat shows `disabled`, other peers continue, no exceptions surface to the CLI
+- [ ] **Basis populated**: after backfill, `SELECT COUNT(*) FROM basis WHERE symbol='BTCUSDT'` returns ≥ 1 per polled cadence
+- [ ] **xvenue idempotency**: re-running `ats ingest xvenue-funding` produces zero net new rows for funding boundaries already stored
 
 ### Acceptance criteria — Tier 3 (only required when promoting)
 
@@ -365,6 +446,10 @@ Expected: every data-class in `ok` state with realistic ages (e.g., `kline_15m` 
 | `tests/test_universe.py` | top-N filter excludes delisted symbols and respects N |
 | `tests/test_backfill_idempotency.py` | run backfill twice on the same window → zero net inserts the second time |
 | `tests/test_markprice_downsample.py` | 60 1s samples → 1 1m row with correct OHLC |
+| `tests/test_taker_buy_vol_parse.py` | given fixture kline payload, `taker_buy_vol` matches `taker_buy_base_asset_volume` and `0 ≤ taker_buy_vol ≤ volume` |
+| `tests/test_xvenue_funding_parse.py` | given fixture Bybit/OKX/Hyperliquid responses, parsed rows have aligned `funding_time` at the 8h UTC boundary |
+| `tests/test_xvenue_symbol_mapping.py` | `seeds/xvenue_symbols.yaml` resolves BTCUSDT → `BTC-USDT-SWAP` (OKX) / `BTC` (HL); missing mapping → peer excluded for that symbol |
+| `tests/test_basis_parse.py` | given fixture `premiumIndex` payload, `(mark - index) / index` matches the returned `premium_index` field within 1e-9 |
 
 ### `ats data validate`
 
@@ -386,3 +471,6 @@ A one-shot command that:
 - **Universe drift** — top-50 changes daily; we re-resolve every 6h. Symbols that fall out of the top-50 are NOT pruned from `candles` (keep the history).
 - **Clock skew** — Binance ts is authoritative; local clock is for nothing. We never compare `now()` to `open_time` without aligning to bar boundaries.
 - **`media_items.body` size** — RSS articles can be long. Truncate `body` to 10 KB on insert; full content is recoverable via the URL.
+- **Cross-venue clock skew at funding boundaries** — Bybit / OKX / Hyperliquid all settle at the same 00/08/16 UTC ticks, but their REST may surface a new rate a few seconds before or after Binance. Normalize to the nearest 8h boundary before diffing in spec 02. Never compare rates with mismatched `funding_time`.
+- **Hyperliquid coin naming** — uses bare `BTC` not `BTCUSDT`. The `seeds/xvenue_symbols.yaml` mapping is the single source of truth; missing entries are silently excluded (logged once at WARN). Adding a new universe symbol requires extending the mapping.
+- **`premiumIndex` cadence** — the endpoint is cheap, but `basis` rows accumulate at 5-min cadence × N symbols × 30d → ~8.6k rows/symbol. Compact via TimescaleDB retention policy in M4 if it ever becomes a problem; in M1 it's negligible.

@@ -40,8 +40,10 @@ the gate* — never after seeing a result.
 
 ## Dependencies on prior specs
 
-- **Spec 05:** a completed `ats replay run` over a ≥ 90d window for the
-  ~5-symbol universe, producing the `paper_trades` set and the report.
+- **Spec 05:** a completed `ats replay run --ablate` over a ≥ 90d window for the
+  ~5-symbol universe, producing the `paper_trades` set, the report, and the
+  per-agent ablation matrix (`ablation.json`). The `--ablate` flag is required
+  for the gate to evaluate G7 (see below).
 
 ---
 
@@ -64,6 +66,7 @@ of available history for the M1 universe.
 | G4 | **Confidence is informative** | hit rate is **monotonically non-decreasing** across the `[0.6,0.7)`, `[0.7,0.8)`, `[0.8,1.0]` confidence buckets, each bucket with n ≥ 10 | If higher confidence doesn't mean higher hit rate, the synthesizer's confidence number is decoration. This is the single most important criterion. |
 | G5 | **Not regime-fragile** | the signal is positive-expectancy in **at least 2 of the 4** regime cells that have n ≥ 10 | A signal that only works in `bull-low` is a bull-market beta trade, not edge. |
 | G6 | **No single-symbol artifact** | no single symbol contributes > 50% of total positive expectancy | Guards against "it's really just the SOL run in March". |
+| G7 | **At least one new agent earns its weight** | at least **two** of the four new M1 agents (PriceAction, CrossVenueFlow, Basis, CVD) have ablation contribution < 0 (i.e. removing them makes the signal materially worse) | If *all four* new agents are CANDIDATE TO DROP, the addition has not paid for itself — the deterministic signal that passed G1–G6 is actually just Structure + Momentum + Funding + Liquidity (the original four). That outcome is still a `GO` for the original 4-agent system, but it requires explicitly dropping the new agents from the synthesizer before declaring GO — leaving them in adds noise without edge. |
 
 **Result logic:**
 
@@ -71,7 +74,22 @@ of available history for the M1 universe.
   backfill more history or widen the window, then re-run.
 - **G1 passes, any of G2–G6 fail** → `NO-GO (no edge)`. The deterministic signal
   does not clear the bar. Go to "If the gate is red" below.
+- **G1–G6 pass, G7 fails** → `GO (after dropping new agents)`. The original
+  four-agent signal has edge; the four new M1 additions did not earn their
+  weight. The gate **drops** the CANDIDATE TO DROP agents (arithmetically
+  renormalizing the surviving weights), persists the new weight set to
+  `data/gate_<date>_weights.json`, and the operator commits that change to
+  `src/ats/orchestration/weights.py` in a standalone commit before proceeding
+  to spec 07.
 - **All pass** → `GO`. M1 is complete. Proceed to spec 07.
+
+**Allowed action vs. forbidden action.** The gate's *only* authorized
+modification to the agent set is **dropping** agents whose ablation
+contribution is ≤ 0. It does **not** re-weight survivors based on the ablation
+deltas. The renormalization after a drop is pure arithmetic (each surviving
+weight ÷ sum of surviving weights). Treating ablation deltas as suggested new
+weights is exactly the anti-goal "no backtesting-driven optimization before
+forward validation."
 
 ---
 
@@ -87,14 +105,23 @@ Output:
 ```
 DECISION GATE — 2026-05-13  (replay window 2026-02-12 → 2026-05-13)
 
-G1 sample size            50+ trades        86      PASS
-G2 expectancy vs random   +0.10 R & >base   +0.21 R vs -0.01 R   PASS
-G3 hit rate vs break-even >= be + 5pts      0.465 vs 0.38        PASS
-G4 confidence monotonic   non-decreasing    0.39 < 0.50 < 0.60   PASS
-G5 regime breadth         >=2/4 positive    3/4 positive         PASS
-G6 no single-symbol >50%  <=50%             BTC 34%              PASS
+G1 sample size            50+ trades             86                   PASS
+G2 expectancy vs random   +0.10 R & >base        +0.21 R vs -0.01 R   PASS
+G3 hit rate vs break-even >= be + 5pts           0.465 vs 0.38        PASS
+G4 confidence monotonic   non-decreasing         0.39 < 0.50 < 0.60   PASS
+G5 regime breadth         >=2/4 positive         3/4 positive         PASS
+G6 no single-symbol >50%  <=50%                  BTC 34%              PASS
+G7 >=2 new agents earn    >=2/4 contribution<0   3/4 negative         PASS
+                                                 (PriceAction -2.2%,
+                                                  CrossVenue -2.8%,
+                                                  Basis -0.9%,
+                                                  CVD +0.0% → drop)
 
-VERDICT: GO  →  M1 complete. Proceed to spec 07 (M2 — LLM Layer).
+new-agent dropped: cvd  (renormalized weights persisted to
+                          data/gate_2026-05-13_weights.json — commit and re-run
+                          before proceeding to spec 07)
+
+VERDICT: GO (after dropping cvd)  →  M1 complete. Proceed to spec 07 (M2 — LLM Layer).
 
 rationale written to data/gate_2026-05-13.md
 ```
@@ -109,8 +136,9 @@ auditable later.
 
 | Path | Responsibility |
 |---|---|
-| `src/ats/gate/criteria.py` | the six criteria as pure functions over a `paper_trades` set; thresholds as module constants |
-| `src/ats/gate/verdict.py` | combine criteria → `GO` / `NO-GO` + reason |
+| `src/ats/gate/criteria.py` | the seven criteria as pure functions over a `paper_trades` set + `ablation.json`; thresholds as module constants |
+| `src/ats/gate/verdict.py` | combine criteria → `GO` / `GO (after dropping ...)` / `NO-GO` + reason |
+| `src/ats/gate/drop.py` | given the ablation matrix, compute the dropped-agent set and renormalized weights; writes `data/gate_<date>_weights.json` |
 | `src/ats/gate/report.py` | render `data/gate_<date>.md` |
 | `src/ats/cli/gate.py` | `ats gate check`, `ats gate validate` |
 
@@ -151,12 +179,14 @@ check`. Do not re-define the thresholds in this file to make a result pass.
 
 ### Acceptance criteria
 
-- [ ] **Thresholds are constants:** G1–G6 thresholds live in `criteria.py` as named constants, not inline magic numbers
-- [ ] **Fixture GO:** a synthetic `paper_trades` set engineered to pass all six → `ats gate check` exits 0, verdict `GO`
-- [ ] **Fixture NO-GO (each criterion):** six synthetic sets, each engineered to fail exactly one criterion → verdict `NO-GO` naming that criterion
-- [ ] **G1 short-circuit:** a 20-trade set → `NO-GO (insufficient data)`, criteria G2–G6 reported as `not evaluated`
-- [ ] **Rationale artifact:** every `ats gate check` writes `data/gate_<date>.md` with all six values and the verdict
-- [ ] **Exit codes:** `GO` → exit 0, any `NO-GO` → exit 1
+- [ ] **Thresholds are constants:** G1–G7 thresholds live in `criteria.py` as named constants, not inline magic numbers
+- [ ] **Fixture GO (all clean):** a synthetic `paper_trades` + ablation set engineered to pass all seven → `ats gate check` exits 0, verdict `GO`
+- [ ] **Fixture GO with drop:** a synthetic set where G1–G6 pass but one new agent has ablation ≥ 0 → verdict `GO (after dropping <agent>)`, exits 0, writes `data/gate_<date>_weights.json` with renormalized weights summing to 1.0
+- [ ] **Fixture NO-GO (each criterion):** seven synthetic sets, each engineered to fail exactly one criterion → verdict `NO-GO` naming that criterion
+- [ ] **G1 short-circuit:** a 20-trade set → `NO-GO (insufficient data)`, criteria G2–G7 reported as `not evaluated`
+- [ ] **Rationale artifact:** every `ats gate check` writes `data/gate_<date>.md` with all seven values and the verdict
+- [ ] **Drop never tunes:** a CI test asserts `data/gate_<date>_weights.json` is produced *only* by arithmetic renormalization of the kept agents — no weight value differs from `original_weight / sum_of_kept_weights`
+- [ ] **Exit codes:** `GO` (with or without drop) → exit 0, any `NO-GO` → exit 1
 
 ### pytest
 
@@ -164,8 +194,10 @@ check`. Do not re-define the thresholds in this file to make a result pass.
 |---|---|
 | `tests/test_gate_criteria.py` | each criterion function on hand-built fixtures |
 | `tests/test_gate_verdict_go.py` | all-pass fixture → GO |
+| `tests/test_gate_verdict_go_with_drop.py` | G7 partial fail (one new agent ≥ 0) → GO (after dropping ...) + correct renormalized weights file |
 | `tests/test_gate_verdict_nogo.py` | one-fail fixtures → NO-GO naming the criterion |
 | `tests/test_gate_g1_shortcircuit.py` | < 50 trades → insufficient-data verdict |
+| `tests/test_gate_drop_is_arithmetic.py` | renormalized weights == `kept_original / sum(kept_originals)` — no tuning |
 
 ### `ats gate validate`
 
@@ -182,6 +214,10 @@ check`. Do not re-define the thresholds in this file to make a result pass.
   threshold genuinely seems wrong, change it in a standalone commit *with
   reasoning*, before the next gate run — never as a reaction to a specific
   failing number.
+- **Drop-then-tune temptation.** After G7 drops an agent, the gate hands the
+  operator a renormalized weight set. The discipline to maintain: commit that
+  weight set as-is and re-run. Do not "while I'm in there, also bump
+  Structure a bit." That bump is exactly the search the architecture forbids.
 - **90d may straddle one regime.** Crypto can spend a quarter entirely in one
   regime, weakening G5. If the available history is regime-monotone, note it in
   the rationale and treat a GO as provisional — the forward paper trades in M2

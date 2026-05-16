@@ -39,14 +39,21 @@ pipeline into a measurable artifact.
 **In:**
 - A historical cycle walker with hard no-look-ahead guarantees
 - Reuse of spec 03's `run_cycle()` and Tier-1 candle-replay reconciliation
-- Reuse of spec 04's deterministic synthesizer
+- Reuse of spec 04's deterministic synthesizer (eight agents)
 - A `paper_trades` table (the same shape spec 08 will reuse for the live loop)
 - A hit-rate report: overall, by regime, by confidence bucket, with sample size
   and a random/buy-and-hold baseline for comparison
+- **A per-agent ablation matrix**: re-runs the same replay window 8 times, each
+  with one agent's weight set to 0 (and the remaining weights renormalized), and
+  reports the delta vs baseline. The decision gate (spec 06) reads this matrix.
 - `data/replay_<window>/` file artifacts for human audit
 
 **Out:**
 - No weight tuning, no parameter search, no optimization loop (anti-goal)
+- **The ablation matrix is not weight tuning.** It measures the marginal
+  contribution of each agent at its *current* weight. The gate may *drop* an
+  agent whose contribution is ≤ 0; it may never *retune* the survivors. There
+  is no search over weight values.
 - No LLM (M1 is deterministic; the harness re-runs in M2 once spec 07 lands, but
   that is an M2 use of the same tool)
 - No live outcome tracking — that is spec 08
@@ -190,7 +197,64 @@ data/replay_2026-02-12_2026-05-13/
   report.md              # the report above, as markdown
   by_regime.json
   by_confidence.json
+  ablation.md            # the ablation matrix (see next section)
+  ablation.json          # machine-readable ablation deltas
 ```
+
+---
+
+## Per-agent ablation matrix
+
+After the baseline replay completes and writes `paper_trades`, the harness reruns
+the **same** cycle walk N additional times (N = number of agents = 8 in M1). On
+each rerun, one agent's weight is set to 0 and the remaining weights are
+renormalized to sum to 1.0 (arithmetic division — *not* a search). The reruns are
+deterministic on the same candle history.
+
+For each rerun, the harness recomputes the same headline metrics (hit rate,
+expectancy, signals_count) and reports the **delta vs baseline**.
+
+```
+ats replay run --since 90d --ablate           # baseline + 8 ablation runs
+ats replay report                              # prints the table below
+```
+
+Output (printed at the tail of the report, also written to `ablation.md`):
+
+```
+ABLATION MATRIX (90d, ~5 symbols, baseline = all 8 agents)
+
+agent           hit_rate_delta   expectancy_delta   signals_delta   verdict
+structure         -3.1%             -0.18 R            -2            earns weight
+momentum          -1.4%             -0.07 R            -1            earns weight
+funding           -0.6%             -0.03 R             0            earns weight
+liquidity         +0.1%             +0.01 R             0            CANDIDATE TO DROP
+price_action      -2.2%             -0.12 R            -3            earns weight
+cross_venue       -2.8%             -0.15 R            -1            earns weight
+basis             -0.9%             -0.05 R             0            earns weight
+cvd               -0.3%             -0.02 R             0            earns weight (marginal)
+```
+
+**How to read this.** A *negative* delta means removing that agent made the
+signal *worse* (the agent earned its weight). A *non-negative* delta means the
+agent contributed nothing or hurt — it is flagged `CANDIDATE TO DROP` and the
+decision gate (spec 06) may drop it before declaring GO.
+
+**This is measurement, not optimization.** Concretely:
+
+- The harness never searches over weight values. Each rerun uses the *fixed*
+  current weights minus the ablated agent's weight (renormalized).
+- The "drop" decision is binary (keep or drop), not a continuous tuning knob.
+- After a drop, the surviving weights are again *arithmetically* renormalized,
+  never re-discovered.
+- The matrix is computed once per replay run. Repeated runs against the same
+  candle history produce byte-identical matrices.
+
+The ablation runs cost ~8× the baseline replay's CPU; on the M1 ~5-symbol
+universe this is still seconds-to-minutes total. The cost grows linearly with
+agent count, which is fine for the M1 8-agent set and remains tolerable through
+M2 (~10 agents with sentiment + narrative added). Beyond that, sampling
+strategies become worth considering — out of scope here.
 
 ---
 
@@ -202,7 +266,8 @@ data/replay_2026-02-12_2026-05-13/
 | `src/ats/replay/journal.py` | `journal_paper_trade()` — writes a `paper_trades` row |
 | `src/ats/replay/reconcile.py` | thin wrapper over spec 03's candle-replay closer; `close_paper_trade()` |
 | `src/ats/replay/report.py` | aggregations + baselines → `report.md` + JSON |
-| `src/ats/cli/replay.py` | `ats replay run`, `ats replay report` |
+| `src/ats/replay/ablation.py` | runs the per-agent ablation loop; writes `ablation.md` + `ablation.json` |
+| `src/ats/cli/replay.py` | `ats replay run [--ablate]`, `ats replay report` |
 
 `close_paper_trade()` lives here and is **reused unchanged by spec 08** — so a
 replay-closed trade and a live-closed trade are the same kind of object.
@@ -212,9 +277,9 @@ replay-closed trade and a live-closed trade are the same kind of object.
 ## CLI added
 
 ```text
-ats replay run --since 90d [--symbols ...]   # walk history, journal + reconcile paper trades
-ats replay report [--window <id>]            # re-print the report for a completed replay
-ats replay validate                          # programmatic smoke test
+ats replay run --since 90d [--symbols ...] [--ablate]   # walk history, journal + reconcile paper trades; --ablate adds the 8-agent ablation matrix
+ats replay report [--window <id>]                       # re-print the report for a completed replay (incl. ablation if present)
+ats replay validate                                     # programmatic smoke test
 ```
 
 ---
@@ -239,6 +304,9 @@ uv run ats replay report
 - [ ] **Report completeness:** the report always includes the random-entry baseline and a by-regime breakdown; missing either fails the test
 - [ ] **Sample-size honesty:** if the window produces < 30 closed trades, the report prints a prominent "INSUFFICIENT SAMPLE" banner (the decision gate, spec 06, will hard-fail on it)
 - [ ] **Coverage:** every emitted `active` signal in the window has exactly one `paper_trades` row; every `paper_trades` row reaches `status='closed'`
+- [ ] **Ablation determinism:** `ats replay run --since 90d --ablate` run twice on the same candle history produces byte-identical `ablation.json`
+- [ ] **Ablation arithmetic:** in each ablation rerun, `sum(active_weights) == 1.0` (renormalized correctly); a unit test asserts the renormalization on a fixed weight set
+- [ ] **Ablation only drops, never tunes:** a CI test asserts the harness never writes a weight value to `src/ats/orchestration/weights.py`; the ablation report only produces deltas + the binary "CANDIDATE TO DROP" label
 
 ### pytest
 
@@ -249,6 +317,8 @@ uv run ats replay report
 | `tests/test_replay_reconcile_conservatism.py` | sl-and-tp-same-bar → sl |
 | `tests/test_replay_closer_parity.py` | replay closer == spec 03 session closer |
 | `tests/test_replay_report.py` | fixture trade set → expected report numbers + baselines present |
+| `tests/test_replay_ablation.py` | fixture replay → 8 ablation rows; one row's weight set to 0 → expected renormalized weights; positive delta → `CANDIDATE TO DROP` label |
+| `tests/test_replay_ablation_no_tune.py` | running `--ablate` does not write to `src/ats/orchestration/weights.py` (file mtime unchanged) |
 
 ### `ats replay validate`
 
@@ -268,6 +338,13 @@ uv run ats replay report
   reflection (with real forward data) is the only thing that authorizes weight
   changes. If you must explore, do it openly and treat the result as a hypothesis
   to be confirmed forward — never as a validated config.
+- **The temptation to misuse the ablation matrix.** The matrix exists for one
+  decision only: should an agent with ≤ 0 marginal contribution be dropped?
+  Looking at the matrix and inventing a new weight ("CrossVenueFlow contributed
+  -2.8% — let's raise its weight to 0.20!") is exactly the overfitting the
+  anti-goal forbids. The harness enforces this structurally: it produces deltas
+  and a binary `CANDIDATE TO DROP` flag, and does not surface any "suggested
+  weight" field. Adding such a field is itself a violation.
 - **Fill assumptions.** Replay assumes immediate fill at `entry_price`. Apply an
   optional 5 bps slippage haircut for honest accounting; document the limitation.
 - **Bar-resolution outcomes.** 15m candles can't tell you intra-bar ordering. The

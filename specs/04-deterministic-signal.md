@@ -1,9 +1,11 @@
 # Spec 04 — Deterministic Signal · Milestone M1
 
-> Four narrow **deterministic** scorers run on the same structured input. The
+> Eight narrow **deterministic** scorers run on the same structured input. The
 > synthesizer combines them into a structured signal: direction, entry zone, SL,
-> TP, confidence, reasons. **No LLM. No vision. No multi-venue data.** This is
-> the entire M1 signal — the thing the decision gate (spec 06) judges.
+> TP, confidence, reasons. **No LLM. No vision.** Multi-venue data is allowed
+> (Bybit / OKX / Hyperliquid funding REST + Binance `premiumIndex`) but only as
+> a *signal*: the system still trades only on Binance. This is the entire M1
+> signal — the thing the decision gate (spec 06) judges.
 >
 > The LLM-assisted half (sentiment, narrative, ±0.20 hybrid deltas, chart
 > vision) is deliberately split out into `specs/07-llm-layer.md` (M2). Do not
@@ -20,12 +22,13 @@
 
 For each top pick produced by spec 03:
 
-1. Run four deterministic agents against shared inputs
+1. Run **eight** deterministic agents against shared inputs
 2. Synthesize a structured signal: direction, entry zone, SL, TP, confidence, reasons
 3. Apply an alignment penalty (disagreement → lower confidence)
 4. Apply regime modulation
-5. Enforce a 1:2 minimum risk-reward
-6. Promote the signal from `proposed` to `active` or `expired`
+5. **Override the entry zone with the PriceAction FVG zone if PriceAction's score and direction qualify**
+6. Enforce a 1:2 minimum risk-reward
+7. Promote the signal from `proposed` to `active` or `expired`
 
 The output is a fully traceable signal: every field reduces to numbers from
 spec 02's features and spec 01's raw data. No "vibes" anywhere.
@@ -37,12 +40,14 @@ spec 02's features and spec 01's raw data. No "vibes" anywhere.
 **Milestone:** M1 — Prove Edge.
 
 **In:**
-- Four deterministic agents: Structure, Momentum, Funding, Liquidity
+- Eight deterministic agents: Structure, Momentum, Funding, Liquidity,
+  PriceAction (FVG), CrossVenueFlow, Basis, CVD
 - Synthesizer: direction vote, alignment penalty, regime modulation, SL/TP
-  rules, RR floor, confidence threshold, sizing
+  rules, **FVG entry-zone override**, RR floor, confidence threshold, sizing
 - `signals` table extension (direction/entry/sl/tp/confidence/…)
 - `agent_runs` audit table
 - Deterministic `reasons[]` (template-rendered from the signal fields — no LLM)
+- **Per-agent ablation reporting hook** (consumed by spec 05's replay harness)
 
 **Out (→ spec 07, M2):**
 - Sentiment agent, Narrative agent (LLM-only)
@@ -64,8 +69,12 @@ spec 02's features and spec 01's raw data. No "vibes" anywhere.
 ## Dependencies on prior specs
 
 - **Spec 03:** `top_picks` and `signals` (proposed status) produced per cycle
-- **Spec 02:** `features` and `regimes` populated
-- **Spec 01:** `candles`, `funding_rates`, `open_interest` populated
+- **Spec 02:** `features` and `regimes` populated, including the new derived
+  features (`cvd_30`, `cvd_slope_10`, `funding_divergence`,
+  `funding_divergence_z_30d`, `funding_peer_count`, `basis_premium`,
+  `basis_z_30d`, `pr_cvd_divergence`)
+- **Spec 01:** `candles` (with `taker_buy_vol`), `funding_rates`,
+  `funding_rates_xvenue`, `open_interest`, `basis` populated
 
 ---
 
@@ -206,50 +215,287 @@ class Agent(Protocol):
 
 ---
 
+### PriceAction (FVG, Option 2 — score + entry-zone override)
+
+**Thesis.** A 3-candle Fair Value Gap left during an impulse is unfilled imbalance:
+the middle candle moves so strongly that candle[i-2].high and candle[i].low (bullish)
+or candle[i-2].low and candle[i].high (bearish) don't overlap. Published forex/index
+studies show ~60% of FVGs hold (don't get fully mitigated within the same session)
+when measured by close. No clean crypto-perp study exists, so this number is a
+**prior, not a guarantee** — the replay harness (spec 05) is what tells us if it
+holds on Binance perps. When a fresh FVG aligns with the structural direction, two
+things happen: (a) confidence rises, (b) the gap edges become a tighter entry zone
+than the breakout close, mechanically improving RR because the gap sits closer to
+the structural invalidation point.
+
+**Logic (deterministic).**
+
+```text
+inputs:  recent_ohlcv (4h primary), atr_4h, current_close, structure_direction
+window:  last 5 closed 4h candles
+
+1. detect FVG on each rolling 3-candle window i:
+   bullish_fvg if candle[i-2].high < candle[i].low      # gap below current price
+   bearish_fvg if candle[i-2].low  > candle[i].high     # gap above current price
+
+2. for the most recent gap within the window:
+   gap_size       = |candle[i-2].high - candle[i].low|   (or symmetric for bearish)
+   relative_size  = gap_size / atr_4h
+   age_bars       = i_now - i_gap
+
+3. direction_alignment_bonus = 1.0  if FVG direction matches structure_direction
+                               0.3  otherwise
+
+   score = clamp(relative_size, 0, 1) * direction_alignment_bonus
+
+4. direction = 'long'    if bullish_fvg
+              'short'    if bearish_fvg
+              'neutral'  if no qualifying gap
+
+5. metadata.fvg_zone (the candidate entry zone for the synthesizer's override):
+   bullish: [candle[i-2].high, candle[i].low]
+   bearish: [candle[i].high,  candle[i-2].low]
+
+6. metadata.fvg_age_bars = age_bars
+```
+
+**Invalidation rule.** If the most recent 4h candle closed *through* the gap
+(full close-mitigation), `score = 0`, direction = `neutral`, and no entry-zone
+override is produced. Wick mitigation does not invalidate (consistent with the
+published "by close" measurement convention).
+
+**Synthesizer integration.** See "Entry-zone override" in the Synthesizer section
+below. Briefly: if `score > 0.6` and direction matches the synthesized direction,
+the synthesizer replaces the default `current_close ± ATR band` entry zone with
+`metadata.fvg_zone`. Otherwise the default applies and PriceAction influences only
+confidence.
+
+**M1 deferred (FVG Option 3).** A two-stage `pending → active on retrace` signal
+lifecycle is **explicitly not** in M1. It requires changes to spec 03's signal
+state machine and reduces the closed-signal sample size that spec 06's gate needs
+(many signals would expire without retrace, never reaching `paper_trades`).
+Revisit in M2 only if PriceAction earns its weight in the M1 ablation matrix.
+
+---
+
+### CrossVenueFlow (cross-exchange funding divergence)
+
+**Thesis.** Funding rates on Binance, Bybit, OKX, and Hyperliquid settle at the same
+8h UTC ticks (00:00 / 08:00 / 16:00). Persistent same-symbol divergence across
+venues reflects participant-mix asymmetry — Binance is heavily retail with high
+leverage, Hyperliquid skews professional, OKX and Bybit sit between. Documented
+cross-venue funding-arb APRs of 5.98–11.4% base with 23%+ peaks confirm the spread
+is real and exploitable. The system does **not** execute the arbitrage (multi-venue
+execution is permanently out of scope per `architecture.md`); it uses the
+divergence as a **directional signal**: the venue with extreme funding hosts the
+crowded crowd, and Binance trades are biased *against* that crowd.
+
+**Logic (deterministic).**
+
+```text
+inputs:  features.funding_divergence, features.funding_divergence_z_30d,
+         features.funding_peer_count  (all computed in spec 02 from
+         funding_rates_xvenue)
+
+1. if funding_peer_count < 2:
+       score = 0, direction = 'neutral', metadata.reason = 'insufficient_peers'
+       return
+
+2. z = features.funding_divergence_z_30d
+
+3. score = min(1.0, |z| / 3.0)
+
+4. direction:
+       'short'   if z > +1.5      # Binance funding much higher than peers
+                                  # → Binance longs crowded → fade with short
+       'long'    if z < -1.5      # Binance funding much lower than peers
+                                  # → Binance shorts crowded → fade with long
+       'neutral' otherwise
+
+5. metadata = {
+       binance_rate:    features.funding_rate,
+       divergence:      features.funding_divergence,
+       divergence_z:    z,
+       peer_count:      features.funding_peer_count,
+   }
+```
+
+**Robustness.** A single peer is too noisy to anchor a median, so the agent
+abstains (`score = 0`) when fewer than 2 peers are available for the cycle. The
+spec-01 freshness output makes peer availability visible in `ats data status`.
+
+**No execution implication.** This agent says "Binance longs look crowded" — it
+does **not** instruct the system to short Hyperliquid or arbitrage the spread.
+The signal influences a Binance-only paper trade, nothing more.
+
+---
+
+### Basis (perp premium over spot index)
+
+**Thesis.** Binance publishes a `premiumIndex` per perp expressing
+`(mark - index) / index` — i.e. how far the perp has decoupled from its
+spot-aggregate index. When the 30d z-score of premium hits an extreme,
+late-arriving longs / shorts have stacked the perp at a premium / discount that
+has historically mean-reverted. This is the *signal version* of the spot-perp
+basis trade (which itself shows 18% APY base / 31% with prediction when executed
+as a delta-neutral arb). As a signal-only input, the edge is weaker than the
+arb's, but it's free, REST-only, and orthogonal to candle-based indicators.
+
+**Logic (deterministic).**
+
+```text
+inputs:  features.basis_premium, features.basis_z_30d
+         (both computed in spec 02 from the `basis` table)
+
+1. if basis_z_30d IS NULL  (basis row missing or warm-up not complete):
+       score = 0, direction = 'neutral', metadata.reason = 'no_basis'
+       return
+
+2. z = features.basis_z_30d
+
+3. score = min(1.0, |z| / 3.0)
+
+4. direction:
+       'short'   if z > +2.0      # perp very rich vs spot → fade
+       'long'    if z < -2.0      # perp very cheap vs spot → fade
+       'neutral' otherwise
+
+5. metadata = {
+       premium_index: features.basis_premium,
+       basis_z:       z,
+   }
+```
+
+**Regime affinity.** This agent is at its best at range / extremes; in strong
+trend regimes the basis can stay one-sided for days and the agent will fire
+direction-against-trend, which the synthesizer's alignment penalty correctly
+penalizes. That is the intended behavior — Basis exists *to disagree* in
+extreme conditions, and the synthesizer aggregates the disagreement.
+
+---
+
+### CVD (cumulative volume delta divergence)
+
+**Thesis.** CVD = cumulative `(taker_buy_vol - taker_sell_vol)` per bar. When
+price makes a new high but CVD does not (or vice versa), aggressive buying isn't
+confirming the move — distribution. Symmetric for new lows. CVD is foundational
+in crypto perp order-flow (Cryptocred's guide, Bookmap, Phemex Academy all treat
+it as a core indicator).
+
+**Logic (deterministic).**
+
+```text
+prereq: candles.taker_buy_vol exists (added in spec 01)
+inputs: features.cvd_30, features.cvd_slope_10, features.pr_cvd_divergence,
+        recent_ohlcv (4h primary, last 30 closed bars)
+
+1. price_NH = recent_ohlcv.high.iloc[-1] == recent_ohlcv.high.tail(30).max()
+   price_NL = recent_ohlcv.low.iloc[-1]  == recent_ohlcv.low.tail(30).min()
+
+2. cvd_NH = features.cvd_30 == cvd_30_rolling_max(30)
+   cvd_NL = features.cvd_30 == cvd_30_rolling_min(30)
+
+3. bearish_div = price_NH and not cvd_NH        # price high, buyers not confirming
+   bullish_div = price_NL and not cvd_NL        # price low,  sellers not confirming
+
+4. score = clamp(features.pr_cvd_divergence, 0, 1)  # 0..1 by construction
+
+5. direction:
+       'short'   if bearish_div
+       'long'    if bullish_div
+       'neutral' otherwise
+
+6. metadata = {
+       cvd_slope_10:  features.cvd_slope_10,
+       price_slope:   recent_ohlcv.close.diff().tail(10).mean(),
+       divergence_type: 'bearish' | 'bullish' | 'none',
+   }
+```
+
+**Null handling.** If `cvd_30` is NULL for the current bar (any of the last 30
+bars had NULL `taker_buy_vol`), the agent abstains.
+
+---
+
 ## Synthesizer
 
 ```python
-def synthesize(scores: list[AgentScore], regime: dict,
+def synthesize(scores: dict[str, AgentScore], regime: dict,
                features: dict, recent_ohlcv: pd.DataFrame) -> Signal | None:
 
-    # M1 weights — four agents only. Spec 07 re-weights to include
-    # sentiment (0.05) and narrative (0.10) and rescales these.
-    weights = {'structure': 0.40, 'momentum': 0.30,
-               'funding': 0.20, 'liquidity': 0.10}
+    # M1 weights — eight agents. Hand-set, version-controlled in
+    # src/ats/orchestration/weights.py. Anti-tuning rule applies:
+    # weights stay fixed across replay runs.
+    # Spec 07 re-weights to include sentiment (0.05) and narrative (0.10)
+    # and rescales these.
+    weights = {
+        'structure':     0.25,
+        'momentum':      0.15,
+        'funding':       0.10,
+        'liquidity':     0.05,
+        'price_action':  0.15,    # FVG (new in M1)
+        'cross_venue':   0.15,    # cross-exchange funding divergence (new)
+        'basis':         0.10,    # perp-vs-spot premium z-score (new)
+        'cvd':           0.05,    # cumulative volume delta divergence (new)
+    }   # sum = 1.00
+
+    # Agents that abstain (score=0, direction=neutral) are still passed in;
+    # the weighted_mean / direction_vote treat their score as 0 and ignore
+    # their direction vote.
 
     # 1. Direction from weighted majority of non-neutral agents
-    direction = direction_vote(scores)
+    direction = direction_vote(scores, weights)
     if direction == 'neutral':
         return None
 
     # 2. Base confidence = weighted mean of |scores in chosen direction|
     base = weighted_mean(scores, weights, direction)
 
-    # 3. Alignment penalty
+    # 3. Alignment penalty (8 agents → variance is more informative;
+    #    threshold tuned for 8-vector but the formula is unchanged)
     variance = score_variance(scores, direction)
     alignment_pen = min(0.5, 1.5 * variance)
     conf = base * (1 - alignment_pen)
 
-    # 4. Regime modulation
+    # 4. Regime modulation (unchanged)
     if regime.cell == 'bear-high' and direction == 'long': conf *= 0.85
     if regime.cell == 'bull-low'  and direction == 'long': conf *= 1.05
     conf = clamp(conf, 0, 1)
 
     # 5. Direction-specific SL/TP rules
-    sl, tp = sl_tp_rules(direction, features, recent_ohlcv, structure_score=...)
-    entry = current_close_or_zone()
+    sl, tp = sl_tp_rules(direction, features, recent_ohlcv,
+                         structure_score=scores['structure'].score)
+
+    # 6. Entry-zone override (FVG Option 2) — the only place a single agent
+    #    influences signal *shape* rather than confidence
+    pa = scores['price_action']
+    if pa.score > 0.6 and pa.direction == direction:
+        entry_zone = pa.metadata['fvg_zone']      # [low, high]
+        entry = (entry_zone[0] + entry_zone[1]) / 2
+        reasons.append(f"entry refined to FVG zone {entry_zone}")
+    else:
+        entry_zone = current_close_band(close, atr_4h)
+        entry = close
+
     rr = abs(tp[0] - entry) / abs(entry - sl)
     if rr < 2.0: return None
 
-    # 6. Confidence threshold
+    # 7. Confidence threshold
     if conf < 0.60: return None
 
-    # 7. Size by confidence tier
+    # 8. Size by confidence tier
     size_pct = size_for(conf)   # 0.60 -> 2%, 0.70 -> 3%, 0.80 -> 4%, 0.90 -> 5%
 
     return Signal(direction, entry_zone, sl, tp, conf, size_pct, reasons, invalidations,
                   agent_scores=dict_of_scores, risk_reward=rr, alignment_pen=alignment_pen)
 ```
+
+**Anti-tuning recap.** Weights live as named constants in
+`src/ats/orchestration/weights.py`. Do not search them. The decision gate
+(spec 06) may *drop* an agent whose ablation contribution (spec 05) is ≤ 0 —
+that is structurally different from retuning weights. After a drop, the
+remaining weights are *re-normalized arithmetically* (each weight ÷ sum of
+remaining weights), never re-discovered.
 
 `reasons[]` in M1 is **template-rendered** from the finalized signal fields
 (e.g. `"breakout above 20-bar high with vol_zscore 2.1"`, `"funding z -2.4 →
@@ -268,13 +514,18 @@ finalized — the LLM still cannot change any field.
 | `src/ats/agents/momentum.py` | deterministic momentum |
 | `src/ats/agents/funding.py` | deterministic funding |
 | `src/ats/agents/liquidity.py` | deterministic liquidity proxy (M1) |
+| `src/ats/agents/price_action.py` | FVG detection + `fvg_zone` metadata (new) |
+| `src/ats/agents/cross_venue.py` | cross-exchange funding divergence (new) |
+| `src/ats/agents/basis.py` | perp-vs-spot premium z-score (new) |
+| `src/ats/agents/cvd.py` | cumulative volume delta divergence (new) |
+| `src/ats/orchestration/weights.py` | hand-set agent weights (8 entries) + re-normalization helper for ablation-dropped agents |
 | `src/ats/synthesis/direction.py` | direction vote |
 | `src/ats/synthesis/sl_tp.py` | SL/TP rules |
-| `src/ats/synthesis/synthesizer.py` | combines scores → signal |
+| `src/ats/synthesis/synthesizer.py` | combines scores → signal; applies FVG entry-zone override |
 | `src/ats/synthesis/reasons.py` | M1: template renderer (spec 07 swaps in the LLM call) |
 | `src/ats/cli/analyze.py` | `ats analyze <SYMBOL>` |
 | `src/ats/cli/cycle.py` | `ats cycle run` |
-| `src/ats/cli/agent.py` | `ats agent <name> run` — one entry point per agent |
+| `src/ats/cli/agent.py` | `ats agent <name> run` — one entry point per agent (now 8) |
 
 ---
 
@@ -303,22 +554,37 @@ uv run ats analyze BTCUSDT
 Expected:
 
 ```
-agent        det     final    direction
-structure    0.74    0.74     long
-momentum     0.68    0.68     long
-funding      0.45    0.45     neutral
-liquidity    0.57    0.57     long
+agent           det     final    direction    notes
+structure       0.74    0.74     long
+momentum        0.68    0.68     long
+funding         0.45    0.45     neutral
+liquidity       0.57    0.57     long
+price_action    0.82    0.82     long         FVG zone [64280, 64360]
+cross_venue     0.61    0.61     short        binance funding +z 1.9 vs peers
+basis           0.38    0.38     neutral
+cvd             0.55    0.55     long         bearish div absent
 
 regime: bull-low
-alignment penalty: 0.04
-base confidence: 0.71
-final confidence: 0.74
+alignment penalty: 0.07     (cross_venue disagrees)
+base confidence: 0.69
+final confidence: 0.67
 
 direction: long
-entry zone: [64320, 64480]
-stop loss:  62950   (-2.3% / 1.5x ATR_4h)
-take profit: [66100, 67800]    rr = 2.4
+entry zone: [64280, 64360]   (FVG override applied — PriceAction score 0.82 > 0.6)
+stop loss:  62950            (-2.1% / 1.5x ATR_4h)
+take profit: [66100, 67800]  rr = 2.6
 ```
+
+Notes on reading the breakdown:
+
+- `cross_venue` voting `short` while everyone else votes `long` is normal —
+  CrossVenueFlow is *supposed* to dissent when Binance funding is hot. The
+  alignment penalty (0.07) absorbs the disagreement; the synthesizer doesn't
+  flip direction unless the weighted majority does.
+- `price_action`'s metadata `fvg_zone` triggered the entry-zone override, which
+  is the only spec-04 path that lets a single agent change signal *shape*.
+- `basis` is neutral here (z within ±2). When it fires direction-against-trend
+  in extreme regimes, expect the alignment penalty to absorb it the same way.
 
 ### Acceptance criteria
 
@@ -329,8 +595,14 @@ take profit: [66100, 67800]    rr = 2.4
 - [ ] **Regime modulation:** `bear-high` reduces long confidence; `bull-low` raises it
 - [ ] **Determinism:** identical `AgentInput` produces an identical `AgentScore` and an identical synthesized `Signal` — byte-for-byte
 - [ ] **No LLM dependency:** the spec-04 code path imports nothing from `src/ats/llm/`; a CI test asserts `anthropic` is not importable in this layer
-- [ ] **agent_runs written:** every analyzed top-pick has exactly four `agent_runs` rows; `llm_delta` is NULL on all of them
+- [ ] **agent_runs written:** every analyzed top-pick has exactly **eight** `agent_runs` rows; `llm_delta` is NULL on all of them
 - [ ] **reasons[] populated:** every `active` signal has 3–5 template-rendered `reasons[]` entries that cite concrete numbers
+- [ ] **FVG entry-zone override:** on a fixture where PriceAction.score > 0.6 and direction matches synth direction, `signals.entry_zone == PriceAction.metadata.fvg_zone` (not the default close±ATR band); on a fixture where the FVG closed through, the default applies
+- [ ] **CrossVenueFlow abstain:** on a fixture with `funding_peer_count < 2`, CrossVenueFlow.score == 0, direction = neutral, and `agent_runs.metadata.reason == 'insufficient_peers'`
+- [ ] **Basis abstain:** on a fixture where `basis_z_30d IS NULL`, Basis.score == 0 and the synthesizer does not crash on the missing input
+- [ ] **CVD abstain:** on a fixture where any of the last 30 `taker_buy_vol` is NULL, CVD.score == 0 and synthesizer proceeds normally
+- [ ] **Weights sum to 1.00:** `sum(weights.values()) == 1.0` at startup; deviation raises at import time
+- [ ] **Weight re-normalization:** after dropping an agent (decision-gate ablation result), the remaining weights renormalize to sum to 1.0 — covered by a dedicated test
 
 ### pytest
 
@@ -340,11 +612,17 @@ take profit: [66100, 67800]    rr = 2.4
 | `tests/test_momentum.py` | RSI + MACD edge cases |
 | `tests/test_funding.py` | extreme z-scores → fade direction |
 | `tests/test_liquidity_proxy.py` | known swing distribution → known proxy output |
-| `tests/test_synthesizer_align.py` | aligned vs misaligned agent vectors |
+| `tests/test_price_action_fvg.py` | bullish / bearish / no-FVG / mitigated fixtures → expected score, direction, `fvg_zone`, and invalidation behavior |
+| `tests/test_cross_venue.py` | peer_count 0/1/2/3, |z| at 1.0/1.5/2.5 → expected score, direction, abstain when peer_count<2 |
+| `tests/test_basis.py` | basis_z at NULL / ±1 / ±2.5 → expected score, direction, abstain on NULL |
+| `tests/test_cvd_agent.py` | bearish-div / bullish-div / no-div fixtures → expected score, direction; NULL `cvd_30` → abstain |
+| `tests/test_synthesizer_align.py` | aligned vs misaligned agent vectors (8-dim) |
 | `tests/test_synthesizer_regime.py` | bear-high reduces long confidence |
 | `tests/test_synthesizer_rr.py` | RR < 2 → rejected |
-| `tests/test_synthesizer_determinism.py` | identical input → byte-identical signal |
-| `tests/test_reasons_template.py` | finalized signal → expected reason phrases |
+| `tests/test_synthesizer_fvg_override.py` | PriceAction.score > 0.6 and direction-matched → `entry_zone == fvg_zone`; score < 0.6 → default band |
+| `tests/test_synthesizer_determinism.py` | identical input (8 agents) → byte-identical signal |
+| `tests/test_weights_invariants.py` | weights sum to 1.0; dropping an agent → remaining renormalize to 1.0 |
+| `tests/test_reasons_template.py` | finalized signal → expected reason phrases (including the FVG override phrase) |
 
 ### `ats cycle validate`
 
@@ -363,10 +641,33 @@ take profit: [66100, 67800]    rr = 2.4
   stand-in for the real liquidation feed. If the decision gate shows it adds
   nothing, that is a *finding*, not a failure — it points effort at the M4
   liquidation feed rather than the M2 LLM layer.
-- **Four-agent weights are a guess.** They are version-controlled constants in
+- **Eight-agent weights are a guess.** They are version-controlled constants in
   `src/ats/orchestration/weights.py`. Resist tuning them — the replay harness
   (spec 05) *measures*; it does not authorize tuning. Weight changes wait for
-  spec 08's reflection data.
+  spec 08's reflection data. The decision gate's only authorized action against
+  the weight set is to **drop** an agent with ablation contribution ≤ 0 and
+  arithmetically renormalize.
+- **FVG prior is from forex/index, not crypto perps.** The ~60% hold rate is a
+  starting hypothesis only. The replay ablation either confirms PriceAction
+  earns its weight on crypto-perp data or it doesn't — the *prior* is not
+  evidence on its own.
+- **CrossVenueFlow correlation with Funding.** The existing Funding agent and
+  CrossVenueFlow both read funding rates. They are not redundant — Funding
+  reads Binance funding *level* (extremity), CrossVenueFlow reads Binance
+  funding *relative to peers* (asymmetry). A symbol can have high Binance
+  funding that's matched by peers (Funding fires, CrossVenueFlow does not) or
+  median-Binance funding that's much higher than peers (CrossVenueFlow fires,
+  Funding does not). The ablation matrix will reveal if they double-count in
+  practice.
+- **Basis can be persistently one-sided in trending regimes.** This is the
+  intended behavior — Basis is designed to dissent during extreme stretches.
+  The synthesizer's alignment penalty correctly handles the dissent.
+- **CVD requires the new `taker_buy_vol` column.** A cold-start without
+  re-backfill leaves `taker_buy_vol = 0` (the migration default), which makes
+  CVD silently always equal `-volume`. The spec-01 acceptance criterion
+  "`taker_buy_vol IS NULL OR taker_buy_vol > volume` returns 0" plus the
+  spec-02 NULL-handling rule guard against this, but it is easy to break in
+  practice. Watch for it.
 - **Direction voting deadlock.** Agents split or all-neutral → reject. Don't
   force a direction from a coin-flip.
 - **Template `reasons[]` can feel thin.** That is acceptable for M1 — they exist
