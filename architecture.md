@@ -14,6 +14,8 @@
 ## What this is
 
 A signal generator for crypto perpetual futures.
+   
+-> I quite hate the idea of a trading "signal". Instead of saying it signal & naming wise only, it's more of a confluence seeker. Signal sounds assuring, while confluence is more of a process of finding multiple data aligning. We're playing in probabilities here (read: gambling), therefore saying "signal" sounds a bit too sure. The idea of "confluence" is because we're trying to have an institution-level data simulator.
 
 It ingests Binance market data, **cross-venue derivatives data** (funding rates
 from Bybit / OKX / Hyperliquid, perp-vs-spot basis), and crypto media; turns the
@@ -324,6 +326,10 @@ system). None of these block M1–M3.
                    │ daemons → Tier 3      │  mark-price poller
                    └───────────────────────┘
 ```
+
+## Questions from glenn:
+1. What's the cron definition? This pipeline is per-run process, but how should we iterate or schedule it?
+2. What's the interval of data pooling (inserting a lot of source to our data lake) for the BE system and the agentic? Assuming the first point is being run simulateneously and agent runs dependently on the BE system with the same interval, token consumption will be crazy.
 
 ---
 
