@@ -1,15 +1,22 @@
 from __future__ import annotations
 
 import asyncio
-from datetime import datetime, timedelta, timezone
-from typing import Any, Optional
+from datetime import UTC, datetime, timedelta
+from typing import Any
 
 import typer
 from rich.console import Console
 from rich.table import Table
 from sqlalchemy import func, select
 
-from ats.db.models import Basis, Candle, FundingRate, FundingRateXVenue, OpenInterest
+from ats.db.models import (
+    Basis,
+    Candle,
+    FundingRate,
+    FundingRateXVenue,
+    MediaItem,
+    OpenInterest,
+)
 from ats.db.session import SessionLocal
 
 app = typer.Typer(name="data", help="Data inspection commands.")
@@ -18,13 +25,16 @@ console = Console()
 
 @app.command()
 def status() -> None:
-    """Show heartbeat statuses and row counts. Exits 1 if any data class is missing."""
-    from ats.ingestion.freshness import check_freshness, get_row_counts
+    """Show heartbeat statuses + row counts. Exits 1 only if a data class is missing.
+
+    Tier-3-only classes (e.g. mark_price) show as n/a in Tier 1 and never fail.
+    """
+    from ats.ingestion.freshness import check_freshness, get_data_class_counts
 
     async def _run() -> tuple[list[dict[str, Any]], dict[str, int]]:
         async with SessionLocal() as session:
             rows = await check_freshness(session)
-            counts = await get_row_counts(session)
+            counts = await get_data_class_counts(session)
             return rows, counts
 
     rows, counts = asyncio.run(_run())
@@ -33,9 +43,14 @@ def status() -> None:
     table.add_column("data_class", style="cyan")
     table.add_column("status")
     table.add_column("last_seen")
+    table.add_column("rows", justify="right")
+    table.add_column("detail", style="dim")
 
     has_missing = False
-    status_colors = {"ok": "green", "stale": "yellow", "missing": "red", "disabled": "dim"}
+    status_colors = {
+        "ok": "green", "stale": "yellow", "missing": "red",
+        "disabled": "dim", "n/a": "dim",
+    }
 
     for r in rows:
         st = r["status"]
@@ -43,14 +58,16 @@ def status() -> None:
             has_missing = True
         color = status_colors.get(st, "white")
         last = str(r["last_seen"])[:19] if r["last_seen"] else "—"
-        table.add_row(r["data_class"], f"[{color}]{st}[/{color}]", last)
+        rows_n = counts.get(r["data_class"], 0)
+        table.add_row(
+            r["data_class"],
+            f"[{color}]{st}[/{color}]",
+            last,
+            str(rows_n),
+            r.get("detail") or "",
+        )
 
     console.print(table)
-
-    if counts:
-        console.print("\n[bold]Row counts:[/bold]")
-        for tbl, cnt in counts.items():
-            console.print(f"  {tbl}: {cnt}")
 
     if has_missing:
         raise typer.Exit(1)
@@ -63,15 +80,61 @@ def _parse_since(since: str) -> datetime:
     if unit not in units or not since[:-1].isdigit():
         raise typer.BadParameter(f"Expected format like '7d', '4h', '30m', got '{since}'")
     delta = timedelta(seconds=int(since[:-1]) * units[unit])
-    return datetime.now(timezone.utc) - delta
+    return datetime.now(UTC) - delta
+
+
+_SPARK_BLOCKS = "▁▂▃▄▅▆▇█"
+
+
+def _sparkline(values: list[float]) -> str:
+    """Map a numeric series to Unicode block characters (oldest→newest, left→right)."""
+    if not values:
+        return ""
+    lo, hi = min(values), max(values)
+    span = hi - lo
+    if span == 0:
+        return _SPARK_BLOCKS[0] * len(values)
+    out = []
+    for v in values:
+        idx = round((v - lo) / span * (len(_SPARK_BLOCKS) - 1))
+        out.append(_SPARK_BLOCKS[idx])
+    return "".join(out)
+
+
+def _print_series(label: str, series: list[float], fmt: str = ".2f") -> None:
+    """Print a labeled, trend-colored sparkline with first/last/min/max stats."""
+    if not series:
+        console.print(f"[yellow]No data for {label}.[/yellow]")
+        return
+    first, last = series[0], series[-1]
+    rising = last >= first
+    color = "green" if rising else "red"
+    arrow = "▲" if rising else "▼"
+    spark = _sparkline(series)
+    pct = ((last - first) / abs(first) * 100) if first != 0 else 0.0
+    console.print(f"[bold]{label}[/bold]  ({len(series)} pts)")
+    console.print(f"  [{color}]{spark}[/{color}]")
+    console.print(
+        f"  first {first:{fmt}}  last [{color}]{last:{fmt}}[/{color}]  "
+        f"min {min(series):{fmt}}  max {max(series):{fmt}}  "
+        f"[{color}]{arrow} {pct:+.2f}%[/{color}]\n"
+    )
+
+
+async def _recent_values(session: Any, stmt: Any) -> list[float]:
+    """Run a 'most-recent-first' select of a single numeric column, return oldest→newest."""
+    result = await session.execute(stmt)
+    vals = [float(v) for v in result.scalars().all() if v is not None]
+    vals.reverse()
+    return vals
 
 
 @app.command()
 def summary(
-    symbol: Optional[str] = typer.Option(None, "--symbol", "-s", help="Filter by symbol (e.g. BTCUSDT)."),
-    since: Optional[str] = typer.Option(None, "--since", help="Time window e.g. '7d', '4h'."),
+    symbol: str | None = typer.Option(None, "--symbol", "-s", help="Filter by symbol."),
+    since: str | None = typer.Option(None, "--since", help="Time window e.g. '7d', '4h'."),
 ) -> None:
-    """Show backfill coverage summary: row counts, time ranges, and latest values per symbol/timeframe."""
+    """Show backfill coverage: row counts, time ranges, and latest values per symbol/tf."""
     since_dt = _parse_since(since) if since else None
 
     async def _run() -> dict[str, Any]:
@@ -179,7 +242,9 @@ def summary(
                     .limit(1)
                 )
                 latest = (await session.execute(stmt)).first()
-                oi_out.append((*row, latest.oi if latest else None, latest.oi_value if latest else None))
+                oi_out.append(
+                    (*row, latest.oi if latest else None, latest.oi_value if latest else None)
+                )
 
             # ── Basis (latest per symbol) ─────────────────────────────────
             basis_stmt = select(
@@ -202,7 +267,13 @@ def summary(
                     .limit(1)
                 )
                 latest = (await session.execute(stmt)).first()
-                basis_out.append((*row, latest.mark_price if latest else None, latest.premium_index if latest else None))
+                basis_out.append(
+                    (
+                        *row,
+                        latest.mark_price if latest else None,
+                        latest.premium_index if latest else None,
+                    )
+                )
 
             return {
                 "candles": candle_rows,
@@ -213,7 +284,11 @@ def summary(
             }
 
     data = asyncio.run(_run())
-    title_suffix = f"  (symbol={symbol}" + (f", since={since}" if since else "") + ")" if (symbol or since) else ""
+    title_suffix = (
+        f"  (symbol={symbol}" + (f", since={since}" if since else "") + ")"
+        if (symbol or since)
+        else ""
+    )
 
     # ── Candles ──────────────────────────────────────────────────────────────
     t = Table(title=f"Candles{title_suffix}")
@@ -233,7 +308,10 @@ def summary(
     for col in ("symbol", "rows", "latest_time", "latest_rate"):
         t2.add_column(col)
     for sym_, rows, lt, rate in data["funding"]:
-        t2.add_row(sym_, str(rows), str(lt)[:19] if lt else "—", f"{float(rate):.6f}" if rate is not None else "—")
+        t2.add_row(
+            sym_, str(rows), str(lt)[:19] if lt else "—",
+            f"{float(rate):.6f}" if rate is not None else "—",
+        )
     console.print(t2)
 
     # ── Cross-venue funding ──────────────────────────────────────────────────
@@ -241,7 +319,10 @@ def summary(
     for col in ("exchange", "symbol", "rows", "latest_time", "latest_rate"):
         t3.add_column(col)
     for exch, sym_, rows, lt, rate in data["xvenue"]:
-        t3.add_row(exch, sym_, str(rows), str(lt)[:19] if lt else "—", f"{float(rate):.6f}" if rate is not None else "—")
+        t3.add_row(
+            exch, sym_, str(rows), str(lt)[:19] if lt else "—",
+            f"{float(rate):.6f}" if rate is not None else "—",
+        )
     console.print(t3)
 
     # ── Open interest ────────────────────────────────────────────────────────
@@ -265,13 +346,13 @@ def summary(
     console.print(t5)
 
 
-def _render_candle(o: float, h: float, l: float, c: float, height: int = 20) -> None:
+def _render_candle(o: float, h: float, low: float, c: float, height: int = 20) -> None:
     """Print a single candlestick chart scaled to `height` terminal rows."""
     bullish = c >= o
     color = "green" if bullish else "red"
     body_top = max(o, c)
     body_bot = min(o, c)
-    price_range = h - l
+    price_range = h - low
     if price_range == 0:
         console.print(f"[{color}]Doji — open=close={o:.2f}[/{color}]")
         return
@@ -283,14 +364,14 @@ def _render_candle(o: float, h: float, l: float, c: float, height: int = 20) -> 
     row_high = price_to_row(h)       # should be 0
     row_btop = price_to_row(body_top)
     row_bbot = price_to_row(body_bot)
-    row_low = price_to_row(l)        # should be height-1
+    row_low = price_to_row(low)      # should be height-1
 
     # price labels at key levels
     labels: dict[int, str] = {
         row_high: f"{h:.2f}  ← high",
         row_btop: f"{body_top:.2f}  ← {'close' if bullish else 'open'}",
         row_bbot: f"{body_bot:.2f}  ← {'open' if bullish else 'close'}",
-        row_low:  f"{l:.2f}  ← low",
+        row_low:  f"{low:.2f}  ← low",
     }
 
     for i in range(height):
@@ -309,7 +390,7 @@ def _render_candle(o: float, h: float, l: float, c: float, height: int = 20) -> 
     pct = abs(c - o) / o * 100
     console.print(
         f"\n  [{color}]{direction}[/{color}]  "
-        f"O {o:.2f}  H {h:.2f}  L {l:.2f}  C {c:.2f}  "
+        f"O {o:.2f}  H {h:.2f}  L {low:.2f}  C {c:.2f}  "
         f"body {pct:.2f}%"
     )
 
@@ -318,9 +399,10 @@ def _render_candle(o: float, h: float, l: float, c: float, height: int = 20) -> 
 def candles(
     symbol: str = typer.Option(..., "--symbol", "-s", help="Symbol e.g. BTCUSDT."),
     timeframe: str = typer.Option(..., "--timeframe", "-t", help="Timeframe: 15m, 1h, or 4h."),
-    limit: int = typer.Option(20, "--limit", "-n", help="Number of rows to show (most recent first)."),
-    since: Optional[str] = typer.Option(None, "--since", help="Only rows after this window e.g. '1d'."),
-    viz: bool = typer.Option(False, "--viz", help="Render the most recent candle as a terminal chart."),
+    limit: int = typer.Option(20, "--limit", "-n", help="Rows to show (most recent first)."),
+    since: str | None = typer.Option(None, "--since", help="Only rows after this window."),
+    viz: bool = typer.Option(False, "--viz", help="Sparkline of closes (--bars 1 = one candle)."),
+    bars: int | None = typer.Option(None, "--bars", help="With --viz: 1 = single candlestick."),
 ) -> None:
     """Show the most recent candle rows for a symbol/timeframe."""
     since_dt = _parse_since(since) if since else None
@@ -345,16 +427,25 @@ def candles(
         return
 
     if viz:
-        latest = rows[0]
+        if bars == 1:
+            latest = rows[0]
+            console.print(
+                f"\n[bold]{symbol} / {timeframe}[/bold]  {str(latest.open_time)[:19]}\n"
+            )
+            _render_candle(
+                float(latest.open),
+                float(latest.high),
+                float(latest.low),
+                float(latest.close),
+            )
+            return
+        # rows are most-recent-first; reverse to oldest→newest for the sparkline
+        closes = [float(r.close) for r in reversed(rows)]
         console.print(
-            f"\n[bold]{symbol} / {timeframe}[/bold]  {str(latest.open_time)[:19]}\n"
+            f"\n[bold]{symbol} / {timeframe}[/bold]  "
+            f"{str(rows[-1].open_time)[:19]} → {str(rows[0].open_time)[:19]}\n"
         )
-        _render_candle(
-            float(latest.open),
-            float(latest.high),
-            float(latest.low),
-            float(latest.close),
-        )
+        _print_series("close", closes)
         return
 
     title = f"Candles  {symbol} / {timeframe}  (latest {limit})"
@@ -376,6 +467,249 @@ def candles(
             str(row.trades) if row.trades is not None else "—",
         )
 
+    console.print(t)
+
+
+@app.command()
+def funding(
+    symbol: str = typer.Option(..., "--symbol", "-s", help="Symbol e.g. BTCUSDT."),
+    limit: int = typer.Option(30, "--limit", "-n", help="Number of recent points."),
+    xvenue: bool = typer.Option(False, "--xvenue", help="Also compare latest rate across venues."),
+) -> None:
+    """Sparkline of recent Binance funding rates; --xvenue compares peers."""
+
+    async def _run() -> tuple[list[float], list[Any]]:
+        async with SessionLocal() as session:
+            stmt = (
+                select(FundingRate.rate)
+                .where(FundingRate.symbol == symbol)
+                .order_by(FundingRate.funding_time.desc())
+                .limit(limit)
+            )
+            series = await _recent_values(session, stmt)
+
+            xv: list[Any] = []
+            if xvenue:
+                # latest rate per exchange for this symbol
+                sub = (
+                    select(
+                        FundingRateXVenue.exchange,
+                        func.max(FundingRateXVenue.funding_time).label("ft"),
+                    )
+                    .where(FundingRateXVenue.symbol == symbol)
+                    .group_by(FundingRateXVenue.exchange)
+                ).subquery()
+                latest = (
+                    select(
+                        FundingRateXVenue.exchange,
+                        FundingRateXVenue.funding_time,
+                        FundingRateXVenue.rate,
+                    )
+                    .join(
+                        sub,
+                        (FundingRateXVenue.exchange == sub.c.exchange)
+                        & (FundingRateXVenue.funding_time == sub.c.ft),
+                    )
+                    .order_by(FundingRateXVenue.exchange)
+                )
+                xv = list((await session.execute(latest)).all())
+            return series, xv
+
+    series, xv = asyncio.run(_run())
+    console.print(f"\n[bold]Funding — {symbol}[/bold] (Binance)\n")
+    _print_series("rate", series, fmt=".6f")
+
+    if xvenue:
+        t = Table(title=f"Cross-Venue Latest Funding — {symbol}")
+        for col in ("exchange", "funding_time", "rate"):
+            t.add_column(col, style="cyan" if col == "exchange" else None)
+        for exch, ft, rate in xv:
+            t.add_row(exch, str(ft)[:19], f"{float(rate):.6f}")
+        console.print(t)
+
+
+@app.command()
+def oi(
+    symbol: str = typer.Option(..., "--symbol", "-s", help="Symbol e.g. BTCUSDT."),
+    limit: int = typer.Option(30, "--limit", "-n", help="Number of recent points."),
+) -> None:
+    """Sparkline of recent open-interest (contracts)."""
+
+    async def _run() -> list[float]:
+        async with SessionLocal() as session:
+            stmt = (
+                select(OpenInterest.oi)
+                .where(OpenInterest.symbol == symbol)
+                .order_by(OpenInterest.ts.desc())
+                .limit(limit)
+            )
+            return await _recent_values(session, stmt)
+
+    series = asyncio.run(_run())
+    console.print(f"\n[bold]Open Interest — {symbol}[/bold]\n")
+    _print_series("oi", series, fmt=".0f")
+
+
+@app.command()
+def basis(
+    symbol: str = typer.Option(..., "--symbol", "-s", help="Symbol e.g. BTCUSDT."),
+    limit: int = typer.Option(30, "--limit", "-n", help="Number of recent points."),
+) -> None:
+    """Sparkline of recent basis (premium_index = (mark - index)/index)."""
+
+    async def _run() -> list[float]:
+        async with SessionLocal() as session:
+            stmt = (
+                select(Basis.premium_index)
+                .where(Basis.symbol == symbol)
+                .order_by(Basis.ts.desc())
+                .limit(limit)
+            )
+            return await _recent_values(session, stmt)
+
+    series = asyncio.run(_run())
+    console.print(f"\n[bold]Basis (premium index) — {symbol}[/bold]\n")
+    _print_series("premium", series, fmt=".6f")
+
+
+@app.command()
+def media(
+    source: str | None = typer.Option(None, "--source", help="Filter by source: 'rss' or 'x'."),
+    limit: int = typer.Option(20, "--limit", "-n", help="Number of recent headlines."),
+) -> None:
+    """List recent media headlines without opening the DB."""
+
+    async def _run() -> list[Any]:
+        async with SessionLocal() as session:
+            stmt = select(MediaItem).order_by(MediaItem.published_at.desc()).limit(limit)
+            if source:
+                stmt = stmt.where(MediaItem.source == source)
+            return list((await session.execute(stmt)).scalars().all())
+
+    items = asyncio.run(_run())
+    if not items:
+        console.print("[yellow]No media items found.[/yellow]")
+        return
+
+    t = Table(title=f"Media (latest {limit}" + (f", source={source}" if source else "") + ")")
+    t.add_column("published", style="cyan")
+    t.add_column("src")
+    t.add_column("account")
+    t.add_column("title")
+    for it in items:
+        title = (it.title or it.body or "")[:80]
+        t.add_row(str(it.published_at)[:19], it.source, it.account, title)
+    console.print(t)
+
+
+@app.command()
+def show(
+    symbol: str = typer.Option(..., "--symbol", "-s", help="Symbol e.g. BTCUSDT."),
+    timeframe: str = typer.Option("1h", "--timeframe", "-t", help="Candle timeframe."),
+    limit: int = typer.Option(30, "--limit", "-n", help="Points per sparkline."),
+) -> None:
+    """One-screen dashboard: price, funding, OI, basis, and recent headlines."""
+
+    async def _run() -> dict[str, Any]:
+        async with SessionLocal() as session:
+            closes = await _recent_values(
+                session,
+                select(Candle.close)
+                .where(Candle.symbol == symbol, Candle.timeframe == timeframe)
+                .order_by(Candle.open_time.desc())
+                .limit(limit),
+            )
+            funding = await _recent_values(
+                session,
+                select(FundingRate.rate)
+                .where(FundingRate.symbol == symbol)
+                .order_by(FundingRate.funding_time.desc())
+                .limit(limit),
+            )
+            oi_series = await _recent_values(
+                session,
+                select(OpenInterest.oi)
+                .where(OpenInterest.symbol == symbol)
+                .order_by(OpenInterest.ts.desc())
+                .limit(limit),
+            )
+            basis_series = await _recent_values(
+                session,
+                select(Basis.premium_index)
+                .where(Basis.symbol == symbol)
+                .order_by(Basis.ts.desc())
+                .limit(limit),
+            )
+            headlines = (
+                await session.execute(
+                    select(MediaItem)
+                    .order_by(MediaItem.published_at.desc())
+                    .limit(5)
+                )
+            ).scalars().all()
+            return {
+                "closes": closes,
+                "funding": funding,
+                "oi": oi_series,
+                "basis": basis_series,
+                "headlines": headlines,
+            }
+
+    d = asyncio.run(_run())
+    console.print(f"\n[bold cyan]══ {symbol} ══[/bold cyan]\n")
+    _print_series(f"price ({timeframe} close)", d["closes"])
+    _print_series("funding rate", d["funding"], fmt=".6f")
+    _print_series("open interest", d["oi"], fmt=".0f")
+    _print_series("basis (premium)", d["basis"], fmt=".6f")
+
+    console.print("[bold]Recent headlines[/bold]")
+    if not d["headlines"]:
+        console.print("  [dim]none[/dim]")
+    for it in d["headlines"]:
+        when = str(it.published_at)[:16]
+        text = (it.title or it.body or "")[:70]
+        console.print(f"  [dim]{when}[/dim] [{it.account}] {text}")
+    console.print()
+
+
+@app.command()
+def yahoo(
+    ticker: str = typer.Option(..., "--ticker", help="Yahoo ticker e.g. ^GSPC, GC=F, BTC-USD."),
+    period: str = typer.Option("1mo", "--period", help="Lookback e.g. 5d, 1mo, 3mo, 1y."),
+    interval: str = typer.Option("1d", "--interval", help="Bar interval e.g. 1d, 1h, 15m."),
+) -> None:
+    """[Exploratory] Fetch Yahoo Finance bars via yfinance. No DB write — feasibility probe."""
+    from ats.ingestion.yahoo import fetch_recent
+
+    try:
+        rows = asyncio.run(fetch_recent(ticker, period, interval))
+    except ModuleNotFoundError:
+        console.print(
+            "[red]yfinance not installed.[/red] Install the optional extra: "
+            "[cyan]uv sync --extra yahoo[/cyan]"
+        )
+        raise typer.Exit(1) from None
+
+    if not rows:
+        console.print(f"[yellow]No data returned for {ticker}.[/yellow]")
+        return
+
+    closes = [r["close"] for r in rows]
+    console.print(
+        f"\n[bold]{ticker}[/bold]  period={period} interval={interval}  "
+        f"({str(rows[0]['ts'])[:16]} → {str(rows[-1]['ts'])[:16]})\n"
+    )
+    _print_series("close", closes)
+
+    t = Table(title=f"Yahoo {ticker} (latest 10)")
+    for col in ("ts", "open", "high", "low", "close", "volume"):
+        t.add_column(col, style="cyan" if col == "ts" else None)
+    for r in rows[-10:]:
+        t.add_row(
+            str(r["ts"])[:16],
+            f"{r['open']:.2f}", f"{r['high']:.2f}", f"{r['low']:.2f}",
+            f"{r['close']:.2f}", f"{r['volume']:.0f}",
+        )
     console.print(t)
 
 

@@ -22,6 +22,10 @@ dependencies = [
     "psycopg2-binary>=2.9",
 ]
 
+[project.optional-dependencies]
+# Exploratory only — Yahoo Finance feasibility probe (`ats data yahoo`). Not an M1 dep.
+yahoo = ["yfinance>=0.2"]
+
 [project.scripts]
 ats = "ats.cli:app"
 

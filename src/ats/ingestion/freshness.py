@@ -21,6 +21,10 @@ BUDGETS: dict[str, timedelta] = {
     "media_rss": timedelta(minutes=35),
 }
 
+# Data classes only produced by the Tier-3 WS daemon (M4). In Tier 1 they have no
+# heartbeat by design, so a missing one is "n/a", not a failure.
+TIER3_ONLY: frozenset[str] = frozenset({"mark_price"})
+
 
 def compute_status(
     last_seen: datetime | None, budget: timedelta
@@ -70,6 +74,46 @@ async def get_row_counts(session: AsyncSession) -> dict[str, int]:
     return counts
 
 
+async def get_data_class_counts(session: AsyncSession) -> dict[str, int]:
+    """Row count backing each freshness data_class, for the status table."""
+    counts: dict[str, int] = {}
+
+    for tf in ("15m", "1h", "4h"):
+        r = await session.execute(
+            text("SELECT COUNT(*) FROM candles WHERE timeframe = :tf"), {"tf": tf}
+        )
+        counts[f"kline_{tf}"] = r.scalar() or 0
+
+    counts["funding"] = (
+        await session.execute(text("SELECT COUNT(*) FROM funding_rates"))
+    ).scalar() or 0
+
+    for venue in ("bybit", "okx", "hyperliquid"):
+        r = await session.execute(
+            text("SELECT COUNT(*) FROM funding_rates_xvenue WHERE exchange = :v"),
+            {"v": venue},
+        )
+        counts[f"funding_{venue}"] = r.scalar() or 0
+
+    counts["open_int"] = (
+        await session.execute(text("SELECT COUNT(*) FROM open_interest"))
+    ).scalar() or 0
+    counts["basis"] = (
+        await session.execute(text("SELECT COUNT(*) FROM basis"))
+    ).scalar() or 0
+    counts["mark_price"] = (
+        await session.execute(text("SELECT COUNT(*) FROM mark_prices_1m"))
+    ).scalar() or 0
+
+    for src in ("rss", "x"):
+        r = await session.execute(
+            text("SELECT COUNT(*) FROM media_items WHERE source = :s"), {"s": src}
+        )
+        counts[f"media_{src}"] = r.scalar() or 0
+
+    return counts
+
+
 async def check_freshness(session: AsyncSession) -> list[dict[str, Any]]:
     result = await session.execute(
         text("SELECT data_class, last_seen_at, status, detail FROM heartbeats")
@@ -81,9 +125,9 @@ async def check_freshness(session: AsyncSession) -> list[dict[str, Any]]:
     for dc, budget in BUDGETS.items():
         hb = hb_map.get(dc)
         if hb is None:
-            status = "missing"
+            status = "n/a" if dc in TIER3_ONLY else "missing"
             last_seen = None
-            detail = None
+            detail = "Tier 3 only" if dc in TIER3_ONLY else None
         else:
             last_seen = hb[1]
             status = "disabled" if hb[2] == "disabled" else compute_status(last_seen, budget)

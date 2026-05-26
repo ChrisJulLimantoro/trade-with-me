@@ -352,7 +352,33 @@ ats ingest media-pull                # one-shot RSS + X(optional) pull (Tier 1: 
 ats ingest start                     # [Tier 3] WS + continuous pollers + freshness watchdog until SIGINT
 ats data status                      # heartbeats + row counts (one-shot)
 ats data validate                    # programmatic smoke test (see below)
+
+# Inspection / visualization (one-shot, read-only — eyeball data without opening Postgres)
+ats data summary [--symbol S] [--since 7d]      # coverage: row counts, time ranges, latest values
+ats data candles -s BTCUSDT -t 1h [--viz]       # recent candle table; --viz = close-price sparkline (--bars 1 = single candlestick)
+ats data funding -s BTCUSDT [--xvenue]          # funding-rate sparkline; --xvenue compares latest rate per peer venue
+ats data oi -s BTCUSDT                          # open-interest trend sparkline
+ats data basis -s BTCUSDT                       # basis (premium_index) trend sparkline
+ats data media [--source rss] [--limit 20]      # recent media headlines
+ats data show -s BTCUSDT                         # one-screen dashboard: price + funding + OI + basis + headlines
+ats data yahoo --ticker ^GSPC                   # [exploratory] Yahoo Finance bars via yfinance; no DB write (feasibility probe)
 ```
+
+### Implementation notes (M1, as-built)
+
+- **`data status` Tier-3 classes:** `mark_price` (and any future WS-only class) has no
+  heartbeat in Tier 1 by design. `data status` renders it as `n/a` (dim) and does **not**
+  count it as `missing`, so the command exits `0` on a healthy Tier-1 run. Only genuinely
+  `missing` classes (past 2× budget) trigger exit `1`.
+- **`open_interest.oi_value` stays NULL in M1.** Binance `GET /fapi/v1/openInterest` returns
+  only `openInterest` (contracts), not notional. Notional would require `oi × mark`; deferred.
+- **OI and basis are single REST snapshots per backfill** (one row per symbol per run), not a
+  historical series. This satisfies the "≥ 1 per polled cadence" acceptance bar for Tier 1; the
+  continuous 5-min cadence is a Tier-3/M4 concern.
+- **Binance funding rows are duplicated into `funding_rates_xvenue`** inside
+  `binance_rest.upsert_funding` (single write path), so CrossVenueFlow queries one table.
+- **X/Twitter:** `x_poller` is a stub that records `media_x: disabled` when `X_BEARER_TOKEN`
+  is unset. Full ingestion remains an M2 concern (spec 07).
 
 ### Skill surface
 
@@ -474,3 +500,8 @@ A one-shot command that:
 - **Cross-venue clock skew at funding boundaries** — Bybit / OKX / Hyperliquid all settle at the same 00/08/16 UTC ticks, but their REST may surface a new rate a few seconds before or after Binance. Normalize to the nearest 8h boundary before diffing in spec 02. Never compare rates with mismatched `funding_time`.
 - **Hyperliquid coin naming** — uses bare `BTC` not `BTCUSDT`. The `seeds/xvenue_symbols.yaml` mapping is the single source of truth; missing entries are silently excluded (logged once at WARN). Adding a new universe symbol requires extending the mapping.
 - **`premiumIndex` cadence** — the endpoint is cheap, but `basis` rows accumulate at 5-min cadence × N symbols × 30d → ~8.6k rows/symbol. Compact via TimescaleDB retention policy in M4 if it ever becomes a problem; in M1 it's negligible.
+- **Yahoo Finance (exploratory, deferred)** — `yfinance` is a viable source (no API key; it
+  scrapes Yahoo's public endpoints). Candidate uses: macro regime context (`^GSPC`, `DX-Y.NYB`,
+  `GC=F`, `^TNX`) or a crypto spot cross-check (`BTC-USD`). A read-only feasibility probe ships
+  as `ats data yahoo` (optional `yahoo` extra; no persistence). Schema, cadence, and whether it
+  feeds a regime/macro signal are **deferred** — not part of M1 ingestion.
