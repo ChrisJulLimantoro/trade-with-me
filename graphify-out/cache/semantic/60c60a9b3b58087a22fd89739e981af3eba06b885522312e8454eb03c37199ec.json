@@ -1,1 +1,0 @@
-{"nodes": [{"id": "architecture_document", "label": "Architecture Document", "file_type": "document", "source_file": "architecture.md"}], "edges": [{"source": "architecture_document", "target": "specs_00_overview", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "architecture.md"}], "hyperedges": []}
