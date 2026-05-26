@@ -15,5 +15,8 @@ wheels/
 .mypy_cache/
 .pytest_cache/
 
+# data artifacts
+data/
+
 # OS
 .DS_Store

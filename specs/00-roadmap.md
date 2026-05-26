@@ -8,6 +8,27 @@ work, validate it, ship it. Specs are the source of truth for *what gets built*;
 
 ---
 
+## Current progress (2026-05-26)
+
+| Spec | Status | Blocking next? |
+|---|---|---|
+| **01 — Data Collection** | 🏗️ All code + 9 test files written. 23/26 tests passing. DB smoke test not yet run. | Yes — must close before spec 02 |
+| 02–10 | 🔲 Not started | — |
+
+**Next action:** run the spec 01 smoke test against a live DB, tick all acceptance criteria, then move to spec 02.
+
+```bash
+docker compose -f ops/docker-compose.yml up -d
+uv run ats db migrate
+uv run ats ingest backfill --since 7d --symbols BTCUSDT,ETHUSDT
+uv run ats ingest xvenue-funding --symbols BTCUSDT,ETHUSDT
+uv run ats ingest media-pull
+uv run ats data status
+uv run ats data validate
+```
+
+---
+
 ## Milestones
 
 | Milestone | Specs | Purpose | Gate to exit |
