@@ -1,0 +1,15 @@
+services:
+  db:
+    image: timescale/timescaledb-ha:pg16
+    environment:
+      POSTGRES_USER: ats
+      POSTGRES_PASSWORD: ats
+      POSTGRES_DB: ats
+    ports:
+      - "5435:5432"
+    volumes:
+      - ats-pgdata:/home/postgres/pgdata/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+
+volumes:
+  ats-pgdata:

@@ -1,8 +1,7 @@
-"""ATS CLI — baseline entrypoint.
+"""ATS CLI entrypoint.
 
-Each phase extends this module with its own commands. See `specs/00-overview.md`
-for the cumulative command surface. The Phase-0 baseline only exposes
-``--version`` and ``--help``.
+Phase 0: --version, --help.
+Spec 01 adds: ats db, ats ingest, ats data.
 """
 
 from __future__ import annotations
@@ -10,17 +9,22 @@ from __future__ import annotations
 import typer
 
 from ats import __version__
+from ats.cli_commands import data as data_cmd
+from ats.cli_commands import db, ingest
 
 app = typer.Typer(
     name="ats",
     help=(
         "Agentic Trading System — crypto perpetuals signal engine.\n\n"
-        "Commands are added per-phase. See specs/00-overview.md for the current "
-        "command surface and roadmap."
+        "See specs/00-roadmap.md for the full command surface and milestone map."
     ),
     add_completion=False,
     no_args_is_help=True,
 )
+
+app.add_typer(db.app)
+app.add_typer(ingest.app)
+app.add_typer(data_cmd.app)
 
 
 def _version_cb(value: bool) -> None:
@@ -41,4 +45,7 @@ def main_callback(
         help="Show version and exit.",
     ),
 ) -> None:
-    """No-op root callback; phase commands are registered here."""
+    from ats.config import settings
+    from ats.logging import configure_logging
+
+    configure_logging(settings.log_level, settings.log_render)

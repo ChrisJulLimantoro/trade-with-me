@@ -2,6 +2,35 @@
 
 **Version:** v0.4 · **Status:** living document · **Companion:** `specs/` for actionable per-milestone plans · `README.md` for live progress
 
+---
+
+## Build status (as of 2026-05-26)
+
+**Milestone:** M1 — Prove Edge · **Active spec:** 01 — Data Collection
+
+| Spec | Status | Notes |
+|---|---|---|
+| 01 — Data Collection | 🏗️ code + tests complete | `ats db migrate` bug fixed; DB smoke test still needed to close |
+| 02–06 — M1 remaining | 🔲 not started | blocked on spec 01 acceptance criteria |
+| 07–10 — M2–M4 | 🔲 not started | gated on M1 decision gate |
+
+**What is running:**
+- `ats db migrate/downgrade` — Alembic wrappers
+- `ats ingest backfill / xvenue-funding / media-pull` — Tier 1 one-shot REST ingestion
+- `ats data status / validate / summary / candles` — data inspection CLI
+- All 9 spec-01 pytest files: **23 passed, 3 skipped** (skips are DB-dependent)
+
+**What is NOT yet wired (future specs):**
+- Any indicator/feature computation (spec 02)
+- Signal agents or synthesizer (spec 04)
+- Replay harness (spec 05)
+- Decision gate (spec 06)
+- LLM calls, learning loop, dashboard, live daemons (M2–M4)
+
+The live tracker with the full acceptance checklist lives in `README.md`.
+
+---
+
 > v0.4 reorganizes the build around **four milestones (M1–M4)** with a hard
 > **decision gate** after M1. The earlier versions described the *end state*
 > well but sequenced the work as a six-phase commitment you couldn't validate

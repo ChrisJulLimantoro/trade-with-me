@@ -1,0 +1,20 @@
+BTCUSDT:
+  bybit: BTCUSDT
+  okx: BTC-USDT-SWAP
+  hyperliquid: BTC
+ETHUSDT:
+  bybit: ETHUSDT
+  okx: ETH-USDT-SWAP
+  hyperliquid: ETH
+SOLUSDT:
+  bybit: SOLUSDT
+  okx: SOL-USDT-SWAP
+  hyperliquid: SOL
+BNBUSDT:
+  bybit: BNBUSDT
+  okx: BNB-USDT-SWAP
+  hyperliquid: BNB
+XRPUSDT:
+  bybit: XRPUSDT
+  okx: XRP-USDT-SWAP
+  hyperliquid: XRP

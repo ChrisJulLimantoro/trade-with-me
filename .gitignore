@@ -15,5 +15,14 @@ wheels/
 .mypy_cache/
 .pytest_cache/
 
+# data artifacts
+data/
+
 # OS
 .DS_Store
+
+graphify-out/*
+!graphify-out/
+!graphify-out/GRAPH_REPORT.md
+!graphify-out/graph.html
+!graphify-out/graph.json

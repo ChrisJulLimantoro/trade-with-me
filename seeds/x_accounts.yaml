@@ -1,0 +1,14 @@
+# M2 will expand this to ~50 accounts. X ingestion is disabled in M1.
+accounts:
+  - coinbase
+  - binance
+  - cz_binance
+  - VitalikButerin
+  - aantonop
+  - GalaxyDigital
+  - DocumentingBTC
+  - woonomic
+  - 100trillionUSD
+  - PeterLBrandt
+  - DonaldJTrump
+  - ElonMusk

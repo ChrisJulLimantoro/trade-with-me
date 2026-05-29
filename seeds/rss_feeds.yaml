@@ -1,0 +1,9 @@
+feeds:
+  - url: https://www.coindesk.com/arc/outboundfeeds/rss/
+    account: coindesk
+  - url: https://www.theblock.co/rss.xml
+    account: theblock
+  - url: https://decrypt.co/feed
+    account: decrypt
+  - url: https://feeds.feedburner.com/CryptopanicNews
+    account: cryptopanic

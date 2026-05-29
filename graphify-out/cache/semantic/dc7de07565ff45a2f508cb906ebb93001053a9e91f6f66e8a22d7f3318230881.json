@@ -1,1 +1,0 @@
-{"nodes": [{"id": "specs_07_skills_and_mcp", "label": "Phase 7: Skills & MCP", "file_type": "document", "source_file": "specs/07-skills-and-mcp.md"}], "edges": [{"source": "specs_07_skills_and_mcp", "target": "specs_06_ui", "relation": "references", "confidence": "EXTRACTED", "confidence_score": 1.0, "source_file": "specs/07-skills-and-mcp.md"}], "hyperedges": []}
