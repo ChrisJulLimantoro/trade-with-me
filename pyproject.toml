@@ -22,6 +22,8 @@ dependencies = [
     "psycopg2-binary>=2.9",
     "pandas>=2.3.3",
     "pandas-ta>=0.4.71b0",
+    # POC LLM-plan trading layer (LLM_BASED_ARCHITECTURE.md). Mock mode needs no key.
+    "openai>=1.40",
 ]
 
 [project.optional-dependencies]

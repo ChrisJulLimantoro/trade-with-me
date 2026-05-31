@@ -3,9 +3,13 @@ from __future__ import annotations
 import uuid
 from datetime import datetime
 
-from sqlalchemy import BigInteger, Index, Integer, Numeric, String, Text, func
-from sqlalchemy.dialects.postgresql import JSONB, UUID
+from sqlalchemy import BigInteger, Boolean, DateTime, Index, Integer, Numeric, String, Text, func
+from sqlalchemy.dialects.postgresql import ARRAY, JSONB, UUID
 from sqlalchemy.orm import DeclarativeBase, Mapped, mapped_column
+
+# tz-aware timestamp for ORM-bound columns (DB columns are timestamptz). The spec-01/02
+# models get away with bare `Mapped[datetime]` because they're written via raw SQL.
+_TZ = DateTime(timezone=True)
 
 
 class Base(DeclarativeBase):
@@ -182,3 +186,120 @@ class Heartbeat(Base):
     status: Mapped[str] = mapped_column(String, nullable=False)
     detail: Mapped[str | None] = mapped_column(Text, nullable=True)
     updated_at: Mapped[datetime] = mapped_column(server_default=func.now(), nullable=False)
+
+
+# --- LLM-plan trading layer (POC, see LLM_BASED_ARCHITECTURE.md) ---
+
+
+class Plan(Base):
+    """One row per create_plan() output — the versioned strategic context."""
+
+    __tablename__ = "plans"
+    __table_args__ = (Index("idx_plans_symbol_status", "symbol", "status", "created_at"),)
+
+    plan_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    symbol: Mapped[str] = mapped_column(String, nullable=False)
+    created_at: Mapped[datetime] = mapped_column(_TZ, server_default=func.now(), nullable=False)
+    expires_at: Mapped[datetime] = mapped_column(_TZ, nullable=False)
+    as_of: Mapped[datetime] = mapped_column(_TZ, nullable=False)  # feature open_time as "now"
+    market_bias: Mapped[str] = mapped_column(String, nullable=False)  # bullish|bearish|neutral
+    status: Mapped[str] = mapped_column(
+        String, nullable=False, default="active"
+    )  # active|expired|invalidated|superseded
+    regime_cell: Mapped[str | None] = mapped_column(String, nullable=True)
+    rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
+    plan_metadata: Mapped[dict[str, object]] = mapped_column(
+        "metadata", JSONB, nullable=False, default=dict
+    )
+
+
+class Setup(Base):
+    """An allowed_setup[] of a plan; inherits plan_id."""
+
+    __tablename__ = "setups"
+    __table_args__ = (
+        Index("idx_setups_plan", "plan_id"),
+        Index("idx_setups_symbol_status", "symbol", "status"),
+    )
+
+    setup_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    plan_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    symbol: Mapped[str] = mapped_column(String, nullable=False)
+    direction: Mapped[str] = mapped_column(String, nullable=False)  # long|short
+    status: Mapped[str] = mapped_column(
+        String, nullable=False, default="proposed"
+    )  # proposed|active|detected|expired|invalidated|realized|rejected
+    entry_zone_low: Mapped[float] = mapped_column(Numeric, nullable=False)
+    entry_zone_high: Mapped[float] = mapped_column(Numeric, nullable=False)
+    take_profit: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
+    stop_loss: Mapped[float] = mapped_column(Numeric, nullable=False)
+    size_pct: Mapped[float] = mapped_column(Numeric, nullable=False)
+    hard_rules: Mapped[list[dict[str, object]]] = mapped_column(JSONB, nullable=False, default=list)
+    soft_rules: Mapped[list[dict[str, object]]] = mapped_column(JSONB, nullable=False, default=list)
+    invalidation_rules: Mapped[list[dict[str, object]]] = mapped_column(
+        JSONB, nullable=False, default=list
+    )
+    expires_at: Mapped[datetime] = mapped_column(_TZ, nullable=False)
+    detected_at: Mapped[datetime | None] = mapped_column(_TZ, nullable=True)
+    setup_metadata: Mapped[dict[str, object]] = mapped_column(
+        "metadata", JSONB, nullable=False, default=dict
+    )
+
+
+class PaperTrade(Base):
+    """Executor output — PAPER only, never a live order."""
+
+    __tablename__ = "paper_trades"
+    __table_args__ = (Index("idx_paper_trades_status", "status", "symbol"),)
+
+    trade_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    setup_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    plan_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
+    symbol: Mapped[str] = mapped_column(String, nullable=False)
+    direction: Mapped[str] = mapped_column(String, nullable=False)  # long|short
+    size_pct: Mapped[float] = mapped_column(Numeric, nullable=False)
+    entry_price: Mapped[float] = mapped_column(Numeric, nullable=False)
+    entry_time: Mapped[datetime] = mapped_column(_TZ, nullable=False)
+    stop_loss: Mapped[float] = mapped_column(Numeric, nullable=False)
+    take_profit: Mapped[list[float]] = mapped_column(JSONB, nullable=False)
+    exit_price: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    exit_time: Mapped[datetime | None] = mapped_column(_TZ, nullable=True)
+    exit_reason: Mapped[str | None] = mapped_column(String, nullable=True)  # sl|tp|expiry|inval
+    pnl_pct: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    pnl_usd: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    status: Mapped[str] = mapped_column(String, nullable=False, default="open")  # open|closed
+    reasons: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
+    trade_metadata: Mapped[dict[str, object]] = mapped_column(
+        "metadata", JSONB, nullable=False, default=dict
+    )
+
+
+class LlmCall(Base):
+    """Audit + cost for each LLM invocation (real or mock)."""
+
+    __tablename__ = "llm_calls"
+    __table_args__ = (Index("idx_llm_calls_kind_time", "kind", "created_at"),)
+
+    call_id: Mapped[uuid.UUID] = mapped_column(
+        UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
+    )
+    created_at: Mapped[datetime] = mapped_column(_TZ, server_default=func.now(), nullable=False)
+    kind: Mapped[str] = mapped_column(String, nullable=False)  # create_plan|confirm_setup
+    model: Mapped[str] = mapped_column(String, nullable=False)
+    mock: Mapped[bool] = mapped_column(Boolean, nullable=False)
+    symbol: Mapped[str | None] = mapped_column(String, nullable=True)
+    plan_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    setup_id: Mapped[uuid.UUID | None] = mapped_column(UUID(as_uuid=True), nullable=True)
+    input_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    output_tokens: Mapped[int] = mapped_column(Integer, nullable=False, default=0)
+    cost_usd: Mapped[float] = mapped_column(Numeric, nullable=False, default=0)
+    latency_ms: Mapped[int | None] = mapped_column(Integer, nullable=True)
+    parse_ok: Mapped[bool] = mapped_column(Boolean, nullable=False, default=True)
+    request: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)
+    response: Mapped[dict[str, object] | None] = mapped_column(JSONB, nullable=True)

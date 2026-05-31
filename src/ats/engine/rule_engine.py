@@ -1,0 +1,145 @@
+"""Deterministic rule engine — the real-time detector.
+
+Evaluates a plan's setups against a feature snapshot WITHOUT any LLM call. A rule is
+a plain dict ``{"left", "operator", "right", "weight"?}`` (the JSON the LLM emits).
+Operands resolve to a feature value, the literal token ``"price"``, or a number.
+
+Pure and DB-free, so it unit-tests like the ``processing`` indicators.
+"""
+
+from __future__ import annotations
+
+import math
+from dataclasses import dataclass, field
+from typing import Any
+
+from ats.logging import get_logger
+
+log = get_logger(__name__)
+
+_NUMERIC_OPS = {
+    ">": lambda a, b: a > b,
+    "<": lambda a, b: a < b,
+    ">=": lambda a, b: a >= b,
+    "<=": lambda a, b: a <= b,
+    "==": lambda a, b: a == b,
+    "!=": lambda a, b: a != b,
+}
+_CROSS_OPS = {"crosses_above", "crosses_below"}
+
+
+def resolve_operand(operand: float | int | str, features: dict[str, Any]) -> float | None:
+    """Resolve a rule operand to a number.
+
+    Numbers are literals. The string ``"price"`` resolves to the current close.
+    Any other string is a feature-column name. Missing / NaN → ``None`` (the rule
+    will then be treated as False by the caller).
+    """
+    if isinstance(operand, bool):  # guard: bool is an int subclass
+        return float(operand)
+    if isinstance(operand, (int, float)):
+        return float(operand)
+    val = features.get(operand)
+    if val is None:
+        return None
+    try:
+        f = float(val)
+    except (TypeError, ValueError):
+        return None
+    return None if math.isnan(f) else f
+
+
+def eval_rule(
+    rule: dict[str, Any], features: dict[str, Any], prev: dict[str, Any] | None = None
+) -> bool:
+    """Evaluate one rule to a bool. Unresolvable operands → False (conservative)."""
+    op = rule.get("operator")
+    left_raw, right_raw = rule.get("left"), rule.get("right")
+
+    if op in _CROSS_OPS:
+        if prev is None:
+            return False
+        cur_l, cur_r = resolve_operand(left_raw, features), resolve_operand(right_raw, features)
+        prev_l, prev_r = resolve_operand(left_raw, prev), resolve_operand(right_raw, prev)
+        if None in (cur_l, cur_r, prev_l, prev_r):
+            return False
+        if op == "crosses_above":
+            return prev_l <= prev_r and cur_l > cur_r
+        return prev_l >= prev_r and cur_l < cur_r
+
+    fn = _NUMERIC_OPS.get(op)
+    if fn is None:
+        log.warning("rule_unknown_operator", operator=op)
+        return False
+    left, right = resolve_operand(left_raw, features), resolve_operand(right_raw, features)
+    if left is None or right is None:
+        return False
+    return bool(fn(left, right))
+
+
+def eval_hard_rules(
+    rules: list[dict[str, Any]], features: dict[str, Any], prev: dict[str, Any] | None = None
+) -> tuple[bool, list[str]]:
+    """All hard rules must pass. Returns (all_passed, list of failed rule descriptions)."""
+    failed = [
+        f"{r.get('left')} {r.get('operator')} {r.get('right')}"
+        for r in rules
+        if not eval_rule(r, features, prev)
+    ]
+    return (len(failed) == 0), failed
+
+
+def score_soft_rules(
+    rules: list[dict[str, Any]], features: dict[str, Any], prev: dict[str, Any] | None = None
+) -> float:
+    """Weighted fraction of soft rules that pass. No soft rules → 1.0 (neutral)."""
+    if not rules:
+        return 1.0
+    total = sum(float(r.get("weight") or 1.0) for r in rules)
+    if total <= 0:
+        return 1.0
+    passed = sum(
+        float(r.get("weight") or 1.0) for r in rules if eval_rule(r, features, prev)
+    )
+    return passed / total
+
+
+def in_entry_zone(price: float | None, low: float, high: float) -> bool:
+    return price is not None and low <= price <= high
+
+
+@dataclass
+class SetupEval:
+    detected: bool
+    price_ok: bool
+    hard_ok: bool
+    soft_score: float
+    price: float | None
+    failed_hard: list[str] = field(default_factory=list)
+
+
+def evaluate_setup(
+    setup: dict[str, Any],
+    features: dict[str, Any],
+    prev: dict[str, Any] | None = None,
+    *,
+    soft_threshold: float,
+) -> SetupEval:
+    """Combine entry-zone + hard rules + soft threshold into a detection decision.
+
+    ``setup`` is a dict with keys ``entry_zone_low``, ``entry_zone_high``,
+    ``hard_rules``, ``soft_rules``. ``features`` must include ``price`` (the close).
+    """
+    price = resolve_operand("price", features)
+    price_ok = in_entry_zone(price, float(setup["entry_zone_low"]), float(setup["entry_zone_high"]))
+    hard_ok, failed = eval_hard_rules(setup.get("hard_rules") or [], features, prev)
+    soft_score = score_soft_rules(setup.get("soft_rules") or [], features, prev)
+    detected = price_ok and hard_ok and soft_score >= soft_threshold
+    return SetupEval(
+        detected=detected,
+        price_ok=price_ok,
+        hard_ok=hard_ok,
+        soft_score=soft_score,
+        price=price,
+        failed_hard=failed,
+    )
