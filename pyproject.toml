@@ -20,6 +20,8 @@ dependencies = [
     "feedparser>=6.0",
     "pyyaml>=6.0",
     "psycopg2-binary>=2.9",
+    "pandas>=2.3.3",
+    "pandas-ta>=0.4.71b0",
 ]
 
 [project.optional-dependencies]

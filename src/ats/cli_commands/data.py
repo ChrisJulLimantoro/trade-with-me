@@ -9,6 +9,9 @@ from rich.console import Console
 from rich.table import Table
 from sqlalchemy import func, select
 
+from ats.cli_commands._viz import SPARK_BLOCKS as _SPARK_BLOCKS
+from ats.cli_commands._viz import print_series as _viz_print_series
+from ats.cli_commands._viz import sparkline as _sparkline
 from ats.db.models import (
     Basis,
     Candle,
@@ -21,6 +24,8 @@ from ats.db.session import SessionLocal
 
 app = typer.Typer(name="data", help="Data inspection commands.")
 console = Console()
+
+__all__ = ["_SPARK_BLOCKS", "_sparkline"]
 
 
 @app.command()
@@ -83,42 +88,9 @@ def _parse_since(since: str) -> datetime:
     return datetime.now(UTC) - delta
 
 
-_SPARK_BLOCKS = "▁▂▃▄▅▆▇█"
-
-
-def _sparkline(values: list[float]) -> str:
-    """Map a numeric series to Unicode block characters (oldest→newest, left→right)."""
-    if not values:
-        return ""
-    lo, hi = min(values), max(values)
-    span = hi - lo
-    if span == 0:
-        return _SPARK_BLOCKS[0] * len(values)
-    out = []
-    for v in values:
-        idx = round((v - lo) / span * (len(_SPARK_BLOCKS) - 1))
-        out.append(_SPARK_BLOCKS[idx])
-    return "".join(out)
-
-
 def _print_series(label: str, series: list[float], fmt: str = ".2f") -> None:
-    """Print a labeled, trend-colored sparkline with first/last/min/max stats."""
-    if not series:
-        console.print(f"[yellow]No data for {label}.[/yellow]")
-        return
-    first, last = series[0], series[-1]
-    rising = last >= first
-    color = "green" if rising else "red"
-    arrow = "▲" if rising else "▼"
-    spark = _sparkline(series)
-    pct = ((last - first) / abs(first) * 100) if first != 0 else 0.0
-    console.print(f"[bold]{label}[/bold]  ({len(series)} pts)")
-    console.print(f"  [{color}]{spark}[/{color}]")
-    console.print(
-        f"  first {first:{fmt}}  last [{color}]{last:{fmt}}[/{color}]  "
-        f"min {min(series):{fmt}}  max {max(series):{fmt}}  "
-        f"[{color}]{arrow} {pct:+.2f}%[/{color}]\n"
-    )
+    """Print a labeled, trend-colored sparkline (delegates to the shared viz module)."""
+    _viz_print_series(console, label, series, fmt)
 
 
 async def _recent_values(session: Any, stmt: Any) -> list[float]:

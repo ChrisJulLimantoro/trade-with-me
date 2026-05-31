@@ -10,7 +10,7 @@ import typer
 
 from ats import __version__
 from ats.cli_commands import data as data_cmd
-from ats.cli_commands import db, ingest
+from ats.cli_commands import db, ingest, process, regime
 
 app = typer.Typer(
     name="ats",
@@ -25,6 +25,8 @@ app = typer.Typer(
 app.add_typer(db.app)
 app.add_typer(ingest.app)
 app.add_typer(data_cmd.app)
+app.add_typer(process.app)
+app.add_typer(regime.app)
 
 
 def _version_cb(value: bool) -> None:
