@@ -17,6 +17,27 @@ class RiskDecision:
     reasons: list[str] = field(default_factory=list)
 
 
+def regime_allows(regime_cell: str | None, direction: str) -> bool:
+    """Whether a setup's direction is aligned with the current regime.
+
+    The losing bucket in replay was counter-trend entries in chop. Rule of thumb:
+    - sideways regimes ("side-*"): take nothing (range chop stops out both ways),
+    - bull regimes ("bull-*"): longs only,
+    - bear regimes ("bear-*"): shorts only,
+    - unknown / missing regime: allow (no information to gate on).
+    """
+    if not regime_cell:
+        return True
+    head = regime_cell.split("-", 1)[0].lower()
+    if head == "side":
+        return False
+    if head == "bull":
+        return direction == "long"
+    if head == "bear":
+        return direction == "short"
+    return True
+
+
 def reward_risk(direction: str, entry: float, stop: float, take_profit: list[float]) -> float:
     """Reward:risk to the FIRST take-profit. Returns 0.0 if risk is non-positive."""
     if not take_profit:

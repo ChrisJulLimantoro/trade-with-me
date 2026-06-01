@@ -95,6 +95,17 @@ Decide one action:
 - "WAIT": conditions are marginal; do not execute this bar.
 - "REJECT": conditions contradict the plan; do not execute.
 
+Be selective — a detection is only an invitation, not a mandate. CONFIRM only when the
+fresh feature snapshot still supports the setup with conviction. Prefer WAIT or REJECT
+when momentum or structure has WEAKENED since the plan was written, e.g.:
+- the entry trigger barely passed (soft_score only just over threshold), or
+- momentum is fading against the trade (e.g. macd_hist turning, rsi_14 reverting toward 50
+  for a short / away from 50 for a long), or
+- price is stretched far into the entry_zone toward the stop rather than the target, or
+- the move looks like exhaustion / a counter-trend fade rather than continuation.
+Use REDUCE_SIZE when the thesis holds but conviction is only moderate. A WAIT/REJECT that
+avoids a marginal trade is a good outcome; do not rubber-stamp.
+
 This is PAPER trading only.
 You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.
 The object must exactly match this schema:

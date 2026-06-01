@@ -14,7 +14,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ats import trace
 from ats.db.models import PaperTrade
-from ats.execution.reconcile import ExitResult
+from ats.execution.reconcile import ExitResult, PartialFill, TradeState
 from ats.logging import get_logger
 
 log = get_logger(__name__)
@@ -67,6 +67,67 @@ async def open_paper_trade(
         size_pct=size_pct,
     )
     return trade.trade_id
+
+
+def _merge_state(trade: PaperTrade, state: TradeState) -> None:
+    """Persist updated exit state into ``trade_metadata`` (preserving other keys)."""
+    md = dict(trade.trade_metadata or {})
+    md.update(state.to_metadata())
+    trade.trade_metadata = md
+
+
+async def record_partial_exit(
+    session: AsyncSession,
+    trade_id: uuid.UUID,
+    partial: PartialFill,
+    state: TradeState,
+    *,
+    equity_usd: float,
+    size_pct: float,
+) -> None:
+    """Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open."""
+    trade = await session.get(PaperTrade, trade_id)
+    if trade is None:
+        log.warning("paper_trade_missing_on_partial", trade_id=str(trade_id))
+        return
+    leg_usd = round(equity_usd * size_pct * partial.frac * partial.pnl_pct, 2)
+    md = dict(trade.trade_metadata or {})
+    md.update(state.to_metadata())
+    legs = list(md.get("partials", []))
+    legs.append(
+        {
+            "tp_index": partial.tp_index,
+            "price": partial.price,
+            "frac": round(partial.frac, 4),
+            "pnl_pct": round(partial.pnl_pct, 6),
+            "pnl_usd": leg_usd,
+        }
+    )
+    md["partials"] = legs
+    trade.trade_metadata = md
+    await session.flush()
+    log.info(
+        "paper_trade_partial",
+        trade_id=str(trade_id),
+        tp_index=partial.tp_index,
+        frac=round(partial.frac, 4),
+        pnl_pct=round(partial.pnl_pct, 4),
+    )
+    trace.outcome(
+        f"SCALED OUT {partial.frac:.2f} at tp{partial.tp_index + 1} "
+        f"@ {partial.price} (leg {partial.pnl_pct * 100:+.2f}%) — stop→breakeven"
+    )
+
+
+async def update_trade_state(
+    session: AsyncSession, trade_id: uuid.UUID, state: TradeState
+) -> None:
+    """Persist a no-fill state change (e.g. a trailing-stop move) for an open trade."""
+    trade = await session.get(PaperTrade, trade_id)
+    if trade is None:
+        return
+    _merge_state(trade, state)
+    await session.flush()
 
 
 async def close_paper_trade(

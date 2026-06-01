@@ -25,12 +25,17 @@ from ats.db.models import LlmCall, PaperTrade, Plan, Setup
 from ats.engine import state
 from ats.engine.invalidation import evaluate_invalidation
 from ats.engine.rule_engine import evaluate_setup
-from ats.execution.executor import close_paper_trade, open_paper_trade
-from ats.execution.reconcile import check_bar_exit
+from ats.execution.executor import (
+    close_paper_trade,
+    open_paper_trade,
+    record_partial_exit,
+    update_trade_state,
+)
+from ats.execution.reconcile import ExitResult, TradeState, step_trade
 from ats import trace
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
-from ats.risk.manager import assess
+from ats.risk.manager import assess, regime_allows
 
 log = get_logger(__name__)
 
@@ -78,9 +83,14 @@ async def _open_trades_for(session: AsyncSession, symbol: str) -> list[PaperTrad
 
 
 async def _reconcile_open_trades(
-    session: AsyncSession, symbol: str, candle: dict[str, Any], report: TickReport
+    session: AsyncSession,
+    symbol: str,
+    candle: dict[str, Any],
+    report: TickReport,
+    *,
+    atr: float | None = None,
 ) -> None:
-    """Close any open trade whose stop/target/expiry is hit by the current bar."""
+    """Advance each open trade by this bar: scale out, trail, or close on stop/target/expiry."""
     for trade in await _open_trades_for(session, symbol):
         if trade.entry_time >= candle["open_time"]:
             continue  # entered this bar or later — can't exit on its own entry bar
@@ -90,25 +100,42 @@ async def _reconcile_open_trades(
             if isinstance(raw_expiry, str)
             else candle["open_time"]
         )
-        exit_result = check_bar_exit(
-            {
-                "direction": trade.direction,
-                "entry_price": _f(trade.entry_price),
-                "stop_loss": _f(trade.stop_loss),
-                "take_profit": [float(x) for x in trade.take_profit],
-            },
+        trade_d = {
+            "direction": trade.direction,
+            "entry_price": _f(trade.entry_price),
+            "stop_loss": _f(trade.stop_loss),
+            "take_profit": [float(x) for x in trade.take_profit],
+        }
+        state = TradeState.from_metadata(trade.trade_metadata)
+        step = step_trade(
+            trade_d,
             candle,
+            state,
             expires_at=expires_at,
+            scale_out_frac=settings.scale_out_frac,
+            trail_atr_mult=settings.trail_atr_mult,
+            atr=atr,
         )
-        if exit_result is not None:
+        if step.closed:
             await close_paper_trade(
                 session,
                 trade.trade_id,
-                exit_result,
+                step.exit_result,
                 equity_usd=settings.paper_equity_usd,
                 size_pct=_f(trade.size_pct),
             )
             report.closed += 1
+        elif step.partial is not None:
+            await record_partial_exit(
+                session,
+                trade.trade_id,
+                step.partial,
+                step.state,
+                equity_usd=settings.paper_equity_usd,
+                size_pct=_f(trade.size_pct),
+            )
+        elif step.state.working_stop != state.working_stop:
+            await update_trade_state(session, trade.trade_id, step.state)
 
 
 async def _handle_invalidation(
@@ -130,20 +157,20 @@ async def _handle_invalidation(
         if sev == "hard":
             hard = True
             s.status = "invalidated"
-            # close any open trade for this setup at the current close
+            # close any open trade for this setup at the current close, banking partials
             for trade in await _open_trades_for(session, s.symbol):
                 if trade.setup_id == s.setup_id:
                     price = feature_row["price"]
                     direction = trade.direction
                     entry = _f(trade.entry_price)
                     raw = (price - entry) / entry if entry else 0.0
-                    from ats.execution.reconcile import ExitResult
-
+                    leg = raw if direction == "long" else -raw
+                    st = TradeState.from_metadata(trade.trade_metadata)
+                    total = st.realized_pnl_pct + st.remaining_frac * leg
                     await close_paper_trade(
                         session,
                         trade.trade_id,
-                        ExitResult(price, feature_row["open_time"], "invalidation",
-                                   raw if direction == "long" else -raw),
+                        ExitResult(price, feature_row["open_time"], "invalidation", total),
                         equity_usd=settings.paper_equity_usd,
                         size_pct=_f(trade.size_pct),
                     )
@@ -151,7 +178,20 @@ async def _handle_invalidation(
         elif sev == "soft":
             paused = True
         elif sev == "warning":
-            report.notes.append(f"warning invalidation on setup {s.setup_id}")
+            # Thesis weakening: protect the open trade by moving its stop to breakeven
+            # and pause new entries this bar.
+            paused = True
+            for trade in await _open_trades_for(session, s.symbol):
+                if trade.setup_id != s.setup_id or trade.status != "open":
+                    continue
+                st = TradeState.from_metadata(trade.trade_metadata)
+                if not st.breakeven:
+                    st.working_stop = _f(trade.entry_price)
+                    st.breakeven = True
+                    await update_trade_state(session, trade.trade_id, st)
+                    report.notes.append(
+                        f"warning invalidation on setup {s.setup_id}: stop→breakeven"
+                    )
 
     if hard:
         plan.status = "invalidated"
@@ -282,7 +322,10 @@ async def evaluate_now(
         "low": feature_row["low"],
         "close": feature_row["close"],
     }
-    await _reconcile_open_trades(session, symbol, candle, report)
+    atr = feature_row.get("atr_14")
+    await _reconcile_open_trades(
+        session, symbol, candle, report, atr=_f(atr) if atr is not None else None
+    )
 
     plan = await state.active_plan(session, symbol)
     if plan is None:
@@ -320,6 +363,12 @@ async def evaluate_now(
         if not ev.detected:
             continue
         report.detections += 1
+        if settings.regime_filter and not regime_allows(plan.regime_cell, setup.direction):
+            trace.outcome(f"SKIPPED: regime {plan.regime_cell} disallows {setup.direction}")
+            report.notes.append(
+                f"setup {setup.setup_id} regime-filtered ({plan.regime_cell}/{setup.direction})"
+            )
+            continue
         await _confirm_and_execute(
             session, client, plan, setup, setup_d, ev, feature_row, now, open_positions, report
         )

@@ -25,10 +25,21 @@ class Settings(BaseSettings):
 
     # --- Engine / planning / risk knobs ---
     plan_refresh_bars: int = 16  # replay: refresh the plan every N feature bars (~4h on 15m)
-    soft_threshold: float = 0.5  # min weighted soft-rule score to "detect" a setup
+    soft_threshold: float = 0.6  # min weighted soft-rule score to "detect" a setup
     max_position_pct: float = 0.10  # risk: max size_pct per trade
-    min_rr: float = 1.5  # risk: min reward:risk
+    min_rr: float = 2.0  # risk: min reward:risk (raised from 1.5 — low hit rate needs bigger wins)
     paper_equity_usd: float = 10_000.0
+
+    # --- Exit management (scale-out + breakeven + trailing) ---
+    # Fraction of the *remaining* position closed at each non-final take-profit. The
+    # remainder rides to the next target with the stop moved to breakeven.
+    scale_out_frac: float = 0.5
+    # Trailing-stop distance as a multiple of atr_14, applied to the runner once the
+    # stop is at breakeven. 0 disables trailing.
+    trail_atr_mult: float = 1.5
+    # Only take setups aligned with the regime: skip entries in sideways regimes and
+    # require trend-aligned direction in trending regimes.
+    regime_filter: bool = True
 
 
 settings = Settings()
