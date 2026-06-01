@@ -17,6 +17,7 @@ class Settings(BaseSettings):
     # --- LLM-plan trading layer (POC, see LLM_BASED_ARCHITECTURE.md) ---
     # OpenAI client. Default to mock so the full pipeline + tests run with no key.
     openai_api_key: str | None = None
+    openai_base_url: str | None = None  # e.g. https://openrouter.ai/api/v1
     llm_mock: bool = True
     llm_plan_model: str = "gpt-4o"  # create_plan — heavier reasoning
     llm_confirm_model: str = "gpt-4o-mini"  # confirm_setup — cheap/fast

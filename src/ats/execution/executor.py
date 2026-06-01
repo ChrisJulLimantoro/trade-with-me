@@ -12,6 +12,7 @@ from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ats import trace
 from ats.db.models import PaperTrade
 from ats.execution.reconcile import ExitResult
 from ats.logging import get_logger
@@ -56,6 +57,15 @@ async def open_paper_trade(
         entry=entry_price,
         size_pct=size_pct,
     )
+    trace.trade_opened(
+        now=entry_time,
+        trade_id=trade.trade_id,
+        plan_id=trade.plan_id,
+        setup_id=trade.setup_id,
+        direction=trade.direction,
+        entry=entry_price,
+        size_pct=size_pct,
+    )
     return trade.trade_id
 
 
@@ -84,4 +94,11 @@ async def close_paper_trade(
         trade_id=str(trade_id),
         reason=exit_result.exit_reason,
         pnl_pct=round(exit_result.pnl_pct, 4),
+    )
+    trace.trade_closed(
+        now=exit_result.exit_time,
+        trade_id=trade_id,
+        plan_id=trade.plan_id,
+        reason=exit_result.exit_reason,
+        pnl_pct=exit_result.pnl_pct,
     )

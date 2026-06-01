@@ -79,29 +79,45 @@ class OpenAIClient:
     def __init__(self, api_key: str) -> None:
         from openai import AsyncOpenAI
 
-        self._client = AsyncOpenAI(api_key=api_key)
+        self._client = AsyncOpenAI(
+            api_key=api_key,
+            **({"base_url": settings.openai_base_url} if settings.openai_base_url else {}),
+        )
 
     async def _parse(
         self, *, model: str, system: str, envelope: dict[str, Any], schema: type
     ) -> tuple[Any | None, LlmResult]:
         t0 = time.perf_counter()
         try:
-            resp = await self._client.responses.parse(
+            resp = await self._client.chat.completions.create(
                 model=model,
-                input=[
+                messages=[
                     {"role": "system", "content": system},
                     {"role": "user", "content": prompts.user_message(envelope)},
                 ],
-                text_format=schema,
-                max_output_tokens=settings.llm_max_tokens,
+                response_format={"type": "json_object"},
+                max_tokens=settings.llm_max_tokens,
+                # opencode zen / OpenRouter convention: disable the reasoning trace so
+                # the token budget goes to the JSON answer, not hidden chain-of-thought.
+                extra_body={
+                    "reasoning": {"enabled": False},
+                    "thinking": {"type": "disabled"}
+                },
             )
-            parsed = resp.output_parsed
+            choice = resp.choices[0]
+            content = choice.message.content or ""
+            if not content:
+                finish = getattr(choice, "finish_reason", None)
+                reasoning = getattr(choice.message, "reasoning_content", None)
+                raise ValueError(
+                    f"model returned no content (finish_reason={finish}, "
+                    f"reasoning_len={len(reasoning or '')})"
+                )
+            parsed = schema.model_validate_json(content)
             usage = getattr(resp, "usage", None)
-            tin = int(getattr(usage, "input_tokens", 0) or 0)
-            tout = int(getattr(usage, "output_tokens", 0) or 0)
+            tin = int(getattr(usage, "prompt_tokens", 0) or 0)
+            tout = int(getattr(usage, "completion_tokens", 0) or 0)
             latency = int((time.perf_counter() - t0) * 1000)
-            if parsed is None:
-                raise ValueError("model returned no parseable output")
             result = LlmResult(
                 parse_ok=True,
                 model=model,

@@ -4,7 +4,8 @@ from __future__ import annotations
 
 import asyncio
 import re
-from datetime import timedelta
+from datetime import datetime, timedelta
+from typing import Any
 
 import typer
 from rich.console import Console
@@ -34,16 +35,42 @@ def replay(
     symbol: str = typer.Option("BTCUSDT", "--symbol", help="Symbol."),
     timeframe: str = typer.Option("15m", "--timeframe", help="Timeframe, e.g. 15m, 1h, 4h."),
     since: str = typer.Option("30d", "--since", help="How far back to replay, e.g. 30d."),
+    log_file: str = typer.Option(
+        None,
+        "--log-file",
+        help="Path for the readable plan/confirm/trade trace "
+        "(default: logs/replay_<symbol>_<tf>.log).",
+    ),
+    no_log: bool = typer.Option(
+        False, "--no-log", help="Disable the trace file (console summary only)."
+    ),
+    reset: bool = typer.Option(
+        False,
+        "--reset",
+        help="Delete existing paper_trades for this symbol before replaying "
+        "(clears stale open positions and prior-run P&L).",
+    ),
 ) -> None:
     """Replay the full loop over historical features (the primary POC demo)."""
+    from pathlib import Path
+
+    from sqlalchemy import text
+
+    from ats import trace
     from ats.engine.loop import run_replay
+
+    if not no_log:
+        stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+        path = log_file or f"logs/replay_{symbol}_{timeframe}_{stamp}.log"
+        Path(path).parent.mkdir(parents=True, exist_ok=True)
+        trace.init(path)
+        trace.header(f"REPLAY  {symbol} {timeframe}  since {since}")
+        console.print(f"[dim]trace -> {path}  (tail -f to watch live)[/dim]")
 
     client = get_client()
 
     async def _run() -> None:
         async with SessionLocal() as session:
-            from sqlalchemy import text
-
             latest = (
                 await session.execute(
                     text(
@@ -59,6 +86,14 @@ def replay(
                 )
                 raise typer.Exit(1)
             since_dt = latest - _parse_since(since)
+            if reset:
+                deleted = (
+                    await session.execute(
+                        text("DELETE FROM paper_trades WHERE symbol=:s"), {"s": symbol}
+                    )
+                ).rowcount
+                await session.commit()
+                console.print(f"[dim]reset: deleted {deleted} paper_trades for {symbol}[/dim]")
             rep = await run_replay(session, client, symbol=symbol, tf=timeframe, since=since_dt)
 
         console.print(
@@ -67,9 +102,11 @@ def replay(
         console.print(
             f"  bars={rep.bars}  plans={rep.plans_created}  detections={rep.detections}  "
             f"opened={rep.opened}  closed={rep.closed}  invalidations={rep.invalidations}  "
-            f"confirm_calls={rep.confirm_calls}"
+            f"confirm_calls={rep.confirm_calls}  risk_rejected={rep.risk_rejected}"
         )
-        await _print_trade_summary(symbol)
+        for note in rep.notes:
+            console.print(f"  [dim]- {note}[/dim]")
+        await _print_trade_summary(symbol, since_dt)
 
     asyncio.run(_run())
 
@@ -180,9 +217,14 @@ def run(
         console.print("\n[dim]stopped.[/dim]")
 
 
-async def _print_trade_summary(symbol: str) -> None:
+async def _print_trade_summary(symbol: str, since: datetime | None = None) -> None:
     from sqlalchemy import text
 
+    params: dict[str, Any] = {"s": symbol}
+    where = "symbol = :s"
+    if since is not None:
+        where += " AND entry_time >= :since"
+        params["since"] = since
     async with SessionLocal() as session:
         rows = (
             await session.execute(
@@ -192,15 +234,16 @@ async def _print_trade_summary(symbol: str) -> None:
                     "count(*) FILTER (WHERE pnl_pct > 0) AS wins, "
                     "round(avg(pnl_pct) FILTER (WHERE status='closed')::numeric, 4) AS avg_pnl, "
                     "round(sum(pnl_usd) FILTER (WHERE status='closed')::numeric, 2) AS pnl_usd "
-                    "FROM paper_trades WHERE symbol = :s"
+                    f"FROM paper_trades WHERE {where}"
                 ),
-                {"s": symbol},
+                params,
             )
         ).mappings().first()
     closed = rows["closed"] or 0
     wins = rows["wins"] or 0
     win_rate = (wins / closed * 100) if closed else 0.0
+    scope = f" (since {str(since)[:19]})" if since is not None else ""
     console.print(
-        f"  trades: closed={closed} open={rows['open'] or 0} "
+        f"  trades{scope}: closed={closed} open={rows['open'] or 0} "
         f"win_rate={win_rate:.0f}% avg_pnl={rows['avg_pnl'] or 0} pnl_usd=${rows['pnl_usd'] or 0}"
     )

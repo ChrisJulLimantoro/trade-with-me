@@ -36,7 +36,15 @@ class ReplayReport:
     closed: int = 0
     invalidations: int = 0
     confirm_calls: int = 0
+    risk_rejected: int = 0
     notes: list[str] = field(default_factory=list)
+
+
+# Per-bar status notes that persist across many consecutive bars. We collapse these
+# to a single line at the transition (start / resume) instead of one line per bar.
+_STICKY_NOTES = frozenset(
+    {"position open: skipping new entries", "soft invalidation: new entries paused"}
+)
 
 
 def _accumulate(report: ReplayReport, tick: TickReport) -> None:
@@ -44,8 +52,29 @@ def _accumulate(report: ReplayReport, tick: TickReport) -> None:
     report.opened += tick.opened
     report.closed += tick.closed
     report.confirm_calls += tick.confirm_calls
+    report.risk_rejected += tick.risk_rejected
     if tick.plan_invalidated:
         report.invalidations += 1
+
+
+def _record_notes(report: ReplayReport, tick: TickReport, active_sticky: str | None) -> str | None:
+    """Append this tick's notes, collapsing sticky states to start/resume transitions.
+
+    Returns the sticky state now active (carried into the next bar).
+    """
+    if tick.now is None:
+        return active_sticky
+    ts = str(tick.now)[:19]
+    sticky = next((n for n in tick.notes if n in _STICKY_NOTES), None)
+    for n in tick.notes:
+        if n not in _STICKY_NOTES:
+            report.notes.append(f"{ts} {n}")
+    if sticky != active_sticky:
+        if sticky is not None:
+            report.notes.append(f"{ts} {sticky}")
+        elif active_sticky is not None:
+            report.notes.append(f"{ts} entries resumed")
+    return sticky
 
 
 async def _ensure_plan(
@@ -83,6 +112,7 @@ async def run_replay(
         return report
 
     bars_since_plan = settings.plan_refresh_bars  # force a plan on the first bar
+    active_sticky: str | None = None
     for i, row in enumerate(rows):
         now = row["open_time"]
         created, bars_since_plan = await _ensure_plan(
@@ -96,6 +126,7 @@ async def run_replay(
             candle_closed=True, now=now,
         )
         _accumulate(report, tick)
+        active_sticky = _record_notes(report, tick, active_sticky)
         report.bars += 1
 
     await session.commit()
@@ -158,6 +189,8 @@ async def run_live(
             detections=tick.detections,
             opened=tick.opened,
             closed=tick.closed,
+            risk_rejected=tick.risk_rejected,
+            notes=tick.notes,
         )
         if once:
             return

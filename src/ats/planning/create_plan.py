@@ -22,10 +22,49 @@ from ats.db.models import LlmCall, Plan, Setup
 from ats.engine import state
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.llm.client import LlmClient
-from ats.llm.schemas import LlmResult, PlanOutput
+from ats import trace
+from ats.llm.schemas import LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
+from ats.risk.manager import reward_risk
 
 log = get_logger(__name__)
+
+
+def _worst_case_fill(setup: SetupOutput) -> float:
+    """The entry-zone edge the engine treats as worst case for reward:risk.
+
+    The engine may fill anywhere inside entry_zone and computes RR at the actual
+    fill, so the unfavorable edge is the one nearest the take-profit: the high edge
+    for longs, the low edge for shorts.
+    """
+    low, high = setup.entry_zone
+    return high if setup.direction == "long" else low
+
+
+def _admissible_setups(setups: list[SetupOutput], *, min_rr: float) -> list[SetupOutput]:
+    """Drop setups whose worst-case-fill RR cannot clear ``min_rr``.
+
+    This mirrors the deterministic risk gate (``risk.manager.assess``) so doomed setups
+    never reach the confirm stage and burn LLM calls. A setup that clears here may still
+    be rejected at fill time if price moves, but it can no longer be structurally
+    impossible.
+    """
+    admissible: list[SetupOutput] = []
+    for s in setups:
+        rr = reward_risk(s.direction, _worst_case_fill(s), s.stop_loss, list(s.take_profit))
+        if rr < min_rr:
+            log.info(
+                "setup_dropped_low_rr",
+                direction=s.direction,
+                worst_case_rr=round(rr, 3),
+                min_rr=min_rr,
+                entry_zone=s.entry_zone,
+                stop_loss=s.stop_loss,
+                tp1=s.take_profit[0] if s.take_profit else None,
+            )
+            continue
+        admissible.append(s)
+    return admissible
 
 
 @dataclass
@@ -102,7 +141,7 @@ async def _persist(
     session.add(plan)
 
     setups: list[Setup] = []
-    for s in plan_out.allowed_setups:
+    for s in _admissible_setups(plan_out.allowed_setups, min_rr=settings.min_rr):
         setup = Setup(
             setup_id=uuid.uuid4(),
             plan_id=plan.plan_id,
@@ -154,6 +193,7 @@ async def create_plan(
             plan_out=plan_out,
             regime_cell=regime_cell,
         )
+        trace.plan(plan, setups)
     else:
         log.warning("create_plan_llm_failed", symbol=symbol, model=llm.model)
 

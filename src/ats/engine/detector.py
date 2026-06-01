@@ -27,6 +27,7 @@ from ats.engine.invalidation import evaluate_invalidation
 from ats.engine.rule_engine import evaluate_setup
 from ats.execution.executor import close_paper_trade, open_paper_trade
 from ats.execution.reconcile import check_bar_exit
+from ats import trace
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.risk.manager import assess
@@ -42,6 +43,7 @@ class TickReport:
     opened: int = 0
     closed: int = 0
     confirm_calls: int = 0
+    risk_rejected: int = 0
     plan_invalidated: bool = False
     paused: bool = False
     notes: list[str] = field(default_factory=list)
@@ -189,6 +191,15 @@ async def _confirm_and_execute(
     }
     confirm, llm = await client.confirm_setup(confirm_env, symbol=setup.symbol)
     report.confirm_calls += 1
+    trace.confirm(
+        now=now,
+        plan_id=plan.plan_id,
+        setup_id=setup.setup_id,
+        ev=ev,
+        action=(confirm.action if confirm else "PARSE_FAIL"),
+        reason=(confirm.reason if confirm else None),
+        size_multiplier=(confirm.size_multiplier if confirm else 1.0),
+    )
     session.add(
         LlmCall(
             call_id=uuid.uuid4(),
@@ -210,6 +221,7 @@ async def _confirm_and_execute(
     if not llm.parse_ok or confirm is None or confirm.action in ("WAIT", "REJECT"):
         if confirm is not None and confirm.action == "REJECT":
             setup.status = "rejected"
+        trace.outcome(f"SKIPPED: {confirm.action if confirm else 'parse_fail'}")
         report.notes.append(
             f"setup {setup.setup_id} not executed ({confirm.action if confirm else 'parse_fail'})"
         )
@@ -225,6 +237,8 @@ async def _confirm_and_execute(
         size_multiplier=multiplier,
     )
     if not decision.approved:
+        report.risk_rejected += 1
+        trace.outcome(f"SKIPPED: risk-rejected — {'; '.join(decision.reasons)}")
         report.notes.append(f"setup {setup.setup_id} risk-rejected: {decision.reasons}")
         return
 
@@ -244,6 +258,7 @@ async def _confirm_and_execute(
     setup.detected_at = now
     open_positions.append({"symbol": setup.symbol})
     report.opened += 1
+    trace.outcome(f"EXECUTED — {'; '.join(decision.reasons)}")
     await session.flush()
 
 
