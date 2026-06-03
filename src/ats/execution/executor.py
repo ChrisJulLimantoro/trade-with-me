@@ -28,10 +28,15 @@ async def open_paper_trade(
     entry_time: datetime,
     size_pct: float,
     reasons: list[str],
+    leverage: float | None = None,
+    liq_price: float | None = None,
+    risk_usd: float | None = None,
 ) -> uuid.UUID:
     """Insert an open paper trade for a detected+confirmed+risk-approved setup.
 
     ``setup`` is a dict with setup_id, plan_id, symbol, direction, stop_loss, take_profit.
+    ``size_pct`` is notional / equity (>= 1.0 when leveraged); ``leverage``/``liq_price``/
+    ``risk_usd`` come from the risk-based sizer.
     """
     trade = PaperTrade(
         trade_id=uuid.uuid4(),
@@ -40,6 +45,9 @@ async def open_paper_trade(
         symbol=setup["symbol"],
         direction=setup["direction"],
         size_pct=size_pct,
+        leverage=leverage,
+        liq_price=liq_price,
+        risk_usd=risk_usd,
         entry_price=entry_price,
         entry_time=entry_time,
         stop_loss=float(setup["stop_loss"]),

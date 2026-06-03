@@ -17,12 +17,26 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ats.config import settings
 from ats.engine import state
-from ats.engine.detector import TickReport, evaluate_now
+from ats.engine.detector import ClosedTradeInfo, TickReport, evaluate_now
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.planning.create_plan import create_plan
 
 log = get_logger(__name__)
+
+
+@dataclass
+class TradeOutcome:
+    """Lightweight summary captured for each closed trade during replay."""
+
+    direction: str
+    entry_price: float
+    stop_loss: float
+    exit_price: float
+    exit_reason: str
+    pnl_pct: float  # raw price return (unlevered), signed
+    atr_at_entry: float | None  # atr_14 at the bar we entered
+    stop_dist_pts: float  # abs(entry - stop_loss) in price points
 
 
 @dataclass
@@ -36,8 +50,36 @@ class ReplayReport:
     closed: int = 0
     invalidations: int = 0
     confirm_calls: int = 0
+    observe_calls: int = 0
     risk_rejected: int = 0
+    trade_outcomes: list[TradeOutcome] = field(default_factory=list)
     notes: list[str] = field(default_factory=list)
+
+    # --- derived metrics (populated by finalise()) ---
+    win_rate: float = 0.0
+    avg_pnl_pct: float = 0.0
+    expectancy_pct: float = 0.0  # avg_win * win_rate - avg_loss * loss_rate
+    avg_stop_dist_atr: float | None = None  # avg stop distance in ATR multiples
+
+    def finalise(self) -> None:
+        """Compute summary metrics from trade_outcomes. Call once after the loop."""
+        if not self.trade_outcomes:
+            return
+        wins = [t for t in self.trade_outcomes if t.pnl_pct > 0]
+        losses = [t for t in self.trade_outcomes if t.pnl_pct <= 0]
+        n = len(self.trade_outcomes)
+        self.win_rate = len(wins) / n
+        self.avg_pnl_pct = sum(t.pnl_pct for t in self.trade_outcomes) / n
+        avg_win = sum(t.pnl_pct for t in wins) / len(wins) if wins else 0.0
+        avg_loss = sum(t.pnl_pct for t in losses) / len(losses) if losses else 0.0
+        self.expectancy_pct = avg_win * self.win_rate + avg_loss * (1 - self.win_rate)
+        atr_multiples = [
+            t.stop_dist_pts / t.atr_at_entry
+            for t in self.trade_outcomes
+            if t.atr_at_entry and t.atr_at_entry > 0
+        ]
+        if atr_multiples:
+            self.avg_stop_dist_atr = sum(atr_multiples) / len(atr_multiples)
 
 
 # Per-bar status notes that persist across many consecutive bars. We collapse these
@@ -52,9 +94,23 @@ def _accumulate(report: ReplayReport, tick: TickReport) -> None:
     report.opened += tick.opened
     report.closed += tick.closed
     report.confirm_calls += tick.confirm_calls
+    report.observe_calls += tick.observe_calls
     report.risk_rejected += tick.risk_rejected
     if tick.plan_invalidated:
         report.invalidations += 1
+    for ct in tick.closed_trades:
+        report.trade_outcomes.append(
+            TradeOutcome(
+                direction=ct.direction,
+                entry_price=ct.entry_price,
+                stop_loss=ct.stop_loss,
+                exit_price=ct.exit_price,
+                exit_reason=ct.exit_reason,
+                pnl_pct=ct.pnl_pct,
+                atr_at_entry=ct.atr_at_close,  # best proxy we have; entry ATR is not threaded
+                stop_dist_pts=abs(ct.entry_price - ct.stop_loss),
+            )
+        )
 
 
 def _record_notes(report: ReplayReport, tick: TickReport, active_sticky: str | None) -> str | None:
@@ -86,7 +142,14 @@ async def _ensure_plan(
     now: datetime,
     bars_since_plan: int,
 ) -> tuple[bool, int]:
-    """Refresh the plan if there is none, it expired, or the refresh cadence elapsed."""
+    """Refresh the plan if there is none, it expired, or the refresh cadence elapsed.
+
+    Never refreshes while a position is open: re-thinking the thesis mid-trade is the
+    exit manager's / invalidation rules' job, not the strategist's, and a plan built
+    while holding would be discarded unused (entries are blocked) — wasting an LLM call.
+    """
+    if await state.open_positions(session, symbol=symbol):
+        return False, bars_since_plan
     plan = await state.active_plan(session, symbol)
     stale = plan is None or now >= plan.expires_at or bars_since_plan >= settings.plan_refresh_bars
     if stale:
@@ -113,23 +176,50 @@ async def run_replay(
 
     bars_since_plan = settings.plan_refresh_bars  # force a plan on the first bar
     active_sticky: str | None = None
+    observe_tf = settings.observe_timeframe
     for i, row in enumerate(rows):
         now = row["open_time"]
+        prev = rows[i - 1] if i > 0 else None
+
+        # While a position is open, manage exits on the finer timeframe: fetch the
+        # observe-tf candles spanning the prior→current decision bar so reconciliation
+        # (and the observation agent) react within the 15m bar, not just at its close.
+        open_before = bool(await state.open_positions(session, symbol=symbol))
+        fine_candles = None
+        if (
+            open_before
+            and settings.observe_enabled
+            and prev is not None
+            and observe_tf != tf
+        ):
+            fine_candles = await state.candles_between(
+                session, symbol, observe_tf, prev["open_time"], now
+            )
+
         created, bars_since_plan = await _ensure_plan(
             session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=bars_since_plan
         )
         if created:
             report.plans_created += 1
-        prev = rows[i - 1] if i > 0 else None
         tick = await evaluate_now(
-            session, client, symbol=symbol, feature_row=row, prev_row=prev,
-            candle_closed=True, now=now,
+            session, client, symbol=symbol, tf=tf, feature_row=row, prev_row=prev,
+            candle_closed=True, now=now, fine_candles=fine_candles,
         )
         _accumulate(report, tick)
         active_sticky = _record_notes(report, tick, active_sticky)
         report.bars += 1
 
+        # Re-plan on close: the thesis that anchored the just-closed trade is stale, so
+        # discard the active plan and force a fresh one on the next bar.
+        if (
+            settings.replan_on_close
+            and tick.closed > 0
+            and await state.supersede_active_plan(session, symbol)
+        ):
+            bars_since_plan = settings.plan_refresh_bars
+
     await session.commit()
+    report.finalise()
     return report
 
 
@@ -156,9 +246,11 @@ async def run_tick(
         session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=settings.plan_refresh_bars
     )
     tick = await evaluate_now(
-        session, client, symbol=symbol, feature_row=latest, prev_row=prev,
+        session, client, symbol=symbol, tf=tf, feature_row=latest, prev_row=prev,
         candle_closed=True, now=now,
     )
+    if settings.replan_on_close and tick.closed > 0:
+        await state.supersede_active_plan(session, symbol)
     await session.commit()
     return tick
 

@@ -35,6 +35,11 @@ def replay(
     symbol: str = typer.Option("BTCUSDT", "--symbol", help="Symbol."),
     timeframe: str = typer.Option("15m", "--timeframe", help="Timeframe, e.g. 15m, 1h, 4h."),
     since: str = typer.Option("30d", "--since", help="How far back to replay, e.g. 30d."),
+    profile: str = typer.Option(
+        "baseline",
+        "--profile",
+        help="Strategy profile (risk/leverage/hold preset): baseline | scalper.",
+    ),
     log_file: str = typer.Option(
         None,
         "--log-file",
@@ -57,14 +62,31 @@ def replay(
     from sqlalchemy import text
 
     from ats import trace
+    from ats.config import settings
     from ats.engine.loop import run_replay
+    from ats.strategy_profiles import apply_profile
+
+    try:
+        applied = apply_profile(profile)
+    except (KeyError, AttributeError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+    if applied:
+        knobs = "  ".join(f"{k}={v}" for k, v in applied.items())
+        console.print(f"[bold magenta]profile[/bold magenta] {profile}: {knobs}")
+    else:
+        console.print(
+            f"[dim]profile {profile}: "
+            f"equity=${settings.paper_equity_usd:g} max_lev={settings.max_leverage:g}x "
+            f"min_rr={settings.min_rr:g} min_stop_atr={settings.min_stop_atr_mult:g}x "
+            f"max_hold={settings.max_hold_bars}b[/dim]"
+        )
 
     if not no_log:
         stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
         path = log_file or f"logs/replay_{symbol}_{timeframe}_{stamp}.log"
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         trace.init(path)
-        trace.header(f"REPLAY  {symbol} {timeframe}  since {since}")
+        trace.header(f"REPLAY  {symbol} {timeframe}  since {since}  profile={profile}")
         console.print(f"[dim]trace -> {path}  (tail -f to watch live)[/dim]")
 
     client = get_client()
@@ -102,8 +124,49 @@ def replay(
         console.print(
             f"  bars={rep.bars}  plans={rep.plans_created}  detections={rep.detections}  "
             f"opened={rep.opened}  closed={rep.closed}  invalidations={rep.invalidations}  "
-            f"confirm_calls={rep.confirm_calls}  risk_rejected={rep.risk_rejected}"
+            f"confirm_calls={rep.confirm_calls}  observe_calls={rep.observe_calls}  "
+            f"risk_rejected={rep.risk_rejected}"
         )
+        if rep.trade_outcomes:
+            atr_str = (
+                f"  avg_stop_atr={rep.avg_stop_dist_atr:.2f}x"
+                if rep.avg_stop_dist_atr is not None
+                else ""
+            )
+            console.print(
+                f"  [bold]trade metrics[/bold]  "
+                f"win_rate={rep.win_rate * 100:.0f}%  "
+                f"avg_pnl={rep.avg_pnl_pct * 100:+.3f}%  "
+                f"expectancy={rep.expectancy_pct * 100:+.3f}%"
+                + atr_str
+            )
+            from rich.table import Table
+
+            t = Table(title="Closed trades this replay")
+            t.add_column("dir")
+            t.add_column("entry", justify="right")
+            t.add_column("stop", justify="right")
+            t.add_column("exit", justify="right")
+            t.add_column("reason")
+            t.add_column("pnl%", justify="right")
+            t.add_column("stop_dist/ATR", justify="right")
+            for oc in rep.trade_outcomes:
+                pnl_color = "green" if oc.pnl_pct > 0 else "red"
+                atr_ratio = (
+                    f"{oc.stop_dist_pts / oc.atr_at_entry:.2f}x"
+                    if oc.atr_at_entry and oc.atr_at_entry > 0
+                    else "-"
+                )
+                t.add_row(
+                    oc.direction,
+                    f"{oc.entry_price:.1f}",
+                    f"{oc.stop_loss:.1f}",
+                    f"{oc.exit_price:.1f}",
+                    oc.exit_reason,
+                    f"[{pnl_color}]{oc.pnl_pct * 100:+.3f}%[/{pnl_color}]",
+                    atr_ratio,
+                )
+            console.print(t)
         for note in rep.notes:
             console.print(f"  [dim]- {note}[/dim]")
         await _print_trade_summary(symbol, since_dt)

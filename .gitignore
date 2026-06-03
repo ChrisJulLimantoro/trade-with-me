@@ -27,4 +27,6 @@ graphify-out/*
 !graphify-out/graph.html
 !graphify-out/graph.json
 
-logs
+logs/*
+!logs/
+!logs/replay_BTCUSDT_15m_20260603-004129.log

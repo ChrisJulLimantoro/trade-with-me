@@ -59,7 +59,17 @@ async def feature_rows_since(
     *,
     until: datetime | None = None,
 ) -> list[dict[str, Any]]:
-    """Ordered feature+candle rows for replay (oldest → newest)."""
+    """Ordered feature+candle rows for replay (oldest → newest).
+
+    Timing note: each row is labelled with its bar's ``open_time`` (= T).  The features
+    (RSI, EMA, MACD …) are computed from that bar's *close* at T+tf, so the decision
+    loop uses close-based indicators but timestamps the decision as T (the open).  This
+    means entries are filled at the *close* of the bar being evaluated — slightly
+    optimistic vs. reality (real fill = open of the next bar), but the bias is consistent
+    across all trades and does not explain losses.  It does NOT constitute look-ahead
+    bias in the usual sense because the bar's close is already known before the replay
+    engine processes it; in a live system the same features are only available at T+tf.
+    """
     sql = _FEATURE_SQL + " AND f.open_time >= :since"
     params: dict[str, Any] = {"symbol": symbol, "tf": tf, "since": since}
     if until:
@@ -151,3 +161,20 @@ async def active_plan(session: AsyncSession, symbol: str) -> Plan | None:
 async def plan_setups(session: AsyncSession, plan_id: uuid.UUID) -> list[Setup]:
     stmt = select(Setup).where(Setup.plan_id == plan_id)
     return list((await session.execute(stmt)).scalars().all())
+
+
+async def supersede_active_plan(session: AsyncSession, symbol: str) -> int:
+    """Mark the symbol's active plan superseded so the next bar builds a fresh one.
+
+    Used after a trade closes: the thesis that motivated the closed trade is stale, so we
+    discard it rather than acting on it again. Returns the number of plans superseded.
+    """
+    result = await session.execute(
+        text(
+            "UPDATE plans SET status = 'superseded' "
+            "WHERE symbol = :symbol AND status = 'active'"
+        ),
+        {"symbol": symbol},
+    )
+    await session.flush()
+    return result.rowcount or 0

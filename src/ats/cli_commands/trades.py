@@ -52,7 +52,7 @@ def show(
             res = await session.execute(
                 text(
                     "SELECT trade_id, symbol, direction, status, entry_price, exit_price, "
-                    "exit_reason, pnl_pct, pnl_usd, entry_time "
+                    "exit_reason, pnl_pct, pnl_usd, leverage, risk_usd, entry_time "
                     f"FROM paper_trades{clause} ORDER BY entry_time DESC LIMIT :lim"
                 ),
                 params,
@@ -71,6 +71,8 @@ def show(
     t.add_column("status")
     t.add_column("entry", justify="right")
     t.add_column("exit", justify="right")
+    t.add_column("lev", justify="right")
+    t.add_column("risk$", justify="right")
     t.add_column("reason")
     t.add_column("pnl%", justify="right")
     t.add_column("pnl$", justify="right")
@@ -87,6 +89,8 @@ def show(
             r["status"],
             f"{float(r['entry_price']):.2f}",
             f"{float(r['exit_price']):.2f}" if r["exit_price"] is not None else "-",
+            f"{float(r['leverage']):.2f}x" if r["leverage"] is not None else "-",
+            f"{float(r['risk_usd']):.2f}" if r["risk_usd"] is not None else "-",
             r["exit_reason"] or "-",
             f"[{pnl_color}]{pnl_str}[/{pnl_color}]",
             f"{float(r['pnl_usd']):+.2f}" if r["pnl_usd"] is not None else "-",
@@ -114,6 +118,8 @@ def stats(
                         "SELECT count(*) AS n, "
                         "count(*) FILTER (WHERE pnl_pct > 0) AS wins, "
                         "round(avg(pnl_pct)::numeric, 4) AS avg_pnl, "
+                        "round(avg(pnl_pct) FILTER (WHERE pnl_pct > 0)::numeric, 4) AS avg_win, "
+                        "round(avg(pnl_pct) FILTER (WHERE pnl_pct <= 0)::numeric, 4) AS avg_loss, "
                         "round(sum(pnl_usd)::numeric, 2) AS pnl_usd "
                         "FROM paper_trades WHERE status='closed' AND entry_time >= :since"
                         + sym_clause
@@ -141,10 +147,14 @@ def stats(
         console.print("[yellow]No closed trades in window.[/yellow]")
         return
     wins = agg["wins"] or 0
+    win_rate = wins / n
+    avg_win = float(agg["avg_win"] or 0)
+    avg_loss = float(agg["avg_loss"] or 0)
+    expectancy = avg_win * win_rate + avg_loss * (1 - win_rate)
     console.print(
         f"\n[bold cyan]Trade stats[/bold cyan] (last {since}{', ' + symbol if symbol else ''})\n"
-        f"  n={n}  win_rate={wins / n * 100:.0f}%  avg_pnl={agg['avg_pnl']}  "
-        f"total_pnl=${agg['pnl_usd']}"
+        f"  n={n}  win_rate={win_rate * 100:.0f}%  avg_pnl={float(agg['avg_pnl'] or 0) * 100:+.3f}%  "
+        f"expectancy={expectancy * 100:+.3f}%  total_pnl=${agg['pnl_usd']}"
     )
     t = Table(title="By exit reason")
     t.add_column("reason")

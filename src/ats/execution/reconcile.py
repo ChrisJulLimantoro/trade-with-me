@@ -29,17 +29,22 @@ def _pnl_pct(direction: str, entry: float, exit_price: float) -> float:
     return raw if direction == "long" else -raw
 
 
+def _liq_hit(direction: str, candle_high: float, candle_low: float, liq_price: float) -> bool:
+    return candle_low <= liq_price if direction == "long" else candle_high >= liq_price
+
+
 def check_bar_exit(
     trade: dict[str, Any],
     candle: dict[str, Any],
     *,
     expires_at: datetime,
     hard_invalidation: bool = False,
+    liq_price: float | None = None,
 ) -> ExitResult | None:
     """Decide whether a single candle closes the trade. Returns None if still open.
 
     ``trade`` needs direction, entry_price, stop_loss, take_profit. ``candle`` needs
-    open_time, high, low, close.
+    open_time, high, low, close. ``liq_price`` (if given) is a hard liquidation backstop.
     """
     direction = trade["direction"]
     entry = float(trade["entry_price"])
@@ -58,6 +63,8 @@ def check_bar_exit(
 
     if sl_hit:  # conservative: stop wins ties
         return ExitResult(stop, ts, "sl", _pnl_pct(direction, entry, stop))
+    if liq_price is not None and _liq_hit(direction, high, low, liq_price):
+        return ExitResult(liq_price, ts, "liquidation", _pnl_pct(direction, entry, liq_price))
     if tp_hit:
         return ExitResult(tp, ts, "tp", _pnl_pct(direction, entry, tp))
     if ts >= expires_at:
@@ -165,11 +172,15 @@ def step_trade(
     trail_atr_mult: float = 0.0,
     atr: float | None = None,
     hard_invalidation: bool = False,
+    liq_price: float | None = None,
 ) -> BarStep:
     """Advance one open trade by a single bar. Returns the resulting :class:`BarStep`.
 
-    Exit priority per bar: hard-invalidation → working stop → current take-profit →
-    expiry (skipped for breakeven-protected runners) → trail update.
+    Exit priority per bar: hard-invalidation → working stop → liquidation → current
+    take-profit → expiry (skipped for breakeven-protected runners) → trail update.
+
+    ``liq_price`` is a hard backstop: sizing guarantees the stop sits inside it, so the
+    stop normally fills first; liquidation only fires if the working stop is somehow looser.
     """
     direction = trade["direction"]
     entry = float(trade["entry_price"])
@@ -207,6 +218,9 @@ def step_trade(
         else:
             reason = "sl"
         return close_all(working_stop, reason)
+
+    if liq_price is not None and _liq_hit(direction, high, low, liq_price):
+        return close_all(liq_price, "liquidation")
 
     if tp_hit:
         if is_final_tp:

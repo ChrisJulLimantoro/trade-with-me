@@ -17,7 +17,13 @@ from typing import Any, Protocol
 
 from ats.config import settings
 from ats.llm import mock_data, prompts
-from ats.llm.schemas import ConfirmOutput, LlmResult, PlanOutput
+from ats.llm.schemas import (
+    ConfirmOutput,
+    LlmResult,
+    ObservationOutput,
+    PlanOutput,
+    ReflectionOutput,
+)
 from ats.logging import get_logger
 
 log = get_logger(__name__)
@@ -46,6 +52,14 @@ class LlmClient(Protocol):
         self, envelope: dict[str, Any], *, symbol: str
     ) -> tuple[ConfirmOutput | None, LlmResult]: ...
 
+    async def observe_trade(
+        self, envelope: dict[str, Any], *, symbol: str
+    ) -> tuple[ObservationOutput | None, LlmResult]: ...
+
+    async def reflect_trade(
+        self, envelope: dict[str, Any], *, symbol: str
+    ) -> tuple[ReflectionOutput | None, LlmResult]: ...
+
 
 class MockClient:
     """Deterministic, offline. Pure function of the envelope."""
@@ -69,6 +83,24 @@ class MockClient:
             parse_ok=True, model="mock", mock=True, raw=confirm.model_dump(mode="json")
         )
         return confirm, result
+
+    async def observe_trade(
+        self, envelope: dict[str, Any], *, symbol: str
+    ) -> tuple[ObservationOutput, LlmResult]:
+        obs = mock_data.canned_observation(envelope)
+        result = LlmResult(
+            parse_ok=True, model="mock", mock=True, raw=obs.model_dump(mode="json")
+        )
+        return obs, result
+
+    async def reflect_trade(
+        self, envelope: dict[str, Any], *, symbol: str
+    ) -> tuple[ReflectionOutput, LlmResult]:
+        reflection = mock_data.canned_reflection(envelope)
+        result = LlmResult(
+            parse_ok=True, model="mock", mock=True, raw=reflection.model_dump(mode="json")
+        )
+        return reflection, result
 
 
 class OpenAIClient:
@@ -149,11 +181,50 @@ class OpenAIClient:
     async def confirm_setup(
         self, envelope: dict[str, Any], *, symbol: str
     ) -> tuple[ConfirmOutput | None, LlmResult]:
-        return await self._parse(
+        parsed, result = await self._parse(
             model=settings.llm_confirm_model,
             system=prompts.CONFIRM_SYSTEM_PROMPT,
             envelope=envelope,
             schema=ConfirmOutput,
+        )
+        if not result.parse_ok:
+            # Retry once — a single JSON format hiccup shouldn't drop a valid setup.
+            log.info("confirm_setup_retry", symbol=symbol)
+            parsed, result = await self._parse(
+                model=settings.llm_confirm_model,
+                system=prompts.CONFIRM_SYSTEM_PROMPT,
+                envelope=envelope,
+                schema=ConfirmOutput,
+            )
+        return parsed, result
+
+    async def observe_trade(
+        self, envelope: dict[str, Any], *, symbol: str
+    ) -> tuple[ObservationOutput | None, LlmResult]:
+        parsed, result = await self._parse(
+            model=settings.llm_observe_model,
+            system=prompts.OBSERVE_SYSTEM_PROMPT,
+            envelope=envelope,
+            schema=ObservationOutput,
+        )
+        if not result.parse_ok:
+            log.info("observe_trade_retry", symbol=symbol)
+            parsed, result = await self._parse(
+                model=settings.llm_observe_model,
+                system=prompts.OBSERVE_SYSTEM_PROMPT,
+                envelope=envelope,
+                schema=ObservationOutput,
+            )
+        return parsed, result
+
+    async def reflect_trade(
+        self, envelope: dict[str, Any], *, symbol: str
+    ) -> tuple[ReflectionOutput | None, LlmResult]:
+        return await self._parse(
+            model=settings.llm_reflect_model,
+            system=prompts.REFLECT_SYSTEM_PROMPT,
+            envelope=envelope,
+            schema=ReflectionOutput,
         )
 
 

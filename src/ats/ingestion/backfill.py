@@ -5,13 +5,22 @@ from datetime import UTC, datetime, timedelta
 import httpx
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ats.config import settings
 from ats.ingestion import binance_rest as br
 from ats.ingestion.freshness import upsert_heartbeat
 from ats.logging import get_logger
 
 log = get_logger(__name__)
 
-TIMEFRAMES = ("15m", "1h", "4h")
+
+def _default_timeframes() -> tuple[str, ...]:
+    """Decision timeframes plus the finer observe timeframe (for dynamic exit management)."""
+    base = ("15m", "1h", "4h")
+    tf = settings.observe_timeframe
+    return (tf, *base) if tf and tf not in base else base
+
+
+TIMEFRAMES = _default_timeframes()
 
 
 def _now_ms() -> int:

@@ -25,7 +25,7 @@ from ats.llm.client import LlmClient
 from ats import trace
 from ats.llm.schemas import LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
-from ats.risk.manager import reward_risk
+from ats.risk.manager import regime_allows, reward_risk
 
 log = get_logger(__name__)
 
@@ -90,6 +90,29 @@ async def build_envelope(
     regime = await state.latest_regime(session, before_ts=as_of)
     candles = await state.recent_candles(session, symbol, tf, as_of, n=50)
     positions = await state.open_positions(session)
+
+    # Derive which directions the regime allows so the strategist doesn't propose setups
+    # that will immediately be discarded by the runtime regime filter.
+    regime_cell: str | None = (regime or {}).get("regime_cell")
+    allowed_directions: list[str] = []
+    for d in ("long", "short"):
+        if regime_allows(regime_cell, d):
+            allowed_directions.append(d)
+
+    # Episodic memory: surface the most-similar prior post-mortems as non-binding context.
+    prior_lessons: list[dict[str, Any]] = []
+    if settings.memory_enabled:
+        try:
+            from ats.learning.fingerprint import build_fingerprint
+            from ats.learning.retrieval import retrieve_relevant_learnings
+
+            fp = build_fingerprint(feature_row, regime)
+            prior_lessons = await retrieve_relevant_learnings(
+                session, fp, k=settings.memory_top_k
+            )
+        except Exception as exc:  # noqa: BLE001 — memory is advisory, never block a plan
+            log.warning("retrieve_learnings_failed", symbol=symbol, error=str(exc))
+
     return {
         "as_of": as_of,
         "symbol": symbol,
@@ -102,10 +125,14 @@ async def build_envelope(
             "open_positions": positions,
         },
         "risk_limits": {
-            "max_position_pct": settings.max_position_pct,
+            "risk_per_trade_pct": settings.risk_per_trade_pct,
+            "max_leverage": settings.max_leverage,
             "min_rr": settings.min_rr,
             "one_position_per_symbol": True,
+            # Directions the runtime regime filter will allow. Propose ONLY these.
+            "allowed_directions": allowed_directions,
         },
+        "prior_lessons": prior_lessons,
     }
 
 

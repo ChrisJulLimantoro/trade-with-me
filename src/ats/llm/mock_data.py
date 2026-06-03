@@ -17,7 +17,9 @@ from typing import Any
 from ats.llm.schemas import (
     ConfirmOutput,
     InvalidationRule,
+    ObservationOutput,
     PlanOutput,
+    ReflectionOutput,
     Rule,
     SetupOutput,
 )
@@ -54,7 +56,8 @@ def canned_plan(envelope: dict[str, Any]) -> PlanOutput:
     """Build a deterministic plan from the market snapshot."""
     bias = _bias(envelope)
     price = _price(envelope)
-    max_size = float((envelope.get("risk_limits") or {}).get("max_position_pct", 0.10))
+    # Nominal only — the risk manager sizes by risk/leverage and ignores this.
+    nominal_size = 0.05
 
     if bias == "neutral" or price is None:
         # No conviction (or no price) → a plan with no actionable setups.
@@ -98,7 +101,7 @@ def canned_plan(envelope: dict[str, Any]) -> PlanOutput:
         entry_zone=entry_zone,
         take_profit=take_profit,
         stop_loss=stop_loss,
-        size_pct=min(0.05, max_size),
+        size_pct=nominal_size,
         hard_rules=hard_rules,
         soft_rules=soft_rules,
         invalidation_rules=invalidation_rules,
@@ -123,3 +126,85 @@ def canned_confirm(envelope: dict[str, Any]) -> ConfirmOutput:
             size_multiplier=0.5,
         )
     return ConfirmOutput(action="WAIT", reason=f"Weak soft score {soft_score:.2f}.")
+
+
+def canned_observation(envelope: dict[str, Any]) -> ObservationOutput:
+    """Deterministic exit-management decision from unrealized P&L + momentum.
+
+    Mirrors a sensible discretionary trader: protect a healthy gain when momentum fades,
+    let a strong winner run, and bail when momentum has clearly flipped against the trade.
+    Pure function of the envelope, so replays stay reproducible.
+    """
+    direction = envelope.get("direction", "long")
+    unrealized = float(envelope.get("unrealized_pct", 0.0))
+    price = float(envelope.get("current_price", 0.0))
+    feats = envelope.get("features_now") or {}
+    macd_hist = feats.get("macd_hist")
+    mh = float(macd_hist) if macd_hist is not None else 0.0
+    # Momentum "with the trade" is positive macd_hist for longs, negative for shorts.
+    momentum_with = mh if direction == "long" else -mh
+
+    # Clear reversal against an at-risk position → exit.
+    if unrealized <= 0.0 and momentum_with < 0:
+        return ObservationOutput(
+            action="EXIT_NOW",
+            reason="Momentum flipped against the trade while not in profit.",
+            confidence=0.8,
+        )
+    # Healthy gain but momentum fading → lock in by tightening toward price.
+    if unrealized >= 0.01 and momentum_with <= 0:
+        # Pull the stop to roughly halfway between entry and current price.
+        entry = float(envelope.get("entry_price", price))
+        new_stop = round(entry + (price - entry) * 0.5, 8)
+        return ObservationOutput(
+            action="TIGHTEN_STOP",
+            reason=f"Banking gains: unrealized {unrealized:+.2%}, momentum fading.",
+            new_stop=new_stop,
+        )
+    # Strong continuation → let it run a bit further.
+    if unrealized >= 0.015 and momentum_with > 0:
+        tps = envelope.get("take_profit") or []
+        if tps:
+            final = float(tps[-1])
+            extended = round(final * (1.01 if direction == "long" else 0.99), 8)
+            return ObservationOutput(
+                action="RAISE_TP",
+                reason="Strong momentum with open profit; extend the final target.",
+                new_tp=[extended],
+            )
+    return ObservationOutput(action="HOLD", reason="No clear edge to adjust this check.")
+
+
+def canned_reflection(envelope: dict[str, Any]) -> ReflectionOutput:
+    """Deterministic post-mortem from the closed trade's exit_reason + pnl.
+
+    Accepts the trade fields either at the top level or nested under a "trade" key (the
+    shape the post-mortem builder emits).
+    """
+    trade = envelope.get("trade") or envelope
+    pnl = float(trade.get("pnl_pct", 0.0))
+    reason = str(trade.get("exit_reason", ""))
+    win = pnl > 0
+
+    if reason in ("tp", "observe_exit") and win:
+        category, quality = "clean_win", "good"
+    elif reason == "sl" and not win:
+        category, quality = "clean_loss", "poor"
+    elif reason == "invalidation":
+        category, quality = "regime_shift", "neutral"
+    elif reason == "expiry":
+        category, quality = "alignment_too_low", "neutral"
+    else:
+        category, quality = "other", "neutral"
+
+    return ReflectionOutput(
+        category=category,
+        hypothesis=f"Trade closed via {reason or 'unknown'} at {pnl:+.2%}.",
+        evidence=(
+            f"direction={trade.get('direction')} "
+            f"entry={trade.get('entry_price')} exit={trade.get('exit_price')}"
+        ),
+        proposed_adjustment="",
+        confidence_in_lesson=0.4,
+        decision_quality=quality,
+    )

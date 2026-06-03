@@ -1,0 +1,732 @@
+========================================================================================
+REPLAY  BTCUSDT 15m  since 10d  profile=scalper
+========================================================================================
+
+PLAN CREATED  2026-05-23 16:00:00  plan=2119bb43  bias=bearish  regime=bear-low  setups=0
+  rationale: Trend is bearish with low volatility. RSI at 67.66 is not overbought for shorts but not ideal. Price is above EMA20/50 but below EMA200, indicating short-term uptrend within longer downtrend. Risk limits only allow shorts. No clear retest level for short entry; price is near recent highs with no resistance. Avoid chasing momentum. Wait for better setup.
+
+PLAN CREATED  2026-05-23 18:00:00  plan=5d54772b  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime indicates bear trend with low volatility. Price has rallied into prior resistance near 75777 and RSI at 69.7 is approaching overbought, offering a short entry on a retest of the resistance zone.
+  setup[1] 4dd9009b  SHORT  size=0.05
+    entry_zone: 75700 -> 75777
+    take_profit: [75200, 74800]   stop_loss: 76000
+    hard:  price <= 75777
+    soft:  rsi_14 > 70 (w0.5)
+    invalidation: [hard] price > 76000 (intrabar)
+
+PLAN CREATED  2026-05-23 20:00:00  plan=2c8c6258  bias=neutral  regime=bear-low  setups=0
+  rationale: RSI is overbought at 75.25, and regime is bearish with low vol. However, allowed_directions only permits shorts, and a short entry at current levels with overbought RSI could be valid but price has rallied strongly recent bars, risking a momentum trap. No good retest level available, so empty setups.
+
+PLAN CREATED  2026-05-23 22:00:00  plan=54aac948  bias=bearish  regime=bear-low  setups=0
+  rationale: The trend is bearish and volatility is low. Price recently spiked to a high near 77427 then rejected, closing back near 76600. RSI is 63, not overbought, but the bearish regime and the rejection from highs suggest a short bias. No good retest entry yet, so waiting for a pullback to a resistance level.
+
+PLAN CREATED  2026-05-24 00:00:00  plan=c303380d  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, RSI is neutral, price recently spiked high then retraced, likely to test support near EMA50. Allowed only short trades.
+  setup[1] 2aa8984d  SHORT  size=0.05
+    entry_zone: 76700 -> 76800
+    take_profit: [76100, 75800, 75500]   stop_loss: 77100
+    hard:  price >= 76700; price <= 76800; rsi_14 < 70; ema_50 < price
+    soft:  macd_hist < 0 (w0.5)
+    invalidation: [hard] price >= 77100 (intrabar); [soft] rsi_14 > 70 (on_close)
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-24 00:30:00  plan=c303380d setup=2aa8984d  action=CONFIRM  size_x=1
+  price=76712.5  hard_ok=True  soft_score=1
+  reason: Price at 76712.5 is within entry zone 76700-76800, hard rules all met (price below 76800, rsi<70, ema50 below price), soft rule (macd_hist<0) satisfied with score 1.0. Momentum composite positive and RSI retreating from overbought supports short thesis. No invalidation triggered.
+TRADE OPENED  2026-05-24 00:30:00  trade=69790e82  plan=c303380d setup=2aa8984d  SHORT @ 76712.5  size=1.97968
+  -> EXECUTED — rr 1.58; lev 1.98x; risk $10.00
+  -> OBSERVE tighten stop -> 77000 (Price has moved slightly away from entry but is still near the stop; RSI above 60 suggests short-term momentum is against the short. Tightening stop to lock in minimal loss.)
+TRADE CLOSED  2026-05-24 02:30:00  trade=69790e82  plan=c303380d  reason=expiry  pnl=-0.08%
+
+PLAN CREATED  2026-05-24 02:45:00  plan=2e367eb6  bias=bearish  regime=bear-low  setups=0
+  rationale: Trend is bearish, volatility low. Price has rallied from 75257 to 76824 but is now consolidating near recent highs. RSI at 59 is not overbought, but we are in a bear regime and allowed only shorts. Prior lessons show short near resistance can hit stop if drift continues, so we wait for a confirmed bearish signal. No clear short setup yet as price is near resistance but RSI is not extreme and we prefer pullback entries. Hence no setups.
+
+PLAN CREATED  2026-05-24 04:45:00  plan=c948c074  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low with allowed direction short only. Price is stagnant around 76750, RSI 54, not extreme. Prior lesson shows short loss due to drift; use tighter entry and adequate stop. Look for a short on a minor retracement to a moving average resistance.
+  setup[1] 1599e125  SHORT  size=0.05
+    entry_zone: 76850 -> 76950
+    take_profit: [76300, 75900, 75500]   stop_loss: 77200
+    hard:  price >= 76850; price <= 76950; rsi_14 > 50
+    soft:  macd_hist < 0 (w0.7); ema_20 < ema_50 (w0.5)
+    invalidation: [hard] price >= 77200 (intrabar); [warning] rsi_14 > 70 (on_close)
+
+PLAN CREATED  2026-05-24 06:45:00  plan=967d0d73  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, RSI is neutral (61) but not overbought, price above EMAs but trend is bearish. Prior lesson suggests short trades in bear-low can drift. Use pullback to 50 EMA (76517) for short entry with protection at recent high.
+  setup[1] c8126665  SHORT  size=0.01
+    entry_zone: 76500 -> 76530
+    take_profit: [75850, 75400]   stop_loss: 76956.1
+    hard:  rsi_14 < 70; price >= 76500; price <= 76530
+    soft:  macd_hist < 0 (w0.5)
+    invalidation: [hard] price > 77040 (intrabar); [hard] price < 76400 (on_close)
+
+PLAN CREATED  2026-05-24 08:45:00  plan=4c78f543  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with no allowed directions; prior_lessons indicate a short loss in similar conditions, but current allowed_directions is empty, prohibiting any setup.
+
+PLAN CREATED  2026-05-24 10:45:00  plan=f57a9366  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low, allowed_directions is empty, so no trades permitted. Market bias neutral.
+
+PLAN CREATED  2026-05-24 12:45:00  plan=5f6d53fb  bias=bullish  regime=bull-low  setups=1
+  rationale: Trend is bull, volatility low, MACD histogram near zero but close to signal line, RSI neutral (53.9), price above all EMAs. Recent candle shows pullback from high of 77300 area to 77077, offering potential retest of prior resistance/support. Allowed directions is only long, so focusing on long setup.
+  setup[1] 4db97477  LONG  size=0.05
+    entry_zone: 76950 -> 77050
+    take_profit: [77450, 77700]   stop_loss: 76700
+    hard:  price >= 76950; price <= 77050; rsi_14 < 70; ema_20 > ema_50
+    soft:  macd_hist > 0 (w0.5); obv > price (w0.3)
+    invalidation: [hard] price <= 76600 (on_close); [soft] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-05-24 14:15:00  plan=8151d6b6  bias=bearish  regime=bull-low  setups=0
+  rationale: Price is in a short-term downtrend, breaking below recent support levels. RSI is oversold at 27.7, indicating potential for a bounce, but momentum is strongly bearish. However, only long setups are allowed by the regime, so no trades are proposed.
+
+PLAN CREATED  2026-05-24 16:15:00  plan=953c7f97  bias=neutral  regime=bull-low  setups=0
+  rationale: Price is consolidating below recent highs with RSI near 43, not oversold. Trend is bullish but volatility is low. Allowed directions only long. No clear pullback entry; RSI not oversold. Wait for better setup.
+
+PLAN CREATED  2026-05-24 18:15:00  plan=38fd401b  bias=neutral  regime=bull-low  setups=0
+  rationale: Price is hovering near EMAs with neutral RSI (~48.6) and low volatility. Recent drop from 77k area found support around 76300 and is now consolidating. Regime is bull-low but bias is neutral due to lack of clear direction; allowed_directions only allow longs, but no compelling long setup with good RR and entry at support retest is evident. Waiting for either a clear pullback to support or a breakout confirmation.
+
+PLAN CREATED  2026-05-24 20:15:00  plan=c226bbdf  bias=bullish  regime=bull-low  setups=0
+  rationale: Trend is bull, volatility is low, RSI near neutral (48.9). Price retraced from 77000+ to 76400 area and is now consolidating around 76650 near the 200 EMA (76497). The macd_hist is positive and rising, suggesting momentum is building. Prior short lessons indicate upward drift, so a long setup on a retest of support is appropriate.
+
+PLAN CREATED  2026-05-24 22:15:00  plan=f4ada01a  bias=bullish  regime=bull-low  setups=1
+  rationale: The trend is bull, volatility is low. After a sharp drop and quick recovery, price is consolidating just below the EMA20/50. RSI at 56 is neutral, not overbought. Momentum composite positive. CVD divergence shows selling pressure waning. Allowed directions only long. Looking for long on retest of support near 76600-76500.
+  setup[1] 449fafa1  LONG  size=0.05
+    entry_zone: 76550 -> 76650
+    take_profit: [77200, 77500, 78000]   stop_loss: 76280
+    hard:  price >= 76550; price <= 76650; rsi_14 < 70; ema_20 > ema_200
+    soft:  macd_hist > 0 (w0.5); momentum_composite > 0.5 (w0.3); obv > 0 (w0.2)
+    invalidation: [hard] price < 76280 (intrabar); [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-05-25 00:15:00  plan=0a5f5c67  bias=neutral  regime=bull-low  setups=0
+  rationale: Bullish trend, low volatility, and allowed directions only long. However, RSI ~62 not extreme, recent price is near the high of the last 24h range (~77180) with resistance around 77200-77300. No clear pullback or retest level; price is not at a support. Better to wait for a dip toward ema_20 (76827) or ema_50 (76742) before considering long. Current price is above both emas, but no good entry zone with narrow width that provides adequate RR given stop must be at least 1.5x ATR (~317 points) below entry. Minimal viable stop would be ~76863, making RR for a long entry near 77180 with min_rr 1.0 require take_profit at least >77500, which is not near a known resistance. Therefore, no setups proposed.
+
+PLAN CREATED  2026-05-25 02:15:00  plan=2489fe5c  bias=bullish  regime=bull-low  setups=1
+  rationale: Price is above all EMAs (20/50/200) with a bullish trend regime. Recent price action shows a bounce from 76088 low to 77364 high, now consolidating near 77107. ATR is 235.68, giving a reasonable stop distance. RSI at 54.6 is neutral, not overbought. Allowed directions are only long, so we look for a pullback entry zone below current price but above recent support.
+  setup[1] 5402ea65  LONG  size=0.05
+    entry_zone: 76900 -> 77050
+    take_profit: [77650, 78000]   stop_loss: 76550
+    hard:  price > ema_50; price > ema_200; rsi_14 < 70
+    soft:  macd_hist > 0 (w0.5); price > ema_20 (w0.3)
+    invalidation: [hard] price < 76500 (intrabar)
+
+PLAN CREATED  2026-05-25 04:15:00  plan=64db549d  bias=bullish  regime=bull-low  setups=1
+  rationale: Trend regime is bull-low, RSI neutral (56), price above all EMAs, recent upward momentum with pullback opportunity. Allowed only longs.
+  setup[1] 57a20ca2  LONG  size=0.05
+    entry_zone: 76950 -> 77000
+    take_profit: [77500, 77700]   stop_loss: 76650
+    hard:  close > ema_20; ema_20 > ema_50; rsi_14 < 70; close < entry_zone[1]
+    soft:  macd_hist > 0 (w0.5); momentum_composite > 0.5 (w0.5)
+    invalidation: [hard] close < 76600 (intrabar)
+
+PLAN CREATED  2026-05-25 06:15:00  plan=a428c48a  bias=bullish  regime=bull-low  setups=1
+  rationale: Trend is bull (EMA slopes up) with low volatility. RSI is neutral (~55), not overbought. Price recently tested support near 76800 and rebounded, now consolidating above 77000. Allowed directions are only long.
+  setup[1] df63e9d6  LONG  size=0.05
+    entry_zone: 77180 -> 77240
+    take_profit: [77650, 77900]   stop_loss: 76990
+    hard:  price <= 77240; price >= 77180; rsi_14 < 70; ema_20 > ema_50
+    soft:  macd_hist > 0 (w0.5); pr_atr > 0.5 (w0.3); momcom > 0.5 (w0.2)
+    invalidation: [hard] price < 76990 (on_close); [warning] rsi_14 > 70 (on_close)
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-25 06:15:00  plan=a428c48a setup=df63e9d6  action=CONFIRM  size_x=1
+  price=77240  hard_ok=True  soft_score=0.8
+  reason: Price exactly at entry zone high (77240), RSI 54.6 well below 70, EMAs aligned bullish (20>50>200), MACD positive and histogram increasing, momentum composite 0.58 above 0.5, PR_ATR 0.55 above 0.5. All hard rules pass, soft score 0.8 confirms strong conviction.
+TRADE OPENED  2026-05-25 06:15:00  trade=1db95732  plan=a428c48a setup=df63e9d6  LONG @ 77240  size=3.0896
+  -> EXECUTED — rr 1.64; lev 3.09x; risk $10.00
+TRADE CLOSED  2026-05-25 08:15:00  trade=1db95732  plan=a428c48a  reason=expiry  pnl=+0.08%
+
+PLAN CREATED  2026-05-25 08:30:00  plan=cd9025de  bias=bullish  regime=bull-low  setups=1
+  rationale: Trend is bull, volatility low, RSI neutral (54.5). Price consolidating above EMA50 and EMA200. Recent dip to 77135 was bought. Allowed directions only long. No good short entries due to restrictions.
+  setup[1] 6cc8af77  LONG  size=0.05
+    entry_zone: 77150 -> 77200
+    take_profit: [77600, 77800]   stop_loss: 76950
+    hard:  price >= entry_zone[0]; price <= entry_zone[1]; rsi_14 < 70; atr_14 > 0
+    soft:  ema_20 > ema_50 (w0.5); macd_hist > 0 (w0.3); vol_zscore_20 > -1 (w0.2)
+    invalidation: [hard] price < 76800 (on_close)
+
+PLAN CREATED  2026-05-25 10:30:00  plan=0c619f53  bias=bullish  regime=bull-low  setups=1
+  rationale: Trend is bull, volatility is low, momentum composite is positive (0.75), MACD histogram positive, price is above all EMAs, and prior lesson shows a win in same regime. RSI is not overbought (57.7), so a long pullback setup is viable.
+  setup[1] 8181838d  LONG  size=0.05
+    entry_zone: 77250 -> 77350
+    take_profit: [77780, 78000]   stop_loss: 77120
+    hard:  rsi_14 < 70; price > ema_50; price > ema_200
+    soft:  macd_hist > 0 (w0.7); momentum_composite > 0.5 (w0.5); vol_zscore_20 > -1 (w0.3)
+    invalidation: [hard] rsi_14 crosses_above 70 (on_close); [warning] price < ema_20 (intrabar)
+
+PLAN CREATED  2026-05-25 12:30:00  plan=9eabfa69  bias=neutral  regime=bull-low  setups=0
+  rationale: The market is in a bull-low regime with low volatility and price near the 20 and 50 EMAs. RSI is neutral at 47.5. Recent price action shows a consolidation between 77000 and 77600 without a clear breakout. No immediate pullback or retest level is evident for a long entry with a favorable risk-reward. Waiting for a better setup.
+
+PLAN CREATED  2026-05-25 14:30:00  plan=1ffdd342  bias=bullish  regime=bull-low  setups=1
+  rationale: Price is above all EMAs, RSI ~60 not overbought, MACD bullish, trend is bull, volatility low. Recent pullback respected EMA20/50 zone. Enter on retest of support near EMA20.
+  setup[1] 54c3d22c  LONG  size=0.05
+    entry_zone: 77350 -> 77400
+    take_profit: [77700, 77900]   stop_loss: 77200
+    hard:  rsi_14 < 70; price >= ema_20; price > ema_50; macd_hist > 0
+    soft:  momentum_composite > 0.5 (w0.7); vol_zscore_20 > -0.5 (w0.3)
+    invalidation: [hard] price < 77150 (intrabar)
+
+PLAN CREATED  2026-05-25 16:30:00  plan=9ff7919d  bias=bullish  regime=bull-low  setups=0
+  rationale: Price is above all EMAs, trend is bull, volatility low, RSI 59.9 (not overbought). Recent price action shows a consolidation near 77500 with a slight uptick. A long setup on retest of EMAs is reasonable, with stop below recent swing low and ATR-based distance.
+
+PLAN CREATED  2026-05-25 18:30:00  plan=9c4d47da  bias=bullish  regime=bull-low  setups=0
+  rationale: Trend is bull, volatility low, RSI neutral (53.4), price above all EMAs. Allowed direction is long only. Recent price action shows consolidation above 77500 after a move up from 77300 area. No clear pullback to a support level yet, so waiting for a retest of the EMA_20 (77556) or a dip near recent lows before entering.
+
+PLAN CREATED  2026-05-25 20:30:00  plan=223e6692  bias=bearish  regime=bull-low  setups=0
+  rationale: Price is in a downtrend from the recent high ~77888, with RSI at 34.1 (approaching oversold) and MACD histogram negative. However, regime allows only long trades. Given the bearish momentum and no clear long setup, we wait.
+
+PLAN CREATED  2026-05-25 22:30:00  plan=a42a2007  bias=bearish  regime=bull-low  setups=0
+  rationale: Price is in a short-term downtrend, below both 20 and 50 EMAs, with bearish MACD and RSI in bearish territory. Allowed directions are only long, but a valid long setup is not present due to RSI being too low and price not at a clear support retest. Hence no setups.
+
+PLAN CREATED  2026-05-26 00:30:00  plan=1d897205  bias=bullish  regime=bull-low  setups=1
+  rationale: BTC is in a bull-low regime with oversold RSI (28.36). Price is near EMA_200 support (77047) and has sold off sharply. Expecting a bounce from oversold conditions, but given the downtrend and low vol, we wait for a retest of the recent support zone before entering long. The allowed direction is long only.
+  setup[1] a28610ec  LONG  size=0.05
+    entry_zone: 76839.5 -> 76900
+    take_profit: [77400, 77700]   stop_loss: 76600
+    hard:  rsi_14 < 35; price >= ema_200; price < ema_50
+    soft:  macd_hist > -30 (w0.5); vol_zscore_20 > 2 (w0.3); cvd_slope_10 > 0 (w0.2)
+    invalidation: [hard] price < 76500 (on_close); [warning] rsi_14 > 50 (on_close)
+
+PLAN CREATED  2026-05-26 02:30:00  plan=42b99ba9  bias=bearish  regime=bull-low  setups=0
+  rationale: RSI at 27 (oversold) suggests potential bounce but trend is down; recent selloff with high volume. Regime allows only longs, so bias is bearish but we cannot short. Awaiting a pullback setup with risk parameters.
+
+PLAN CREATED  2026-05-26 04:30:00  plan=a04fc283  bias=neutral  regime=bull-low  setups=0
+  rationale: Price is consolidating in a range near 76700, with RSI at 43 (neutral) and low volatility. No clear pullback or retest setup is present; momentum composite is slightly positive but not compelling. Allowed directions only allow longs, but no good entry zone with adequate risk-reward is identifiable now.
+
+PLAN CREATED  2026-05-26 06:30:00  plan=a8304ad7  bias=bullish  regime=bull-low  setups=1
+  rationale: Price rallied from lows near 76434 to trade at 76942.6, above the 20 EMA (76813) and 50 EMA (76964). RSI at 56.3 is neutral, not overbought. The overall trend is bullish with low volatility. A pullback to a support zone near the 20 EMA offers a long entry with a tight stop below recent lows.
+  setup[1] 753ad9d5  LONG  size=0.05
+    entry_zone: 76810 -> 76850
+    take_profit: [77250, 77450, 77650]   stop_loss: 76600
+    hard:  price >= entry_zone[0]; price <= entry_zone[1]; rsi_14 < 70; price > ema_20
+    soft:  macd_hist > 0 (w0.5); volume > vol_zscore_20 (w0.3)
+    invalidation: [hard] rsi_14 >= 70 (on_close); [warning] price < stop_loss (intrabar)
+
+PLAN CREATED  2026-05-26 08:30:00  plan=9a2b4590  bias=neutral  regime=side-low  setups=0
+  rationale: Regime indicates side-low volatility with no allowed directions (empty allowed_directions), so no trades are permitted. No setups are generated.
+
+PLAN CREATED  2026-05-26 10:30:00  plan=92d09b5c  bias=neutral  regime=side-low  setups=0
+  rationale: RSI at 74 suggests overbought conditions, and allowed_directions is empty, so no setups can be placed.
+
+PLAN CREATED  2026-05-26 12:30:00  plan=2dc38a98  bias=neutral  regime=side-low  setups=0
+  rationale: Sideways-low volatility regime, RSI near 50, no clear momentum. Recent price action shows a sharp rally from 76686 to 77548 then pullback, currently consolidating around 77000. No optimal retest entry with favorable risk-reward. Allowed directions empty, so no setups possible.
+
+PLAN CREATED  2026-05-26 14:30:00  plan=ce92c3f5  bias=neutral  regime=side-low  setups=0
+  rationale: The regime is side-low with no allowed directions, so no setups can execute. Allowed_directions is empty, meaning no trades permitted this bar.
+
+PLAN CREATED  2026-05-26 16:30:00  plan=f79eace2  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is sideways with low volatility. Allowed directions is empty, so no trades can execute.
+
+PLAN CREATED  2026-05-26 18:30:00  plan=7a37c92b  bias=neutral  regime=side-low  setups=0
+  rationale: Market is in side-low regime, RSI near oversold but not extreme, recent price action shows bearish momentum with lower highs and lower lows. However, allowed_directions is empty, meaning no setups can be executed. Hence no trades proposed.
+
+PLAN CREATED  2026-05-26 20:30:00  plan=c6cb2629  bias=neutral  regime=side-low  setups=0
+  rationale: Market in side-low regime with RSI near 42, price below EMAs, low volatility. No allowed directions; no setups possible.
+
+PLAN CREATED  2026-05-26 22:30:00  plan=40f88c58  bias=neutral  regime=side-low  setups=0
+  rationale: RSI is 37, not yet oversold; price is below all EMAs, trend is side-low. Allowed_directions is empty, so no setups can be generated. Market bias is neutral.
+
+PLAN CREATED  2026-05-27 00:30:00  plan=93b30a73  bias=bearish  regime=bear-low  setups=0
+  rationale: Regime is bear-low, trend is bearish, price below all EMAs (20,50,200). Allowed direction is short only. RSI at 46 is not oversold, allowing short entries. Momentum composite positive but could be a dead cat bounce. Recent price consolidated around 75900-76100 then broke down to new lows near 75641. There is a retest opportunity of the 76000 level after the breakdown. Short entry zone around 75900-76000, with stop above recent high 76138 and targets at 75600 and 75200. ATR ~162, stop distance ~1.5x ATR = 243, so stop at ~76243? But the resistance is around 76138. Set stop at 76150 which is ~1.3x ATR from entry, but need at least 1.5x to avoid tight stop rejection. Let's use stop at 76200, distance from entry 76000 is 200, 200/162=1.23x ATR, less than 1.5. To satisfy 1.5x ATR, stop distance must be at least 243. So set stop at 76243 (entry 76000 + 243). But to maintain RR, need TP1 at least 1.0 * 243 = 243 points below entry, i.e., 75757. Since regime is bearish and trend is down, we expect lower prices. Set TP1 at 75600 (400 points below entry, RR=1.65 from worst-case fill at 76000). But entry zone is 75900-76000, worst-case for short is at highest entry 76000. TP1=75600, stop=76243, RR = (76000-75600)/(76243-76000) = 400/243=1.65 > min_rr. Also RSI not oversold, so entry not risky. Add soft rule to avoid RSI<30. No prior lessons relevant.
+
+PLAN CREATED  2026-05-27 02:30:00  plan=9ecf62f8  bias=bearish  regime=bear-low  setups=1
+  rationale: The trend is bearish in a low volatility regime. Price is below all EMAs, RSI is below 50 (36.97) but above 30, suggesting bearish but not oversold. Recent price action shows lower highs and lower lows, with no strong retracement. A short setup is viable on a retest of the recent swing high or EMA resistance, but given the weak RSI and bearish structure, a pullback to a resistance level offers a good entry. However, the current RSI is not oversold, so shorting at the current level might be risky; waiting for a retest is better. But allowed_directions only allow short, and RSI is below 70, so shorting is okay but not ideal. Entry zone is placed near the recent high retest area, with stop above recent swing high, and targets based on previous support levels.
+  setup[1] fdd327a8  SHORT  size=0.05
+    entry_zone: 75750 -> 75850
+    take_profit: [75450, 75100, 74700]   stop_loss: 75980
+    hard:  price < ema_20; price < ema_50; price < ema_200; rsi_14 < 70
+    soft:  rsi_14 < 50 (w0.7); macd_hist < 0 (w0.5)
+    invalidation: [hard] price > stop_loss (intrabar); [soft] rsi_14 crosses_above 60 (on_close)
+
+PLAN CREATED  2026-05-27 04:30:00  plan=88523973  bias=bearish  regime=bear-low  setups=0
+  rationale: BTC is in a bear regime with low volatility, price is below all EMAs, RSI is oversold (25.85) but still trending down. Allowed direction is short only. Recent price broke below 75500 support with volume. A short setup on a retest of broken support is viable, but RSI oversold suggests caution; waiting for a bounce to retest is preferred.
+
+PLAN CREATED  2026-05-27 06:30:00  plan=01c46511  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, MACD histogram positive but crossover not yet confirmed, RSI neutral, price below all EMAs. Recent selloff suggests bearish bias. Allowed direction is short only.
+  setup[1] 37edb3e8  SHORT  size=0.05
+    entry_zone: 75795 -> 75820
+    take_profit: [75400, 75200]   stop_loss: 76070
+    hard:  price < ema_20; price < ema_50; price < ema_200; rsi_14 < 70
+    soft:  macd_hist < 0 (w0.7); vol_zscore_20 < -0.5 (w0.5); momentum_composite < 0.5 (w0.3)
+    invalidation: [hard] rsi_14 >= 70 (intrabar); [soft] price crosses_above ema_20 (on_close); [warning] price > 76000 (intrabar)
+
+PLAN CREATED  2026-05-27 08:30:00  plan=52243c7f  bias=bearish  regime=bear-low  setups=1
+  rationale: Trend is bearish, volatility low. Price is below EMA20/50/200. RSI 57.4 not extreme, but bearish momentum composite and OBV negative. Allowed directions only 'short'. A short setup on retest of resistance near recent high at 76010 may offer good RR.
+  setup[1] 3d83cb76  SHORT  size=0.05
+    entry_zone: 75980 -> 76010
+    take_profit: [75700, 75550]   stop_loss: 76200
+    hard:  price <= ema_20; rsi_14 < 70
+    soft:  macd_hist < 0 (w0.5); obv < 0 (w0.3)
+    invalidation: [hard] price crosses_above ema_50 (on_close)
+
+PLAN CREATED  2026-05-27 09:45:00  plan=c0a7996d  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bearish with bear trend and low volatility. Allowed direction is short only. Price is below 200 EMA and has been making lower highs with resistance near 75900-76000. RSI at 53.4 is not oversold, allowing further downside. Short setup on retest of 75900-76000 area.
+  setup[1] a829570b  SHORT  size=0.05
+    entry_zone: 75900 -> 76000
+    take_profit: [75500, 75300, 75100]   stop_loss: 76200
+    hard:  price >= 75900; price <= 76000; rsi_14 < 70; ema_20 < ema_50
+    soft:  macd_hist < 0 (w0.5)
+    invalidation: [hard] price > 76200 (intrabar)
+
+PLAN CREATED  2026-05-27 11:45:00  plan=c0eb830c  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, RSI below 50, price below all EMAs, prior candle shows a sharp drop from 75883 to 75737, indicating bearish momentum. Allowed directions only short.
+  setup[1] 3d1c3134  SHORT  size=0.05
+    entry_zone: 75820 -> 75850
+    take_profit: [75200, 74900]   stop_loss: 76090
+    hard:  price < ema_20; price < ema_50; rsi_14 < 50
+    soft:  macd_hist < 0 (w0.5); price < 75737.9 (w0.3)
+    invalidation: [hard] rsi_14 >= 70 (intrabar); [warning] price > 76090 (intrabar)
+
+PLAN CREATED  2026-05-27 13:45:00  plan=d9f70e75  bias=bearish  regime=bear-low  setups=1
+  rationale: Market is in a bear trend with low volatility, and RSI is near oversold (32.19) suggesting potential for further decline. Recent price action shows a sharp selloff from 76155 to 74835, with current price at 75054.3. Allowed directions are short only. A short setup is proposed on a retest of the broken support turned resistance near 75167-75414.
+  setup[1] 39f2482e  SHORT  size=0.05
+    entry_zone: 75167 -> 75414.7
+    take_profit: [74200, 73800]   stop_loss: 75800
+    hard:  price <= ema_50; rsi_14 < 70; price >= ema_200; atr_14 > 100
+    soft:  macd_hist < 0 (w0.7); cvd_slope_10 < 0 (w0.5)
+    invalidation: [hard] price > 75800 (intrabar); [warning] rsi_14 crosses_above 50 (on_close)
+
+PLAN CREATED  2026-05-27 15:45:00  plan=4986255d  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is below all EMAs, trend is bear, volatility is low, and RSI is neutral around 47, suggesting potential continuation of downtrend. Recent sharp selloff from 76155 to 74835 indicates bearish momentum. Only short trades are allowed.
+  setup[1] e0b2e97c  SHORT  size=0.05
+    entry_zone: 75100 -> 75250
+    take_profit: [74500, 74000]   stop_loss: 75550
+    hard:  close < ema_20; close < ema_50; rsi_14 < 70; price > 75100; price < 75250
+    soft:  macd_hist < 0 (w0.7); atr_14 > 200 (w0.5)
+    invalidation: [hard] price > 75550 (intrabar)
+
+PLAN CREATED  2026-05-27 17:45:00  plan=c48130d4  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bearish with low volatility, RSI 37.5 (not oversold for short), price below all EMAs. Prior lesson warns of mild upward drift but not a decisive bear move, so we need a tight entry with generous stop to avoid being stopped out. A short on a retest of the 74450 support break area is proposed.
+  setup[1] 6931f0c0  SHORT  size=0.05
+    entry_zone: 74500 -> 74650
+    take_profit: [73100, 72500]   stop_loss: 75200
+    hard:  rsi_14 < 55; price < ema_20; price < ema_50; price < ema_200
+    soft:  price crosses_below 74650 (w1)
+    invalidation: [hard] price > 75200 (intrabar)
+
+PLAN CREATED  2026-05-27 19:45:00  plan=7ed82c75  bias=bearish  regime=bear-low  setups=0
+  rationale: Trend regime is bear, volatility low. RSI neutral (47), price below EMAs (20,50,200). Recent price action shows lower highs and a break below 75000. Allowed direction is short only. No strong pullback retest setup that matches risk criteria, so no trade this bar.
+
+PLAN CREATED  2026-05-27 21:45:00  plan=634d5381  bias=bearish  regime=bear-low  setups=0
+  rationale: Price is in a downtrend with bear regime, RSI below 30 (oversold but momentum still down), recent sharp drop suggests continuation. Allowed directions only 'short', so bias is bearish.
+
+PLAN CREATED  2026-05-27 23:45:00  plan=34b98a27  bias=bearish  regime=bear-low  setups=0
+  rationale: Price is in a clear downtrend on the 15m timeframe with RSI at 37.8, well below 50, and recent price action shows a break below the 75000 support zone. The regime is bear-low, and allowed_directions only permit shorts. A retest of the broken support near 75000 as resistance offers a potential short entry with a clean risk/reward profile.
+
+PLAN CREATED  2026-05-28 01:45:00  plan=55cb16d6  bias=bearish  regime=bear-low  setups=1
+  rationale: Trend is bearish (ema_20 < ema_50 < ema_200), RSI below 50 (38.15), recent price action shows a sharp drop from 75k to 74k with lower highs and lows. Low volatility and bear regime. Allowed directions only short. RSI near oversold (38) but not yet <30, allowing a short on a retrace to resistance.
+  setup[1] f264f90b  SHORT  size=0.05
+    entry_zone: 74350 -> 74450
+    take_profit: [74000, 73600]   stop_loss: 74700
+    hard:  close < ema_20; close < ema_50; rsi_14 < 70; price < ema_20
+    soft:  rsi_14 > 30 (w0.5); macd_hist > 0 (w0.3)
+    invalidation: [hard] price >= 74700 (intrabar); [warning] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-05-28 03:45:00  plan=cabde068  bias=bearish  regime=bear-low  setups=1
+  rationale: Market is in bear-low regime with RSI deeply oversold (18.7) and price below all major EMAs. Despite oversold RSI, the bearish trend is strong and recent volatility (low) suggests continuation rather than reversal. Allowed direction is 'short' only.
+  setup[1] 979e2b51  SHORT  size=0.05
+    entry_zone: 73100 -> 73300
+    take_profit: [72500, 72000]   stop_loss: 73700
+    hard:  rsi_14 < 30; close < ema_20; close < ema_50
+    soft:  obv < 0 (w0.5); macd_hist < 0 (w0.5)
+    invalidation: [hard] close > 73700 (intrabar); [soft] rsi_14 crosses_above 30 (on_close)
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-28 03:45:00  plan=cabde068 setup=979e2b51  action=CONFIRM  size_x=1
+  price=73224.5  hard_ok=True  soft_score=1
+  reason: Hard rules satisfied, soft score perfect, RSI deeply oversold (18.7) well below 30, price inside entry zone and below both EMAs, MACD histogram negative and widening. No invalidation triggered. Conviction high.
+TRADE OPENED  2026-05-28 03:45:00  trade=2d21bda1  plan=cabde068 setup=979e2b51  SHORT @ 73224.5  size=1.53995
+  -> EXECUTED — rr 1.52; lev 1.54x; risk $10.00
+  -> OBSERVE tighten stop -> 73400 (RSI at 16.3 is deeply oversold; price below all EMAs with strong bearish momentum (MACD histogram negative). Short is profitable. Tighten stop to protect gains while letting position run.)
+  -> SCALED OUT 0.50 at tp1 @ 73058.1 (leg +0.23%) — stop→breakeven
+  -> OBSERVE scale out 0.50 @ 73058.1 (Strong bearish momentum with RSI at 24 (oversold) and price below all EMAs; good profit already, scale out to bank gains and set breakeven for remainder.)
+  -> OBSERVE tighten stop -> 73200 (Strong downward momentum confirmed by deeply oversold RSI and bearish MACD; price well below EMAs. Tightening stop to lock in partial gain while giving room.)
+  -> OBSERVE tighten stop -> 73180 (Price has moved favorably and RSI is deeply oversold, suggesting potential reversal. Tighten stop to lock in gains.)
+  -> OBSERVE tighten stop -> 73050 (Price strongly in profit, RSI 21 oversold for short suggests possible snap-back; tightening stop locks gains while protecting against reversal.)
+TRADE CLOSED  2026-05-28 05:30:00  trade=2d21bda1  plan=cabde068  reason=trail  pnl=+0.23%
+
+PLAN CREATED  2026-05-28 05:45:00  plan=c83db2b9  bias=bearish  regime=bear-low  setups=0
+  rationale: Price is in a clear downtrend on 15m, with RSI deeply oversold (24.4) suggesting potential bounce but not yet a reversal signal. Regime is bear-low, and allowed_directions only allow shorts. Current price near 72960 is below all EMAs (20,50,200). A short setup on a retracement to EMA-20 (73525) or prior support-turned-resistance zone is appropriate, but must respect RSI oversold condition. However, RSI < 30 warns against shorting at current levels; the ideal short entry would be after a pullback toward resistance. Given the oversold RSI, I will not propose a setup now to avoid chasing. Instead, I return an empty allowed_setups and wait for a retracement.
+
+PLAN CREATED  2026-05-28 07:45:00  plan=f6cf3884  bias=bearish  regime=bear-low  setups=1
+  rationale: The regime is bear-low, and the trend is bearish with price below all EMAs (20, 50, 200). Recent price action shows a sharp decline from 75k to 73k, followed by a minor bounce to 73467. RSI is neutral (~49.5), not oversold, leaving room for further downside. Volume spikes during the drop suggest selling pressure. CVD slope is positive (233.6) but may reflect short covering. Allowed_directions only permits shorts. A short setup on a retest of resistance around 73650 is appropriate.
+  setup[1] 6bcfd0f2  SHORT  size=0.05
+    entry_zone: 73550 -> 73650
+    take_profit: [72600, 72000]   stop_loss: 74000
+    hard:  price >= 73550; price <= 73650; rsi_14 < 70; ema_20 > price
+    soft:  macd_hist < 0 (w0.7); rsi_14 > 30 (w0.5)
+    invalidation: [hard] price >= 74000 (intrabar); [soft] rsi_14 > 70 (on_close)
+
+PLAN CREATED  2026-05-28 09:45:00  plan=bad73f65  bias=bearish  regime=bear-low  setups=1
+  rationale: Trend is bear (low volatility), price below EMAs (20, 50, 200), momentum positive but RSI neutral. Allowed directions only short. Prior lessons show short success in bear-low. Setup: short on pullback to EMAs resistance.
+  setup[1] f4e4e436  SHORT  size=0.05
+    entry_zone: 73550 -> 73600
+    take_profit: [72850, 72400]   stop_loss: 74100
+    hard:  price < ema_20; price < ema_50; rsi_14 < 70
+    soft:  momentum_composite > 0.5 (w0.5); pr_momentum > 0.5 (w0.5)
+    invalidation: [hard] price > 74150 (intrabar)
+
+PLAN CREATED  2026-05-28 11:45:00  plan=631bc462  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, only short trades allowed. Price is below EMA 50 and EMA 200, with recent breakdown from 74k to 73k. RSI around 52 is neutral, not oversold, allowing room to short. ATR is 166.4, providing reasonable stop distance. The short setup targets a retest of recent lows near 72700, with stop above the recent consolidation at 73700.
+  setup[1] 483d7dcb  SHORT  size=0.05
+    entry_zone: 73350 -> 73480
+    take_profit: [72750, 72450]   stop_loss: 73700
+    hard:  price < ema_50; price < ema_200; rsi_14 > 30
+    soft:  macd_hist > 0 (w0.5); cvd_slope_10 < 0 (w0.4)
+    invalidation: [hard] price > 73750 (intrabar); [soft] rsi_14 < 30 (on_close)
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-28 11:45:00  plan=631bc462 setup=483d7dcb  action=WAIT  size_x=1
+  price=73479.1  hard_ok=True  soft_score=1
+  reason: Price is at entry zone high (73480), but rsi_14 at 52.2 is neutral, not oversold, and macd_hist positive shows short-term momentum up, conflicting with short thesis. Soft score is 1.0 but momentum composite 0.67 suggests fading bearish momentum. No clear conviction to enter short here.
+  -> SKIPPED: WAIT
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-28 12:00:00  plan=631bc462 setup=483d7dcb  action=WAIT  size_x=1
+  price=73372.8  hard_ok=True  soft_score=1
+  reason: Price just entered the zone but at the low edge; soft rules scored well but RSI at 47.5 shows fading momentum for a short, not extreme yet; CVD slope is negative (good) but macd_hist positive suggests some bullish pressure. Price is close to stop at 73700, risk/reward not compelling. Better to wait for more confirmation or a better entry.
+  -> SKIPPED: WAIT
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-28 12:30:00  plan=631bc462 setup=483d7dcb  action=WAIT  size_x=1
+  price=73454  hard_ok=True  soft_score=1
+  reason: Price is inside entry zone but RSI 14 at 51.4 is near neutral, far from oversold, and MACD histogram turning positive suggests weakening bearish momentum for a short. Soft rule conditions are met but conviction is low.
+  -> SKIPPED: WAIT
+
+PLAN CREATED  2026-05-28 13:45:00  plan=699c2c08  bias=bearish  regime=bear-low  setups=1
+  rationale: Market is trending bearish (EMA200 above price, bear regime) with recent breakdown below 73400. RSI is neutral (39) allowing short entry on pullback. Allowed directions only include short. Setup targets a short on retest of 73140 resistance.
+  setup[1] 50b25304  SHORT  size=0.05
+    entry_zone: 73100 -> 73180
+    take_profit: [72400, 72000]   stop_loss: 73450
+    hard:  rsi_14 < 70; price < ema_20; price < ema_50
+    soft:  macd_hist < 0 (w0.3); vol_zscore_20 > 1.5 (w0.2)
+    invalidation: [hard] price > 73500 (intrabar); [warning] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-05-28 15:45:00  plan=9aa8606a  bias=bearish  regime=bear-low  setups=0
+  rationale: Trend is bearish, low volatility, regime is bear-low. RSI is 42, not oversold. Price near recent lows, likely to break support. Observing prior lessons show short trades in this regime can win. Allowed direction is short only.
+
+PLAN CREATED  2026-05-28 17:45:00  plan=1e49b5ab  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is below both 20 and 50 EMAs, with a bearish regime. Short setup aligns with bearish bias and allowed direction. Price recently bounced from lows but shows resistance near 73500. A short setup with a stop above recent highs targets a retest of support near 72800.
+  setup[1] 9d078675  SHORT  size=0.05
+    entry_zone: 73480 -> 73520
+    take_profit: [73100, 72800, 72500]   stop_loss: 73800
+    hard:  rsi_14 < 70; close < ema_50; close < ema_20
+    soft:  macd_hist < 0 (w0.7); vol_zscore_20 < 0 (w0.5)
+    invalidation: [hard] close >= 73800 (intrabar)
+
+PLAN CREATED  2026-05-28 19:45:00  plan=81f76b74  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, RSI at 51.09 is neutral, price below EMA200 (74486) and recent price action showing a bounce from 72755 but failing to reclaim 73700. Allowed directions restrict to short only. A short retest of 73550 area (recent swing high) offers a good entry with stop above 73750 (above recent highs) and target at 73100 (prior support). Entry zone kept narrow to ensure risk:reward at worst-case fill is above 1.0.
+  setup[1] ba0aff73  SHORT  size=0.05
+    entry_zone: 73530 -> 73570
+    take_profit: [73100, 72900]   stop_loss: 73750
+    hard:  price < 73750; rsi_14 < 60; atr_14 > 0
+    soft:  macd_hist < 0 (w0.7)
+    invalidation: [hard] price > 73750 (intrabar)
+
+PLAN CREATED  2026-05-28 21:45:00  plan=820d4956  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low with allowed_directions only short. Recent price rally from 72755 to 73877 may be a pullback within downtrend. RSI at 61 is not overbought, but we wait for a retest of resistance before shorting. Current price at 73796 is near recent high, but entry zone set at previous resistance area around 73800-73900. Stop above recent swing high at 74050, TP at 73400 (previous support) gives RR >1.3 at worst-case fill. ATR is 195, stop distance ~254 (>1.3x ATR), meets minimum stop width.
+  setup[1] 9273998a  SHORT  size=0.05
+    entry_zone: 73800 -> 73900
+    take_profit: [73400, 73000, 72600]   stop_loss: 74050
+    hard:  price >= 73800; price <= 73900; rsi_14 < 70
+    soft:  ema_20 < ema_200 (w0.5); macd_hist < 0 (w0.3)
+    invalidation: [hard] price >= 74050 (intrabar); [soft] rsi_14 > 70 (on_close)
+
+PLAN CREATED  2026-05-28 23:45:00  plan=2aa3b89b  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, trend is bear with low volatility. RSI at 52 is neutral, not oversold, allowing shorts. Price is near recent high but below 200 EMA, suggesting resistance. Allowed directions only include short.
+  setup[1] 16147c73  SHORT  size=0.05
+    entry_zone: 73650 -> 73695
+    take_profit: [73100, 72800]   stop_loss: 73950
+    hard:  rsi_14 > 30; close < ema_200; atr_14 > 100
+    soft:  rsi_14 < 70 (w0.5); macd_hist < 0 (w0.5)
+    invalidation: [hard] close > ema_20 (on_close)
+
+PLAN CREATED  2026-05-29 00:00:00  plan=7dd6dc0e  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is below 200 EMA, trend is bear, RSI is neutral (57) not oversold, potential retest of moving averages as resistance. Allowed direction is short only due to regime filter. Prior lessons show shorts work in bear-low regime.
+  setup[1] 0c5404b0  SHORT  size=0.05
+    entry_zone: 73724.4 -> 73800
+    take_profit: [73200, 72800]   stop_loss: 74150
+    hard:  price < ema_200; rsi_14 > 30; rsi_14 < 70
+    soft:  macd_hist < 0 (w1)
+    invalidation: [hard] price >= 74150 (intrabar); [warning] rsi_14 > 70 (on_close)
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-29 00:00:00  plan=7dd6dc0e setup=0c5404b0  action=CONFIRM  size_x=1
+  price=73724.4  hard_ok=True  soft_score=1
+  reason: Price is well within entry zone, RSI below 70, MACD histogram negative, all hard rules satisfied. The setup remains valid with no signs of weakening.
+TRADE OPENED  2026-05-29 00:00:00  trade=a05c4eca  plan=7dd6dc0e setup=0c5404b0  SHORT @ 73724.4  size=1.73225
+  -> EXECUTED — rr 1.23; lev 1.73x; risk $10.00
+TRADE CLOSED  2026-05-29 02:00:00  trade=a05c4eca  plan=7dd6dc0e  reason=expiry  pnl=+0.20%
+
+PLAN CREATED  2026-05-29 02:15:00  plan=ea65910d  bias=bearish  regime=bear-low  setups=1
+  rationale: Bearish low-vol regime, RSI below 50, MACD histogram negative, price below all EMAs, CVD slope negative. Short-only allowed.
+  setup[1] c81198c7  SHORT  size=0.05
+    entry_zone: 73470 -> 73550
+    take_profit: [73100, 72800]   stop_loss: 73750
+    hard:  price < ema_20; price < ema_50; price < ema_200; rsi_14 < 50; macd_hist < 0
+    soft:  rsi_14 > 30 (w0.8); vol_zscore_20 < 1 (w0.5)
+    invalidation: [hard] price > ema_20 (on_close); [soft] rsi_14 > 65 (intrabar)
+
+PLAN CREATED  2026-05-29 04:15:00  plan=a37dbe64  bias=bearish  regime=bear-low  setups=0
+  rationale: Regime is bear-low, RSI is neutral (45) suggesting no immediate overbought/oversold extreme, but short-only allowed. Price is below both EMA_20 and EMA_50, indicating bearish alignment. Recent price action shows a decline from ~73900 to ~73197 with small bounces, consistent with bearish drift. No clear pullback/retest entry yet; waiting for a test of recent low or a bounce to EMA resistance.
+
+PLAN CREATED  2026-05-29 06:15:00  plan=2beebd54  bias=bearish  regime=bear-low  setups=1
+  rationale: The macro trend is bearish (trend='bear', volatility='low'). RSI at 60 is not oversold, so shorting is still viable. The recent price action shows a rejection near 73900 and a decline into the 73300 area, with a consolidation around 73500-73700. The short setup aims for a retest of the lower range (73170-73300) and a breakdown. The entry is set near the recent swing high around 73700, with a stop above the recent high at 73910. ATR is 153, so stop distance is about 210, which is ~1.37x ATR, slightly below 1.5; however, the stop at 73910 is ~210 points from entry at 73700 (if worst-case fill at 73685), which is ~1.4x ATR. To meet 1.5x ATR, the stop could be widened, but that would increase risk. Given the low volatility regime and the risk limits allow short, we proceed with a narrow stop just above the prior high. The first target is at 73300, giving a reward of ~385 points from worst-case fill of 73685, resulting in RR ~1.83, which meets min_rr. Additional targets at 73170 and 73000. RSI is 60, not overbought, so short entry is acceptable.
+  setup[1] e5619a36  SHORT  size=0.05
+    entry_zone: 73663.5 -> 73700
+    take_profit: [73300, 73170, 73000]   stop_loss: 73910
+    hard:  rsi_14 < 70; price > ema_20; price < ema_200
+    soft:  macd_hist < 0 (w0.5)
+    invalidation: [hard] price >= 73910 (intrabar); [soft] rsi_14 > 70 (on_close)
+
+PLAN CREATED  2026-05-29 08:15:00  plan=7bfd435a  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, RSI neutral, price below 200 EMA, allowed_directions only short. Prior lessons include a successful short in bear-low regime, supporting short bias.
+  setup[1] 0b1d2940  SHORT  size=0.05
+    entry_zone: 73775 -> 73795
+    take_profit: [73450, 73300, 73150]   stop_loss: 74020
+    hard:  price < ema_200; rsi_14 > 30; rsi_14 < 70
+    soft:  macd < macd_signal (w0.5); cvd_slope_10 < 0 (w0.3)
+    invalidation: [hard] price > 74020 (intrabar)
+
+PLAN CREATED  2026-05-29 10:15:00  plan=2fc68498  bias=bearish  regime=bear-low  setups=0
+  rationale: The trend is bearish (bear-low regime) and RSI is neutral at 48.4, not oversold, allowing room for further downside. Price is below EMA 200 and EMA 20 is below EMA 50, confirming bearish structure. Allowed direction is only short, so only short setups are considered. No obvious pullback/retest level is clear; price is hovering near 73600 with no clear resistance retest. Thus, no setup is triggered.
+
+PLAN CREATED  2026-05-29 12:15:00  plan=3fac7723  bias=bearish  regime=bear-low  setups=1
+  rationale: Price in a downtrend, below all EMAs, RSI below 50, bear regime, and low vol. Short allowed. Consider short on a retest of resistance.
+  setup[1] 2b6af584  SHORT  size=0.05
+    entry_zone: 73450 -> 73500
+    take_profit: [73000, 72700, 72400]   stop_loss: 73650
+    hard:  price <= ema_50; rsi_14 < 50; price >= entry_zone[0]
+    soft:  macd_hist < 0 (w0.7); obv < 0 (w0.5)
+    invalidation: [hard] rsi_14 > 60 (intrabar); [soft] price > ema_20 (on_close)
+
+PLAN CREATED  2026-05-29 14:15:00  plan=777dcb7b  bias=bearish  regime=bear-low  setups=1
+  rationale: RSI deep in oversold territory (25.8) suggests potential for a bounce, but the bear regime and momentum weakness favor short entries on any retrace to resistance. Price is below all EMAs and MACD is bearish. Allowed_directions is only short, so we only consider shorts. RSI <30 is oversold, so wait for a pullback to near EMA20 (73274) to enter short with a tight stop.
+  setup[1] b8cb74e1  SHORT  size=0.05
+    entry_zone: 73250 -> 73300
+    take_profit: [72690, 72436, 72000]   stop_loss: 73500
+    hard:  price <= ema_20; price >= ema_50; rsi_14 < 70
+    soft:  macd_hist < 0 (w0.7); momentum_composite < 0 (w0.5)
+    invalidation: [hard] price > 73500 (intrabar)
+
+PLAN CREATED  2026-05-29 15:15:00  plan=c7396615  bias=bearish  regime=bear-low  setups=1
+  rationale: Trend is bearish, volatility is low, RSI near 58 (not oversold), recent price drop from 73866 to 72690, now bouncing but may retest lows. Regime allows only shorts.
+  setup[1] de2f95a1  SHORT  size=0.05
+    entry_zone: 73700 -> 73800
+    take_profit: [73100, 72600]   stop_loss: 74100
+    hard:  price <= ema_50; rsi_14 > 50; atr_14 > 200
+    soft:  macd_hist < 0 (w0.5)
+    invalidation: [hard] price crosses_above ema_200 (on_close); [soft] rsi_14 > 70 (on_close)
+
+PLAN CREATED  2026-05-29 16:45:00  plan=68333581  bias=bearish  regime=bear-low  setups=1
+  rationale: The regime is bear-low, and allowed_directions only permits shorts. RSI at 61.9 is not oversold, providing room for a short. Price recently bounced from 72436 to 74124, but the overall trend remains bearish with the 200 EMA at 73939 acting as resistance. A retest of the 73900-74000 area offers a short entry near resistance, with a stop above the recent high and a target towards the recent lows.
+  setup[1] 5f147fd4  SHORT  size=0.05
+    entry_zone: 73900 -> 74050
+    take_profit: [73300, 72800]   stop_loss: 74250
+    hard:  rsi_14 < 70; price > ema_200; price < 74100; macd_hist < 0
+    soft:  vol_zscore_20 < 0 (w0.3)
+    invalidation: [hard] price > 74250 (intrabar)
+
+PLAN CREATED  2026-05-29 18:45:00  plan=cec307e6  bias=bearish  regime=bear-low  setups=1
+  rationale: Regime is bear-low, RSI is 41.86 (not oversold), recent price dropped from 74177 to 73343 with high volume. Short setup aligns with bearish regime and allowed direction short.
+  setup[1] b0a204ff  SHORT  size=0.05
+    entry_zone: 73400 -> 73500
+    take_profit: [72800, 72400, 72000]   stop_loss: 73900
+    hard:  rsi_14 < 70; price < ema_20; price < ema_50; price < ema_200
+    soft:  macd_hist < 0 (w0.6); momentum_composite > 0 (w0.4)
+    invalidation: [hard] price >= 73900 (intrabar); [hard] rsi_14 >= 70 (intrabar)
+----------------------------------------------------------------------------------------
+CONFIRM  2026-05-29 19:45:00  plan=cec307e6 setup=b0a204ff  action=CONFIRM  size_x=1
+  price=73489  hard_ok=True  soft_score=1
+  reason: All hard rules passed, price (73489) within entry zone (73400-73500), momentum composite positive (0.209), and macd_hist deeply negative (-62.8) supporting short. Soft score 1.0. No invalidation triggered.
+TRADE OPENED  2026-05-29 19:45:00  trade=dad049fc  plan=cec307e6 setup=b0a204ff  SHORT @ 73489  size=1.78805
+  -> EXECUTED — rr 1.68; lev 1.79x; risk $10.00
+TRADE CLOSED  2026-05-29 21:45:00  trade=dad049fc  plan=cec307e6  reason=expiry  pnl=+0.04%
+
+PLAN CREATED  2026-05-29 22:00:00  plan=18cb69d1  bias=neutral  regime=side-low  setups=0
+  rationale: No allowed directions specified; cannot propose any setups.
+
+PLAN CREATED  2026-05-30 00:00:00  plan=683452b4  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with no allowed directions. Prior trades in bear-low were winners but current allowed_directions is empty, so no setups can execute. Market is consolidating with RSI near 50, no clear directional signal.
+
+PLAN CREATED  2026-05-30 02:00:00  plan=c0a061b7  bias=neutral  regime=side-low  setups=0
+  rationale: Sideways-low regime with no allowed directions, so no setups can be proposed. RSI near 50, price near EMAs, low volatility. Wait for a clear directional signal.
+
+PLAN CREATED  2026-05-30 04:00:00  plan=874ce54c  bias=neutral  regime=side-low  setups=0
+  rationale: RSI is near 44, not extreme. Price is consolidating below EMAs (20,50,200). Trend is side, volatility low. Allowed_directions is empty, so no setups can execute. Neutral bias with no setups.
+
+PLAN CREATED  2026-05-30 06:00:00  plan=db50a66d  bias=neutral  regime=side-low  setups=0
+  rationale: No allowed_directions provided, so no setups can be executed. Market is in side-low regime with tight range and low volatility.
+
+PLAN CREATED  2026-05-30 08:00:00  plan=0246a1ba  bias=neutral  regime=side-low  setups=0
+  rationale: Sideways trend with low volatility and no clear directional edge. RSI near 50, price near EMAs. Allowed_directions empty means no setups can execute. Waiting for better conditions.
+
+PLAN CREATED  2026-05-30 10:00:00  plan=36822483  bias=neutral  regime=side-low  setups=0
+  rationale: Sideways-low volatility regime, RSI ~57 (neutral), price near EMAs with no clear momentum. No allowed_directions configured, so no setups are permitted.
+
+PLAN CREATED  2026-05-30 12:00:00  plan=859e2794  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with allowed_directions empty, so no setups can execute. Market is ranging near EMAs, RSI 52, lacking momentum. Waiting for clearer directional signal.
+
+PLAN CREATED  2026-05-30 14:00:00  plan=3e73cfce  bias=neutral  regime=side-low  setups=0
+  rationale: RSI is overbought (75.9) and regime is side-low. Allowed_directions is empty, so no setups can be executed. Waiting for clearer conditions.
+
+PLAN CREATED  2026-05-30 16:00:00  plan=7e7c86ca  bias=neutral  regime=side-low  setups=0
+  rationale: The regime is side-low with low volatility. RSI is neutral (62), price near EMAs. Allowed directions list is empty, so no setups can be executed. Returning empty allowed_setups.
+
+PLAN CREATED  2026-05-30 18:00:00  plan=4bbe2f3c  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with no allowed_directions, thus no setups should be proposed.
+
+PLAN CREATED  2026-05-30 20:00:00  plan=5087531b  bias=neutral  regime=side-low  setups=0
+  rationale: Price is ranging near EMAs with low volatility (side-low regime). RSI at 51.9 shows no momentum bias. Volume and CVD are neutral. No prior lessons directly apply as they were for bear-low regime. Allowed_directions is empty, so no setups are permitted.
+
+PLAN CREATED  2026-05-30 22:00:00  plan=f7a6a683  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with no allowed directions, and market is consolidating around EMAs with low volatility. No trade is warranted.
+
+PLAN CREATED  2026-05-31 00:00:00  plan=a045be23  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with no allowed_directions (empty list). No setups can execute this bar. Bias is neutral by default.
+
+PLAN CREATED  2026-05-31 02:00:00  plan=57f8b66e  bias=neutral  regime=side-low  setups=0
+  rationale: No allowed directions in risk limits; no setups can execute. Market is in side-low regime with low volatility.
+
+PLAN CREATED  2026-05-31 04:00:00  plan=d514a5f6  bias=neutral  regime=side-low  setups=0
+  rationale: No setups allowed because allowed_directions is empty. Market is side-low with low volatility, and no recent lessons force a trade.
+
+PLAN CREATED  2026-05-31 06:00:00  plan=af742734  bias=neutral  regime=side-low  setups=0
+  rationale: Price is consolidating in a narrow range around EMA levels; RSI is neutral at 43.8, and MACD histogram is negative but converging. Regime indicates 'side-low' volatility. Allowed_directions is empty, so no trades are permitted.
+
+PLAN CREATED  2026-05-31 08:00:00  plan=d0271c59  bias=neutral  regime=side-low  setups=0
+  rationale: No allowed directions in risk limits; regime filter prevents any setup.
+
+PLAN CREATED  2026-05-31 10:00:00  plan=07dc4f2a  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low, RSI near 41, price below EMAs but within recent range. Allowed_directions is empty, so no trades can execute.
+
+PLAN CREATED  2026-05-31 12:00:00  plan=b4f4e2ea  bias=neutral  regime=side-low  setups=0
+  rationale: Sideways regime with low volatility, RSI near 50, no clear directional bias. Allowed directions list is empty, so no setups can execute.
+
+PLAN CREATED  2026-05-31 14:00:00  plan=41e52c74  bias=neutral  regime=side-low  setups=0
+  rationale: No allowed_directions specified by regime filter; market in side-low regime with price near support and RSI near oversold, but no direction is permitted. Returning empty allowed_setups.
+
+PLAN CREATED  2026-05-31 16:00:00  plan=8605b7fc  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with volatility percentile at 0, indicating extremely low volatility. RSI at 36.25 shows bearish lean but not oversold. Price is below all EMAs (20,50,200) suggesting downtrend. However, allowed_directions is empty, so no setups can execute. Market bias is neutral due to low vol and no direction allowed.
+
+PLAN CREATED  2026-05-31 18:00:00  plan=c2bb9c55  bias=neutral  regime=side-low  setups=0
+  rationale: Sideways-low regime with RSI near 45 and no clear trend. Recent drop found support near 73340 but price remains below EMAs. No strong directional signal; waiting for a retest or breakout.
+
+PLAN CREATED  2026-05-31 20:00:00  plan=9c2d5036  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with no allowed directions; no setups can execute. RSI neutral, price near EMAs, low volatility. Waiting for directional filter to change.
+
+PLAN CREATED  2026-05-31 22:00:00  plan=fc9337c8  bias=neutral  regime=side-low  setups=0
+  rationale: Despite a bullish candle closing higher, RSI at 65 and low volatility regime suggest choppy conditions. The allowed_directions list is empty, prohibiting any setups, so no trades are proposed.
+
+PLAN CREATED  2026-06-01 00:00:00  plan=1663e7f3  bias=neutral  regime=side-low  setups=0
+  rationale: Regime filter 'allowed_directions' is empty, so no trades are allowed this bar. Market bias is neutral due to side-low regime and recent pullback from highs, but no setups can execute.
+
+PLAN CREATED  2026-06-01 02:00:00  plan=8e23375a  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with low volatility. RSI at 44.6, not oversold or overbought. Recent price action shows consolidation around 73500 with no clear directional impetus. Allowed_directions is empty, so no setups can execute. Returning neutral bias with empty allowed_setups.
+
+PLAN CREATED  2026-06-01 04:00:00  plan=88457bcf  bias=neutral  regime=side-low  setups=0
+  rationale: Regime filter allowed_directions is empty, prohibiting any setups. Market is in side-low volatility with mixed signals; no direction allowed.
+
+PLAN CREATED  2026-06-01 06:00:00  plan=3cd76b0c  bias=neutral  regime=side-low  setups=0
+  rationale: Regime is side-low with low volatility. RSI is 38, not oversold. Allowed_directions is empty, so no trades allowed.
+
+PLAN CREATED  2026-06-01 08:00:00  plan=fda11a12  bias=bearish  regime=side-low  setups=0
+  rationale: Price trending down, RSI below 30 (oversold), but momentum composite negative and CVD slope negative. Allowed_directions is empty, so no setups can execute.
+
+PLAN CREATED  2026-06-01 10:00:00  plan=db81da25  bias=neutral  regime=side-low  setups=0
+  rationale: Price is in a downtrend on lower timeframes, RSI is near oversold (34.6), but the regime is side-low and allowed_directions is empty, so no setups can execute. Waiting for clearer direction from regime.
+
+PLAN CREATED  2026-06-01 12:00:00  plan=2d3e3f46  bias=bearish  regime=side-low  setups=0
+  rationale: Price is trending down with RSI at 20 (oversold) but momentum composite and CVD divergence are bearish. Regime is side-low with high volume spike suggesting aggressive selling. However, allowed_directions is empty, so no setups can execute.
+
+PLAN CREATED  2026-06-01 14:00:00  plan=1f66957e  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is in a clear short-term downtrend below all major EMAs, RSI at 24.9 (oversold but not extreme enough to prevent further downside in a bear regime). Recent candles show strong selling pressure with a breakdown below 72000. The bear-low regime supports shorting. Allowed direction is only short. A retest of the 71800-72000 area after a momentary bounce would provide a decent entry with RR > 1.3 when sized properly.
+  setup[1] 58024807  SHORT  size=0.05
+    entry_zone: 71800 -> 72000
+    take_profit: [71000, 70500, 70000]   stop_loss: 72600
+    hard:  rsi_14 < 40; price < ema_20; price < ema_50; price < ema_200; atr_14 > 0
+    soft:  macd_hist < 0 (w0.5); momentum_composite < 0 (w0.5); cvd_slope_10 < 0 (w0.3)
+    invalidation: [hard] price > 72300 (intrabar); [warning] rsi_14 < 20 (on_close)
+
+PLAN CREATED  2026-06-01 16:00:00  plan=72707bd4  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is in a strong downtrend, below all EMAs, RSI is extremely oversold (22.2), but the regime is bear-low and allowed_directions only permits shorts. The extreme RSI suggests a potential bounce, but the trend is bearish and volume is high on selloffs. Shorting on a pullback to a resistance level offers a better risk/reward than chasing the drop. Setup: short on retest of recent support-turned-resistance near 71100, with stop above 71600 (1.5x ATR) and target at 70200.
+  setup[1] c1f6becd  SHORT  size=0.05
+    entry_zone: 71100 -> 71200
+    take_profit: [70200, 69600]   stop_loss: 71600
+    hard:  rsi_14 < 40; price < ema_20; ema_20 < ema_50; ema_50 < ema_200
+    soft:  rsi_14 < 30 (w0.5); volume > 5000 (w0.3)
+    invalidation: [hard] price > 71600 (intrabar)
+
+PLAN CREATED  2026-06-01 17:30:00  plan=01f64dbd  bias=bearish  regime=bear-low  setups=1
+  rationale: The regime is bear-low, and allowed_directions only permit shorts. Price is below key EMAs (50, 200), RSI is neutral (~48) not oversold, so a retest of recent lows near 71000 is possible. Momentum composite positive but short-term trend remains weak. The prior lesson shows a successful short in bear-low regime.
+  setup[1] d0fc5aff  SHORT  size=0.05
+    entry_zone: 71720 -> 71761
+    take_profit: [71000, 70600]   stop_loss: 72350
+    hard:  price < ema_50; price < ema_200; rsi_14 < 70
+    soft:  macd_hist < 0 (w0.5); momentum_composite < 0.5 (w0.3); pr_atr < 0.8 (w0.2)
+    invalidation: [hard] price >= 72351 (intrabar); [warning] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-06-01 19:30:00  plan=44ababb7  bias=bearish  regime=bear-low  setups=1
+  rationale: Trend regime is bear-low, RSI is neutral, price below all EMs, momentum composite positive but could be a dead cat bounce. Recent price action shows lower highs since the selloff. Allowed direction is short only.
+  setup[1] 0234f852  SHORT  size=0.05
+    entry_zone: 71650 -> 71750
+    take_profit: [71200, 70800]   stop_loss: 72050
+    hard:  price < ema_20; rsi_14 > 30; price >= 71650
+    soft:  macd_hist > 0 (w0.5)
+    invalidation: [hard] price > 72050 (intrabar)
+
+PLAN CREATED  2026-06-01 21:30:00  plan=b5e60363  bias=bearish  regime=bear-low  setups=0
+  rationale: Price is in a bear trend with low volatility, RSI near oversold at 30.68, suggesting potential for further downside but risk of retracement. Momentum composite is positive but weak. Allowed directions only 'short', so only short setups considered.
+
+PLAN CREATED  2026-06-01 23:30:00  plan=3c8f9068  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is below EMA_200 and EMA_50 (bearish alignment), RSI near 50 (no extreme), regime is bear-low. Recent consolidation around 71200-71500 suggests a bear flag/pullback. Prior lessons show a clean short win in bear-low regime. Current price near the top of recent range provides a short entry opportunity with a stop above the recent high.
+  setup[1] 26a3874a  SHORT  size=0.05
+    entry_zone: 71489.7 -> 71564
+    take_profit: [70900, 70600]   stop_loss: 71850
+    hard:  price <= 71564; price >= 71489.7; rsi_14 < 70; ema_50 < ema_200
+    soft:  macd_hist < 0 (w0.5); rsi_14 > 50 (w0.3); momentum_composite < 0.5 (w0.2)
+    invalidation: [hard] price > 71850 (intrabar); [warning] rsi_14 > 70 (on_close)
+
+PLAN CREATED  2026-06-02 01:30:00  plan=294eaa0d  bias=bearish  regime=bear-low  setups=1
+  rationale: The regime is bear-low, trend is bear, and RSI is 38.5, not oversold, supporting further downside. Recent price action shows a series of lower highs and lower lows. Allowed direction is short only. Previous lessons confirm short trades can be successful in this regime. A short setup targeting a retest of recent lows is appropriate.
+  setup[1] 10af086b  SHORT  size=0.05
+    entry_zone: 71100 -> 71200
+    take_profit: [70600, 70300]   stop_loss: 71450
+    hard:  rsi_14 < 50; price < ema_20; price < ema_50; price < ema_200
+    soft:  macd_hist < 0 (w0.7); momentum_composite < 0.5 (w0.5)
+    invalidation: [hard] price > 71500 (intrabar); [warning] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-06-02 03:30:00  plan=88ec91a9  bias=bearish  regime=bear-low  setups=1
+  rationale: The regime is bearish with low volatility. Recent price action shows a sharp drop from above 71400 to below 71000, currently consolidating near 70960. RSI at 47 is not oversold, allowing room for further downside. A short retest of the recent breakdown level around 71100-71200 aligns with the bearish bias. The allowed_directions list only permits shorts.
+  setup[1] ae643d5b  SHORT  size=0.05
+    entry_zone: 71050 -> 71150
+    take_profit: [70600, 70300, 70000]   stop_loss: 71400
+    hard:  price < ema_20; price < ema_50; rsi_14 < 70
+    soft:  macd_hist < 0 (w0.5); momentum_composite < 0.5 (w0.3); pr_cvd_divergence > 0.8 (w0.2)
+    invalidation: [hard] price >= 71400 (intrabar); [warning] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-06-02 05:30:00  plan=185453d2  bias=bearish  regime=bear-low  setups=1
+  rationale: Price in bear-low regime, trending below all EMAs, RSI near 38 not oversold, RVOL low, good short setup after retracement to 70900-71000 resistance area. Prior lessons show short success in this regime.
+  setup[1] c62024af  SHORT  size=0.05
+    entry_zone: 70885 -> 70980
+    take_profit: [70250, 69900, 69500]   stop_loss: 71350
+    hard:  rsi_14 < 50; close < ema_20; close < ema_50; close < ema_200
+    soft:  macd_hist < 0 (w0.5); momentum_composite < 0.5 (w0.3)
+    invalidation: [hard] close > 71350 (intrabar); [soft] rsi_14 >= 60 (on_close)
+
+PLAN CREATED  2026-06-02 07:30:00  plan=81f0119e  bias=bearish  regime=bear-low  setups=1
+  rationale: Price is in a bearish regime (bear-low), below both 50 and 200 EMA, with RSI at 39 suggesting no oversold condition for shorts. Recent price action shows a sharp decline from highs above 71600 to current levels around 70176, with a potential retest of the recent low around 69666. The allowed direction is only short, and the bias aligns with the trend.
+  setup[1] f4755a86  SHORT  size=0.05
+    entry_zone: 70100 -> 70300
+    take_profit: [69300, 68800]   stop_loss: 70650
+    hard:  close < ema_50; close < ema_200; rsi_14 < 70
+    soft:  rsi_14 > 30 (w0.5); macd_hist < 0 (w0.5)
+    invalidation: [hard] close >= 70650 (intrabar); [warning] rsi_14 < 30 (on_close)
+
+PLAN CREATED  2026-06-02 09:30:00  plan=2ece9c0d  bias=bearish  regime=bear-low  setups=0
+  rationale: BTC is in a bear regime with low volatility. RSI is 28.5 (oversold) but momentum is negative and price is below all EMAs. The trend is bearish, so a short setup is appropriate. However, RSI is below 30, which suggests a potential bounce, so we wait for a pullback retest of a resistance level before entering. The prior lessons show successful shorts in bear-low regime, but the current RSI is too low for an immediate entry.
+
+PLAN CREATED  2026-06-02 11:30:00  plan=fc0b804a  bias=bearish  regime=bear-low  setups=0
+  rationale: Price in a clear downtrend, below all EMAs, with bearish regime (bear-low). RSI near 35, not yet oversold but weak. Recent OHLCV shows lower highs and lower lows. Allowed directions only 'short'. No suitable retest for a short entry at this moment as price is grinding lower without a pullback to a resistance level. Waiting for a bounce to a resistance zone.
+
+PLAN CREATED  2026-06-02 13:30:00  plan=e5a1a37e  bias=bearish  regime=bear-low  setups=1
+  rationale: Price in a downtrend, below all EMAs (20, 50, 200), RSI at 27 (oversold region but still bearish momentum), MACD histogram negative and declining, trend bear-low regime. Allowed directions are shorts only. Prior lessons indicate successful short in bear-low regime. RSI <30 suggests caution, but we look for a pullback retest of broken support to enter short.
+  setup[1] fa09cbbe  SHORT  size=0.05
+    entry_zone: 69050 -> 69200
+    take_profit: [68200, 67800]   stop_loss: 69600
+    hard:  price >= 69050; price <= 69200; rsi_14 < 50; ema_20 > price
+    soft:  obv < -200000 (w0.5); macd_hist < 0 (w0.3); vol_zscore_20 > 1 (w0.2)
+    invalidation: [hard] price >= 69300 (intrabar); [soft] rsi_14 >= 70 (intrabar); [warning] macd crosses_above macd_signal (on_close)
+
+PLAN CREATED  2026-06-02 15:30:00  plan=ecd4bcef  bias=bearish  regime=bear-low  setups=0
+  rationale: Trend is bearish (EMA_20 < EMA_50 < EMA_200), RSI 14.5 deep in oversold, but momentum remains strongly negative (macd_hist deeply negative). Regime cell is bear-low, allowed_directions only 'short'. Price is in a steep downtrend, making a short pullback entry appropriate.

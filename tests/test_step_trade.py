@@ -27,6 +27,24 @@ def _step(trade, candle, state, **kw):
     return step_trade(trade, candle, state, **kw)
 
 
+def test_liquidation_closes_when_stop_is_far() -> None:
+    # Stop far below (50); a liq backstop at 80. A bar diving to 78 misses the stop but
+    # hits liq → closed at the liq price with reason "liquidation".
+    trade = {"direction": "long", "entry_price": 100.0, "stop_loss": 50.0, "take_profit": [120.0]}
+    step = _step(trade, _c(101, 78, 79), TradeState(), liq_price=80.0)
+    assert step.closed
+    assert step.exit_result.exit_reason == "liquidation"
+    assert step.exit_result.exit_price == pytest.approx(80.0)
+
+
+def test_stop_wins_when_nearer_than_liquidation() -> None:
+    # Normal case: stop (95) is nearer than liq (80); a bar to 79 trips the stop first.
+    step = _step(LONG, _c(101, 79, 80), TradeState(), liq_price=80.0)
+    assert step.closed
+    assert step.exit_result.exit_reason == "sl"
+    assert step.exit_result.exit_price == pytest.approx(95.0)
+
+
 def test_partial_scale_out_at_tp1_moves_to_breakeven() -> None:
     step = _step(LONG, _c(111, 99, 109), TradeState())
     assert not step.closed

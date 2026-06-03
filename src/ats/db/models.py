@@ -263,7 +263,10 @@ class PaperTrade(Base):
     plan_id: Mapped[uuid.UUID] = mapped_column(UUID(as_uuid=True), nullable=False)
     symbol: Mapped[str] = mapped_column(String, nullable=False)
     direction: Mapped[str] = mapped_column(String, nullable=False)  # long|short
-    size_pct: Mapped[float] = mapped_column(Numeric, nullable=False)
+    size_pct: Mapped[float] = mapped_column(Numeric, nullable=False)  # notional/equity (=leverage)
+    leverage: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    liq_price: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    risk_usd: Mapped[float | None] = mapped_column(Numeric, nullable=True)
     entry_price: Mapped[float] = mapped_column(Numeric, nullable=False)
     entry_time: Mapped[datetime] = mapped_column(_TZ, nullable=False)
     stop_loss: Mapped[float] = mapped_column(Numeric, nullable=False)

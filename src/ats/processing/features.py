@@ -9,6 +9,7 @@ import numpy as np
 import pandas as pd
 from sqlalchemy import text
 
+from ats.config import settings
 from ats.processing.composite import momentum_composite
 from ats.processing.indicators import atr, cvd, ema, macd, obv, realized_vol, roc, rsi
 from ats.processing.normalize import PR_LOOKBACK, percentile_rank
@@ -303,12 +304,20 @@ async def upsert_features(
     return len(values)
 
 
+def _default_timeframes() -> tuple[str, ...]:
+    """Decision timeframes plus the finer observe timeframe used for exit management."""
+    base = ("15m", "1h", "4h")
+    tf = settings.observe_timeframe
+    return (tf, *base) if tf and tf not in base else base
+
+
 async def run_once(
     session: AsyncSession,
     symbols: list[str],
-    timeframes: tuple[str, ...] = ("15m", "1h", "4h"),
+    timeframes: tuple[str, ...] | None = None,
 ) -> None:
     """Compute features for the most recent closed bar for each symbol/timeframe."""
+    timeframes = timeframes or _default_timeframes()
     for symbol in symbols:
         for tf in timeframes:
             candles_df = await _fetch_candles(session, symbol, tf, bars=500)
@@ -324,9 +333,10 @@ async def backfill(
     session: AsyncSession,
     since: datetime,
     symbols: list[str],
-    timeframes: tuple[str, ...] = ("15m", "1h", "4h"),
+    timeframes: tuple[str, ...] | None = None,
 ) -> None:
     """Compute and upsert features for all bars since `since`, idempotent."""
+    timeframes = timeframes or _default_timeframes()
     for symbol in symbols:
         for tf in timeframes:
             candles_df = await _fetch_candles(session, symbol, tf, since=since)
