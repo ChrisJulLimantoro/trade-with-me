@@ -37,7 +37,7 @@ def check_bar_exit(
     trade: dict[str, Any],
     candle: dict[str, Any],
     *,
-    expires_at: datetime,
+    expires_at: datetime | None,
     hard_invalidation: bool = False,
     liq_price: float | None = None,
 ) -> ExitResult | None:
@@ -67,7 +67,7 @@ def check_bar_exit(
         return ExitResult(liq_price, ts, "liquidation", _pnl_pct(direction, entry, liq_price))
     if tp_hit:
         return ExitResult(tp, ts, "tp", _pnl_pct(direction, entry, tp))
-    if ts >= expires_at:
+    if expires_at is not None and ts >= expires_at:  # None = time-stop disabled
         return ExitResult(close, ts, "expiry", _pnl_pct(direction, entry, close))
     return None
 
@@ -167,7 +167,7 @@ def step_trade(
     candle: dict[str, Any],
     state: TradeState,
     *,
-    expires_at: datetime,
+    expires_at: datetime | None,
     scale_out_frac: float,
     trail_atr_mult: float = 0.0,
     atr: float | None = None,
@@ -242,7 +242,8 @@ def step_trade(
         )
 
     # Time-stop: let breakeven-protected runners keep going; close anything still at risk.
-    if ts >= expires_at and not state.breakeven:
+    # expires_at is None when the time-stop is disabled (settings.max_hold_bars <= 0).
+    if expires_at is not None and ts >= expires_at and not state.breakeven:
         return close_all(close, "expiry")
 
     # Trail the runner once it is protected.

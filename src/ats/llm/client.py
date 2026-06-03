@@ -132,7 +132,7 @@ class OpenAIClient:
                 # opencode zen / OpenRouter convention: disable the reasoning trace so
                 # the token budget goes to the JSON answer, not hidden chain-of-thought.
                 extra_body={
-                    "reasoning": {"enabled": False},
+                    # "reasoning": {"enabled": False},
                     "thinking": {"type": "disabled"}
                 },
             )

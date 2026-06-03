@@ -69,6 +69,11 @@ class Settings(BaseSettings):
     observe_exit_min_conf: float = 0.7
     llm_observe_model: str = "gpt-4o-mini"  # tactical exit manager — cheap/fast
 
+    # --- Multi-timeframe context (higher-timeframe bias for create_plan) ---
+    # Slower charts whose most-recent CLOSED bar is shown to the strategist for bias and
+    # direction only. Executable rules still reference base-timeframe features. Empty = off.
+    context_timeframes: list[str] = ["1h", "4h"]
+
     # --- Episodic memory (post-mortem learnings + retrieval into create_plan) ---
     memory_enabled: bool = True
     memory_top_k: int = 3  # prior learnings injected into the plan envelope

@@ -9,6 +9,7 @@ active at a time (plan versioning).
 from __future__ import annotations
 
 import json
+import math
 import uuid
 from dataclasses import dataclass
 from datetime import datetime
@@ -78,6 +79,60 @@ def _json_safe(obj: Any) -> Any:
     return json.loads(json.dumps(obj, default=str))
 
 
+def _prune_missing(row: dict[str, Any]) -> dict[str, Any]:
+    """Drop feature keys whose value is None or NaN before sending to the strategist.
+
+    A NaN/missing operand makes the rule engine silently evaluate to False, so an absent
+    feature must never be advertised — otherwise the LLM may anchor a hard rule on a dead
+    column and the setup becomes permanently undetectable. Columns that are NULL in the DB
+    today (basis, OI delta) simply vanish from the envelope and reappear automatically once
+    they are populated. Non-numeric fields (timestamps, strings) are always preserved.
+    """
+    pruned: dict[str, Any] = {}
+    for k, v in row.items():
+        if v is None:
+            continue
+        if isinstance(v, float) and math.isnan(v):
+            continue
+        pruned[k] = v
+    return pruned
+
+
+def _rule_operands(rules: list[Any]) -> set[str]:
+    """Feature names referenced by a rule list (string operands, excluding ``price``)."""
+    refs: set[str] = set()
+    for r in rules:
+        d = r.model_dump() if hasattr(r, "model_dump") else r
+        for key in ("left", "right"):
+            v = d.get(key)
+            if isinstance(v, str) and v != "price":
+                refs.add(v)
+    return refs
+
+
+def _warn_unknown_features(plan_out: PlanOutput, available: set[str], *, symbol: str) -> None:
+    """Log (once per plan) any setup rule that references a feature absent from the envelope.
+
+    The envelope is pruned of NaN/missing features, so a referenced name that isn't in
+    ``available`` is one the LLM invented or one whose column is currently unavailable —
+    either way the rule would silently evaluate False, so we surface it loudly here.
+    """
+    for s in plan_out.allowed_setups:
+        refs = (
+            _rule_operands(s.hard_rules)
+            | _rule_operands(s.soft_rules)
+            | _rule_operands(s.invalidation_rules)
+        )
+        unknown = sorted(refs - available)
+        if unknown:
+            log.warning(
+                "setup_rule_unknown_feature",
+                symbol=symbol,
+                direction=s.direction,
+                unknown=unknown,
+            )
+
+
 async def build_envelope(
     session: AsyncSession,
     symbol: str,
@@ -99,6 +154,28 @@ async def build_envelope(
         if regime_allows(regime_cell, d):
             allowed_directions.append(d)
 
+    # Higher-timeframe context: a read-only snapshot of slower charts for bias/direction
+    # only (executable rules stay on the base tf). Look-ahead guard: an htf bar with
+    # open_time T closes at T + htf_duration, so it is only fully formed at `as_of` when
+    # T <= as_of - htf_duration. Calling the readers with that shifted timestamp selects
+    # the most-recent CLOSED htf bar and never leaks a still-forming one during replay.
+    higher_timeframes: dict[str, Any] = {}
+    for htf in settings.context_timeframes:
+        if htf == tf:
+            continue
+        htf_as_of = as_of - timeframe_to_timedelta(htf)
+        htf_features = await state.latest_feature_row(session, symbol, htf, as_of=htf_as_of)
+        if htf_features is None:
+            log.warning("htf_context_missing", symbol=symbol, timeframe=htf)
+            continue
+        higher_timeframes[htf] = {
+            "as_of": htf_as_of,
+            "features": _prune_missing(htf_features),
+            "recent_ohlcv": await state.recent_candles(
+                session, symbol, htf, htf_as_of, n=20
+            ),
+        }
+
     # Episodic memory: surface the most-similar prior post-mortems as non-binding context.
     prior_lessons: list[dict[str, Any]] = []
     if settings.memory_enabled:
@@ -117,9 +194,10 @@ async def build_envelope(
         "as_of": as_of,
         "symbol": symbol,
         "timeframe": tf,
-        "features": feature_row,
+        "features": _prune_missing(feature_row),
         "regime": regime,
         "recent_ohlcv": candles,
+        "higher_timeframes": higher_timeframes,
         "portfolio": {
             "equity_usd": settings.paper_equity_usd,
             "open_positions": positions,
@@ -211,6 +289,8 @@ async def create_plan(
     plan: Plan | None = None
     setups: list[Setup] = []
     if llm.parse_ok and plan_out is not None:
+        available = set((envelope.get("features") or {}).keys()) | {"price"}
+        _warn_unknown_features(plan_out, available, symbol=symbol)
         regime_cell = (envelope.get("regime") or {}).get("regime_cell")
         plan, setups = await _persist(
             session,

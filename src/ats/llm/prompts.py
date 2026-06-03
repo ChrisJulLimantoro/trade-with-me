@@ -99,6 +99,12 @@ Rules:
   when they point to genuine structural issues (e.g. "stop_too_tight → widen stop"). Ignore
   any lesson that says to tighten the stop further; the risk manager now enforces ATR-relative
   minimums and a tight stop will be rejected at execution anyway.
+- HIGHER-TIMEFRAME CONTEXT: a "higher_timeframes" map may be present (e.g. "1h", "4h"),
+  each giving the most recent CLOSED bar on that slower chart (its features + recent OHLCV).
+  Use it ONLY to inform market_bias and which directions to propose — e.g. align with the
+  higher-timeframe trend and avoid fighting it. All hard_rules, soft_rules, and
+  invalidation_rules MUST reference base-timeframe features only (rsi_14, ema_50, atr_14,
+  price, …) — NEVER higher-timeframe values.
 
 You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.
 The object must exactly match this schema:

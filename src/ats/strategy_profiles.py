@@ -32,7 +32,7 @@ PROFILES: dict[str, dict[str, Any]] = {
         "risk_per_trade_pct": 0.01,    # still risk ~1% of (the smaller) equity per stop-out
         "min_rr": 1.0,                 # accept ~1:1 — scalps take quick, nearby targets
         "min_stop_atr_mult": 0.5,      # allow tight stops (relax the noise-stop guard)
-        "max_hold_bars": 8,            # short holds (~2h on 15m); scalps don't marinate
+        "max_hold_bars": 0,            # short holds (~2h on 15m); scalps don't marinate
         "plan_refresh_bars": 8,        # re-think the plan more often (~2h on 15m)
         "trail_atr_mult": 1.0,         # trail closer to lock small gains fast
         "scale_out_frac": 0.5,         # bank half at the first target, ride the rest

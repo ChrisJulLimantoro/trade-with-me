@@ -172,11 +172,14 @@ async def _advance_trade(
     expiry). Every ``observe_every_bars`` candles, consult the observation agent and apply
     its (code-clamped) adjustment. Stops on the first full close.
     """
-    raw_expiry = (trade.trade_metadata or {}).get("expires_at")
-    last_ts = candles[-1]["open_time"] if candles else trade.entry_time
-    expires_at = (
-        datetime.fromisoformat(raw_expiry) if isinstance(raw_expiry, str) else last_ts
-    )
+    if settings.max_hold_bars <= 0:
+        expires_at: datetime | None = None  # time-stop disabled — trades run to SL/TP
+    else:
+        raw_expiry = (trade.trade_metadata or {}).get("expires_at")
+        last_ts = candles[-1]["open_time"] if candles else trade.entry_time
+        expires_at = (
+            datetime.fromisoformat(raw_expiry) if isinstance(raw_expiry, str) else last_ts
+        )
     trade_d = {
         "direction": trade.direction,
         "entry_price": _f(trade.entry_price),
@@ -579,7 +582,7 @@ async def _confirm_and_execute(
     # expiry: a trade that triggers late in a plan's life still gets a full hold budget,
     # so a healthy, still-running position is no longer cut short by the plan clock.
     trade = await session.get(PaperTrade, trade_id)
-    if trade is not None:
+    if trade is not None and settings.max_hold_bars > 0:
         hold = timeframe_to_timedelta(tf) * settings.max_hold_bars
         trade.trade_metadata = {"expires_at": (now + hold).isoformat()}
     setup.status = "realized"
