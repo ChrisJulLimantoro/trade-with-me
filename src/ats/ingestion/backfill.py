@@ -66,3 +66,15 @@ async def run(
             await br.upsert_basis(session, symbol, basis_row)
             log.info("backfill_basis_done", symbol=symbol)
             await upsert_heartbeat(session, "basis", "ok")
+
+    # Cross-venue funding (Bybit/OKX/Hyperliquid) — historical, powers funding_divergence.
+    # Non-fatal: a venue/mapping miss must not abort the Binance backfill above.
+    try:
+        from ats.ingestion.universe import load_xvenue_mapping
+        from ats.ingestion.xvenue_funding import pull_all as pull_xvenue
+
+        await pull_xvenue(session, symbols, load_xvenue_mapping())
+        await upsert_heartbeat(session, "xvenue_funding", "ok")
+        log.info("backfill_xvenue_done", symbols=symbols)
+    except Exception as exc:  # noqa: BLE001 — advisory feed; never block the core backfill
+        log.warning("backfill_xvenue_failed", error=str(exc))

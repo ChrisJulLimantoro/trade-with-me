@@ -49,10 +49,33 @@ def resolve_operand(operand: float | int | str, features: dict[str, Any]) -> flo
     return None if math.isnan(f) else f
 
 
+def _record_unresolved(
+    raw: float | int | str, features: dict[str, Any], sink: list[str] | None
+) -> None:
+    """Note a string operand (a feature reference) that didn't resolve to a number.
+
+    ``missing`` = the column isn't in the feature row at all (often pruned because it is
+    unavailable, or an LLM-hallucinated name); ``nan`` = present but null/NaN. Numbers and
+    the literal ``price`` token are never recorded.
+    """
+    if sink is None or not isinstance(raw, str) or raw == "price":
+        return
+    sink.append(f"{raw}:{'nan' if raw in features else 'missing'}")
+
+
 def eval_rule(
-    rule: dict[str, Any], features: dict[str, Any], prev: dict[str, Any] | None = None
+    rule: dict[str, Any],
+    features: dict[str, Any],
+    prev: dict[str, Any] | None = None,
+    *,
+    unresolved: list[str] | None = None,
 ) -> bool:
-    """Evaluate one rule to a bool. Unresolvable operands → False (conservative)."""
+    """Evaluate one rule to a bool. Unresolvable operands → False (conservative).
+
+    When ``unresolved`` is given, any string operand that fails to resolve is appended to
+    it so callers can surface rules anchored on missing/NaN features instead of letting
+    them silently fail closed.
+    """
     op = rule.get("operator")
     left_raw, right_raw = rule.get("left"), rule.get("right")
 
@@ -62,6 +85,10 @@ def eval_rule(
         cur_l, cur_r = resolve_operand(left_raw, features), resolve_operand(right_raw, features)
         prev_l, prev_r = resolve_operand(left_raw, prev), resolve_operand(right_raw, prev)
         if None in (cur_l, cur_r, prev_l, prev_r):
+            if cur_l is None or prev_l is None:
+                _record_unresolved(left_raw, features, unresolved)
+            if cur_r is None or prev_r is None:
+                _record_unresolved(right_raw, features, unresolved)
             return False
         if op == "crosses_above":
             return prev_l <= prev_r and cur_l > cur_r
@@ -73,24 +100,36 @@ def eval_rule(
         return False
     left, right = resolve_operand(left_raw, features), resolve_operand(right_raw, features)
     if left is None or right is None:
+        if left is None:
+            _record_unresolved(left_raw, features, unresolved)
+        if right is None:
+            _record_unresolved(right_raw, features, unresolved)
         return False
     return bool(fn(left, right))
 
 
 def eval_hard_rules(
-    rules: list[dict[str, Any]], features: dict[str, Any], prev: dict[str, Any] | None = None
+    rules: list[dict[str, Any]],
+    features: dict[str, Any],
+    prev: dict[str, Any] | None = None,
+    *,
+    unresolved: list[str] | None = None,
 ) -> tuple[bool, list[str]]:
     """All hard rules must pass. Returns (all_passed, list of failed rule descriptions)."""
     failed = [
         f"{r.get('left')} {r.get('operator')} {r.get('right')}"
         for r in rules
-        if not eval_rule(r, features, prev)
+        if not eval_rule(r, features, prev, unresolved=unresolved)
     ]
     return (len(failed) == 0), failed
 
 
 def score_soft_rules(
-    rules: list[dict[str, Any]], features: dict[str, Any], prev: dict[str, Any] | None = None
+    rules: list[dict[str, Any]],
+    features: dict[str, Any],
+    prev: dict[str, Any] | None = None,
+    *,
+    unresolved: list[str] | None = None,
 ) -> float:
     """Weighted fraction of soft rules that pass. No soft rules → 1.0 (neutral)."""
     if not rules:
@@ -99,7 +138,9 @@ def score_soft_rules(
     if total <= 0:
         return 1.0
     passed = sum(
-        float(r.get("weight") or 1.0) for r in rules if eval_rule(r, features, prev)
+        float(r.get("weight") or 1.0)
+        for r in rules
+        if eval_rule(r, features, prev, unresolved=unresolved)
     )
     return passed / total
 
@@ -116,6 +157,9 @@ class SetupEval:
     soft_score: float
     price: float | None
     failed_hard: list[str] = field(default_factory=list)
+    # Feature references (in hard/soft rules) that didn't resolve this bar, as
+    # "<name>:missing" / "<name>:nan" — surfaces rules anchored on dead columns.
+    unresolved_operands: list[str] = field(default_factory=list)
 
 
 def evaluate_setup(
@@ -130,10 +174,15 @@ def evaluate_setup(
     ``setup`` is a dict with keys ``entry_zone_low``, ``entry_zone_high``,
     ``hard_rules``, ``soft_rules``. ``features`` must include ``price`` (the close).
     """
+    unresolved: list[str] = []
     price = resolve_operand("price", features)
     price_ok = in_entry_zone(price, float(setup["entry_zone_low"]), float(setup["entry_zone_high"]))
-    hard_ok, failed = eval_hard_rules(setup.get("hard_rules") or [], features, prev)
-    soft_score = score_soft_rules(setup.get("soft_rules") or [], features, prev)
+    hard_ok, failed = eval_hard_rules(
+        setup.get("hard_rules") or [], features, prev, unresolved=unresolved
+    )
+    soft_score = score_soft_rules(
+        setup.get("soft_rules") or [], features, prev, unresolved=unresolved
+    )
     detected = price_ok and hard_ok and soft_score >= soft_threshold
     return SetupEval(
         detected=detected,
@@ -142,4 +191,5 @@ def evaluate_setup(
         soft_score=soft_score,
         price=price,
         failed_hard=failed,
+        unresolved_operands=sorted(set(unresolved)),
     )

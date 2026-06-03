@@ -13,6 +13,7 @@ from ats.config import settings
 from ats.processing.composite import momentum_composite
 from ats.processing.indicators import atr, cvd, ema, macd, obv, realized_vol, roc, rsi
 from ats.processing.normalize import PR_LOOKBACK, percentile_rank
+from ats.processing.xvenue import funding_divergence_at, funding_divergence_z
 
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
@@ -23,14 +24,19 @@ def compute_features_frame(
     *,
     tf: str,
     funding_df: pd.DataFrame | None = None,
+    xvenue_df: pd.DataFrame | None = None,
 ) -> pd.DataFrame:
     """Pure: compute all features for a (symbol, tf) candle DataFrame.
 
     candles_df must have columns: open, high, low, close, volume, taker_buy_vol, open_time.
-    funding_df (optional): DataFrame with columns [funding_time, rate] for funding_z.
+    funding_df (optional): DataFrame with columns [funding_time, rate] for funding_rate /
+    funding_z_30d.
+    xvenue_df (optional): DataFrame with columns [exchange, funding_time, rate] for
+    cross-venue funding divergence (funding_divergence / _z_30d / peer_count).
 
-    Returns a DataFrame aligned to candles_df index with all feature columns.
-    xvenue and basis columns are filled with NaN (require DB; computed in DB wrapper).
+    Returns a DataFrame aligned to candles_df index with all feature columns. Columns whose
+    source data is not supplied (e.g. basis, OI) remain NaN; the engine prunes NaN features
+    before they reach the strategist, so an absent column is hidden rather than dead.
     """
     df = candles_df.reset_index(drop=True)
     n = len(df)
@@ -83,8 +89,20 @@ def compute_features_frame(
         fz_std = funding_rate_col.rolling(lookback, closed="left").std()
         funding_z_col = ((funding_rate_col - fz_mean) / fz_std).rename("funding_z_30d")
 
+    # ── Cross-venue funding divergence ─────────────────────────────────────────
+    funding_divergence_col = pd.Series([float("nan")] * n, dtype=float)
+    funding_divergence_z_col = pd.Series([float("nan")] * n, dtype=float)
+    funding_peer_count_col = pd.Series([float("nan")] * n, dtype=float)
+    if xvenue_df is not None and not xvenue_df.empty:
+        (
+            funding_divergence_col,
+            funding_divergence_z_col,
+            funding_peer_count_col,
+        ) = _compute_xvenue_columns(df, xvenue_df)
+
     # ── OI delta ─────────────────────────────────────────────────────────────
-    # Placeholder — OI delta requires join with open_interest table; filled by DB wrapper
+    # OI is ingested as a single snapshot today (no history), so per-bar deltas can't be
+    # computed; left NaN until historical OI ingestion lands. Pruned from the envelope.
     oi_delta_1h = pd.Series([float("nan")] * n, dtype=float)
     oi_delta_24h = pd.Series([float("nan")] * n, dtype=float)
 
@@ -136,10 +154,10 @@ def compute_features_frame(
             "realized_vol_30d": rv30,
             "cvd_30": cvd_30,
             "cvd_slope_10": cvd_slope_10,
-            # xvenue and basis filled with NaN; DB wrapper populates these
-            "funding_divergence": float("nan"),
-            "funding_divergence_z_30d": float("nan"),
-            "funding_peer_count": float("nan"),
+            "funding_divergence": funding_divergence_col.reset_index(drop=True),
+            "funding_divergence_z_30d": funding_divergence_z_col.reset_index(drop=True),
+            "funding_peer_count": funding_peer_count_col.reset_index(drop=True),
+            # basis ingested as a single snapshot today (no history); left NaN + pruned.
             "basis_premium": float("nan"),
             "basis_z_30d": float("nan"),
             "momentum_composite": momentum_col,
@@ -171,6 +189,57 @@ def _rolling_price_slope(close: pd.Series, window: int) -> pd.Series:
             continue
         slopes.append(float(np.polyfit(x, y, 1)[0]))
     return pd.Series(slopes, index=close.index, dtype=float)
+
+
+def _compute_xvenue_columns(
+    df: pd.DataFrame, xvenue_df: pd.DataFrame
+) -> tuple[pd.Series, pd.Series, pd.Series]:
+    """Per-bar cross-venue funding divergence, its 30d z-score, and peer count.
+
+    ``xvenue_df`` has columns [exchange, funding_time, rate]. We pivot to one row per 8h
+    funding boundary, compute ``divergence = binance - median(peers)`` and ``peer_count``
+    at each boundary (reusing the pure cores), roll a z-score over the boundary series,
+    then as-of merge each bar to the last boundary <= its open_time (mirrors the
+    funding_rate merge). Bars before the first boundary stay NaN.
+    """
+    n = len(df)
+    nan = pd.Series([float("nan")] * n, dtype=float)
+    piv = (
+        xvenue_df.pivot_table(
+            index="funding_time", columns="exchange", values="rate", aggfunc="last"
+        ).sort_index()
+    )
+    if piv.empty:
+        return nan.copy(), nan.copy(), nan.copy()
+
+    divs: list[float] = []
+    counts: list[float] = []
+    for _, row in piv.iterrows():
+        b = row.get("binance")
+        binance = float(b) if pd.notna(b) else None
+        peers = [
+            float(row[c]) if (c in piv.columns and pd.notna(row.get(c))) else None
+            for c in ("bybit", "okx", "hyperliquid")
+        ]
+        d, cnt = funding_divergence_at(binance, peers)
+        divs.append(d if d is not None else float("nan"))
+        counts.append(float(cnt))
+    div_series = pd.Series(divs, index=piv.index, dtype=float)
+    div_arr = div_series.to_numpy()
+    z_arr = funding_divergence_z(div_series).to_numpy()
+    cnt_arr = np.array(counts, dtype=float)
+
+    # As-of: index of the last boundary with funding_time <= each bar's open_time.
+    bt = pd.to_datetime(pd.Series(piv.index), utc=True).to_numpy()
+    ot = pd.to_datetime(df["open_time"], utc=True).to_numpy()
+    idx = np.searchsorted(bt, ot, side="right") - 1
+    valid = idx >= 0
+    safe = np.clip(idx, 0, len(bt) - 1)
+
+    def _pick(arr: np.ndarray) -> pd.Series:
+        return pd.Series(np.where(valid, arr[safe], np.nan), dtype=float)
+
+    return _pick(div_arr), _pick(z_arr), _pick(cnt_arr)
 
 
 async def upsert_features(
@@ -319,11 +388,16 @@ async def run_once(
     """Compute features for the most recent closed bar for each symbol/timeframe."""
     timeframes = timeframes or _default_timeframes()
     for symbol in symbols:
+        # Funding / xvenue are per-symbol (not tf-specific) — fetch once per symbol.
+        funding_df = await _fetch_funding(session, symbol)
+        xvenue_df = await _fetch_xvenue(session, symbol)
         for tf in timeframes:
             candles_df = await _fetch_candles(session, symbol, tf, bars=500)
             if candles_df.empty:
                 continue
-            features_df = compute_features_frame(candles_df, tf=tf)
+            features_df = compute_features_frame(
+                candles_df, tf=tf, funding_df=funding_df, xvenue_df=xvenue_df
+            )
             # Only upsert the last bar
             last = features_df.tail(1)
             await upsert_features(session, symbol, tf, last)
@@ -338,11 +412,16 @@ async def backfill(
     """Compute and upsert features for all bars since `since`, idempotent."""
     timeframes = timeframes or _default_timeframes()
     for symbol in symbols:
+        # Funding / xvenue are per-symbol; fetch once with the same warm-up window.
+        funding_df = await _fetch_funding(session, symbol, since=since)
+        xvenue_df = await _fetch_xvenue(session, symbol, since=since)
         for tf in timeframes:
             candles_df = await _fetch_candles(session, symbol, tf, since=since)
             if candles_df.empty:
                 continue
-            features_df = compute_features_frame(candles_df, tf=tf)
+            features_df = compute_features_frame(
+                candles_df, tf=tf, funding_df=funding_df, xvenue_df=xvenue_df
+            )
             # Only upsert bars >= since
             mask = pd.to_datetime(features_df["open_time"], utc=True) >= pd.Timestamp(since)
             await upsert_features(session, symbol, tf, features_df[mask])
@@ -391,4 +470,66 @@ async def _fetch_candles(
         df[col] = pd.to_numeric(df[col], errors="coerce")
     if since is None:
         df = df.sort_values("open_time").reset_index(drop=True)
+    return df
+
+
+async def _fetch_funding(
+    session: AsyncSession,
+    symbol: str,
+    since: datetime | None = None,
+) -> pd.DataFrame:
+    """Fetch Binance funding rates into a [funding_time, rate] DataFrame (ascending)."""
+    if since is not None:
+        warmup = since - timedelta(days=90)
+        result = await session.execute(
+            text(
+                "SELECT funding_time, rate FROM funding_rates "
+                "WHERE symbol = :symbol AND funding_time >= :warmup ORDER BY funding_time"
+            ),
+            {"symbol": symbol, "warmup": warmup},
+        )
+    else:
+        result = await session.execute(
+            text(
+                "SELECT funding_time, rate FROM funding_rates "
+                "WHERE symbol = :symbol ORDER BY funding_time DESC LIMIT 1000"
+            ),
+            {"symbol": symbol},
+        )
+    rows = result.fetchall()
+    if not rows:
+        return pd.DataFrame(columns=["funding_time", "rate"])
+    df = pd.DataFrame(rows, columns=["funding_time", "rate"])
+    df["rate"] = pd.to_numeric(df["rate"], errors="coerce")
+    return df.sort_values("funding_time").reset_index(drop=True)
+
+
+async def _fetch_xvenue(
+    session: AsyncSession,
+    symbol: str,
+    since: datetime | None = None,
+) -> pd.DataFrame:
+    """Fetch cross-venue funding into an [exchange, funding_time, rate] DataFrame."""
+    if since is not None:
+        warmup = since - timedelta(days=90)
+        result = await session.execute(
+            text(
+                "SELECT exchange, funding_time, rate FROM funding_rates_xvenue "
+                "WHERE symbol = :symbol AND funding_time >= :warmup ORDER BY funding_time"
+            ),
+            {"symbol": symbol, "warmup": warmup},
+        )
+    else:
+        result = await session.execute(
+            text(
+                "SELECT exchange, funding_time, rate FROM funding_rates_xvenue "
+                "WHERE symbol = :symbol ORDER BY funding_time DESC LIMIT 2000"
+            ),
+            {"symbol": symbol},
+        )
+    rows = result.fetchall()
+    if not rows:
+        return pd.DataFrame(columns=["exchange", "funding_time", "rate"])
+    df = pd.DataFrame(rows, columns=["exchange", "funding_time", "rate"])
+    df["rate"] = pd.to_numeric(df["rate"], errors="coerce")
     return df
