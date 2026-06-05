@@ -11,6 +11,8 @@ from __future__ import annotations
 import json
 from typing import Any
 
+from ats.config import settings
+
 # The rule grammar shared by hard/soft/invalidation rules. Kept terse and explicit
 # so the model emits rules the deterministic engine can evaluate without ambiguity.
 _RULE_GRAMMAR = """\
@@ -48,7 +50,21 @@ _CONFIRM_SCHEMA = """\
   "size_multiplier": <0..1 float, only meaningful for REDUCE_SIZE> (CAN'T BE NULL)
 }"""
 
-PLAN_SYSTEM_PROMPT = f"""\
+def plan_system_prompt() -> str:
+    """Render the strategist system prompt with the live risk posture baked in.
+
+    The stop-width guidance must track ``settings.min_stop_atr_mult`` so the strategist
+    uses the headroom a profile actually allows: the default *swing* posture wants wide
+    (>=1.5x ATR) stops, while a *scalper* posture (min_stop_atr_mult ~0.5) wants tight
+    stops — which is what lets the risk sizer push leverage up. A hardcoded 1.5x ATR rule
+    would make the strategist place swing-width stops even in scalp mode, collapsing
+    leverage. The prompt stays a stable cacheable prefix *per profile* (it only changes
+    when the profile changes), so caching still holds across same-profile calls.
+    """
+    m = settings.min_stop_atr_mult
+    m_hi = round(m * 1.5, 2)
+    rr_target = round(settings.min_rr + 0.3, 2)
+    return f"""\
 You are the strategist in a crypto perpetuals trading system. You decide WHAT to
 trade; deterministic code decides WHEN. You are given a structured market snapshot
 (indicators, regime, recent OHLCV summary, portfolio, risk limits) as JSON.
@@ -77,14 +93,16 @@ Rules:
   take_profit and `entry` is the ACTUAL fill price. The engine may fill anywhere inside
   entry_zone, so it computes RR at the zone edge NEAREST the take_profit (the worst-case
   fill: entry_zone[high] for longs, entry_zone[low] for shorts). Design each setup so RR
-  clears risk_limits.min_rr at that worst-case edge — aim for >= 1.3 to leave a buffer.
+  clears risk_limits.min_rr at that worst-case edge — aim for >= {rr_target} to leave a buffer.
   Concretely: place take_profit[0] far enough that even the unfavorable fill is rewarding.
   Only take_profit[0] counts toward RR (additional take_profit entries are for scaling).
 - Keep entry_zone NARROW — at most ~half the stop distance (|entry - stop|). Wide zones
   make the worst-case fill RR collapse below the favorable-edge RR you may be eyeing.
-- STOP WIDTH: stops must be at least 1.5x ATR (atr_14 in features) away from entry. Stops
+- STOP WIDTH: stops must be at least {m}x ATR (atr_14 in features) away from entry. Stops
   tighter than this sit inside normal bar noise and will be rejected by the risk manager
-  before execution. A stop at 1.5–2x ATR is the minimum viable distance. This is NOT the
+  before execution. A stop at {m}–{m_hi}x ATR is the minimum viable distance. Tighter ATR
+  multiples are appropriate for a fast/scalp posture (lower min_stop_atr_mult) and let the
+  risk sizer use more leverage; wider multiples suit a slower swing posture. This is NOT the
   same as tightening — wider stops need a correspondingly farther take_profit[0] to clear min_rr.
 - ENTRY TIMING: prefer pullback / retest entries rather than chasing momentum. Specifically:
   - avoid entering longs when RSI > 70 (overbought) or shorts when RSI < 30 (oversold) —

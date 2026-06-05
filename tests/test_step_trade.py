@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from ats.execution.reconcile import TradeState, step_trade
+from ats.execution.reconcile import TradeState, breakeven_stop, step_trade
 from ats.risk.manager import regime_allows
 
 T0 = datetime(2026, 1, 1, tzinfo=UTC)
@@ -91,9 +91,75 @@ def test_breakeven_runner_survives_expiry() -> None:
     assert not step.closed
 
 
-def test_unprotected_trade_closes_at_expiry() -> None:
-    step = _step(LONG, _c(101, 99, 100.5, ts=T0), TradeState(), expires_at=T0)
+def test_unprotected_flat_trade_closes_at_expiry() -> None:
+    # A flat/losing, unprotected trade is still time-stopped (close 99.5 < entry 100).
+    step = _step(LONG, _c(101, 99, 99.5, ts=T0), TradeState(), expires_at=T0)
     assert step.closed and step.exit_result.exit_reason == "expiry"
+
+
+def test_in_profit_trade_survives_expiry() -> None:
+    # Fix A: a green but not-yet-breakeven trade is NOT cut by the time-stop. Close 105 >
+    # entry 100, no sl/tp hit (tp1=110), so it keeps running past expiry.
+    step = _step(LONG, _c(106, 101, 105, ts=T0), TradeState(), expires_at=T0)
+    assert not step.closed
+
+
+def test_early_breakeven_arm_without_scale_out() -> None:
+    # Fix B: favorable excursion of 7 pts >= 1x ATR(=5) arms breakeven without scaling out.
+    step = _step(LONG, _c(107, 100, 106), TradeState(), breakeven_arm_atr=1.0, atr=5.0)
+    assert not step.closed
+    assert step.partial is None
+    assert step.state.breakeven is True
+    assert step.state.working_stop == pytest.approx(100.0)  # entry
+    assert step.state.remaining_frac == pytest.approx(1.0)  # nothing banked
+    assert step.state.realized_pnl_pct == pytest.approx(0.0)
+    assert step.notes  # carries an "armed breakeven early" note
+
+
+def test_breakeven_stop_covers_costs() -> None:
+    # With no costs the breakeven stop is exactly entry; with costs it shifts past entry so
+    # a stop-out nets ~flat instead of a fee-only loss.
+    assert breakeven_stop("long", 100.0, 0.0) == pytest.approx(100.0)
+    assert breakeven_stop("long", 100.0, 10.0) == pytest.approx(100.0 * 1.002)
+    assert breakeven_stop("short", 100.0, 10.0) == pytest.approx(100.0 * 0.998)
+
+
+def test_early_arm_blocked_by_profit_floor() -> None:
+    # A favorable excursion that clears the ATR threshold but NOT the cost-based profit
+    # floor must not arm breakeven (prevents fee-only scratch exits).
+    # floor = entry * 2*cost_bps/1e4 * mult = 100 * 0.002 * 5 = 1.0 ; ATR thresh = 0.1*5 = 0.5
+    step = _step(
+        LONG, _c(100.6, 100, 100.4), TradeState(),
+        breakeven_arm_atr=0.1, atr=5.0, cost_bps=10.0, breakeven_arm_cost_mult=5.0,
+    )
+    assert step.state.breakeven is False  # excursion 0.6 < profit floor 1.0
+
+
+def test_review_on_expiry_defers_instead_of_closing() -> None:
+    # An unprotected flat/losing trade at expiry returns expiry_due (for caller review)
+    # rather than closing here.
+    step = _step(LONG, _c(101, 99, 99.5, ts=T0), TradeState(), expires_at=T0,
+                 review_on_expiry=True)
+    assert not step.closed
+    assert step.expiry_due is True
+
+
+def test_costs_net_full_close() -> None:
+    # cost_bps=10 → round-trip cost 2*10bps = 0.002 deducted from a full-position close.
+    step = _step(LONG, _c(101, 94, 96), TradeState(), cost_bps=10.0)
+    assert step.closed and step.exit_result.exit_reason == "sl"
+    assert step.exit_result.pnl_pct == pytest.approx(-0.05 - 0.002)
+
+
+def test_costs_net_scaled_close_total_two_legs() -> None:
+    # Partial at tp1 then final at tp2, with costs. Each leg nets its share; total cost
+    # across both legs == 2 * cost_bps (entry + exit on the whole position).
+    after_tp1 = _step(LONG, _c(111, 99, 109), TradeState(), cost_bps=10.0).state
+    assert after_tp1.realized_pnl_pct == pytest.approx(0.5 * 0.10 - 0.5 * 0.002)
+    step = _step(LONG, _c(121, 105, 119), after_tp1, cost_bps=10.0)
+    assert step.closed and step.exit_result.exit_reason == "tp"
+    gross = 0.5 * 0.10 + 0.5 * 0.20
+    assert step.exit_result.pnl_pct == pytest.approx(gross - 0.002)
 
 
 def test_trailing_stop_locks_in_profit() -> None:

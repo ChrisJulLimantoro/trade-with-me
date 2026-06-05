@@ -42,13 +42,32 @@ class Settings(BaseSettings):
     # entry bar (NOT the plan/setup entry-window expiry). Breakeven-protected runners are
     # exempt and keep trailing. Decoupling this from the setup window stops a healthy,
     # still-running trade from being cut just because the plan's clock ran out.
-    max_hold_bars: int = 24  # ~6h on 15m
+    max_hold_bars: int = 48  # ~12h on 15m
+    # When an unprotected, non-profitable trade reaches max_hold_bars, do NOT blind-close it:
+    # consult the exit manager (thesis review). HOLD → extend one more hold window; a clear
+    # reversal → EXIT_NOW. Demotes the time-stop from a guillotine to a review trigger.
+    expiry_review_enabled: bool = True
+    # Hard backstop on the review above: after this many HOLD-driven extensions, force the
+    # time-stop close regardless, so a stuck trade can't tie up the one-per-symbol slot forever.
+    max_hold_extensions: int = 2
     # Fraction of the *remaining* position closed at each non-final take-profit. The
     # remainder rides to the next target with the stop moved to breakeven.
     scale_out_frac: float = 0.5
+    # Move the stop to breakeven once the trade's favorable excursion reaches this multiple
+    # of atr_14, WITHOUT waiting for the first scale-out. Arming breakeven early protects a
+    # green runner from the time-stop and starts the trail sooner. 0 disables early arming.
+    breakeven_arm_atr: float = 1.0
+    # Profit floor on the early arm: only arm breakeven once the favorable excursion also
+    # clears this many round-trip costs of profit. Stops the arm from scratching trades at
+    # entry for a guaranteed fee-only loss when price wiggles straight back. 0 disables.
+    breakeven_arm_cost_mult: float = 2.0
     # Trailing-stop distance as a multiple of atr_14, applied to the runner once the
     # stop is at breakeven. 0 disables trailing.
     trail_atr_mult: float = 1.5
+    # Round-trip trading costs charged at each leg-banking site (entry + exit), in basis
+    # points. fee_bps = taker fee per side; slippage_bps = assumed adverse fill per side.
+    fee_bps: float = 5.0
+    slippage_bps: float = 2.0
     # Only take setups aligned with the regime: skip entries in sideways regimes and
     # require trend-aligned direction in trending regimes.
     regime_filter: bool = True

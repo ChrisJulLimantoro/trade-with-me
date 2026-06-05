@@ -173,7 +173,7 @@ class OpenAIClient:
     ) -> tuple[PlanOutput | None, LlmResult]:
         return await self._parse(
             model=settings.llm_plan_model,
-            system=prompts.PLAN_SYSTEM_PROMPT,
+            system=prompts.plan_system_prompt(),
             envelope=envelope,
             schema=PlanOutput,
         )

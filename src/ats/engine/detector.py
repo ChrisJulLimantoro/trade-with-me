@@ -13,7 +13,7 @@ from __future__ import annotations
 
 import uuid
 from dataclasses import dataclass, field
-from datetime import datetime
+from datetime import datetime, timedelta
 from decimal import Decimal
 from typing import Any
 
@@ -31,7 +31,14 @@ from ats.execution.executor import (
     record_partial_exit,
     update_trade_state,
 )
-from ats.execution.reconcile import ExitResult, PartialFill, TradeState, _pnl_pct, step_trade
+from ats.execution.reconcile import (
+    ExitResult,
+    PartialFill,
+    TradeState,
+    _pnl_pct,
+    net_of_costs,
+    step_trade,
+)
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats import trace
 from ats.llm.client import LlmClient
@@ -188,6 +195,17 @@ async def _advance_trade(
     }
     state = TradeState.from_metadata(trade.trade_metadata)
     liq_price = _f(trade.liq_price) if trade.liq_price is not None else None
+    cost_bps = settings.fee_bps + settings.slippage_bps
+    # Review-gate the time-stop only when the exit manager is actually available.
+    can_review = (
+        settings.expiry_review_enabled
+        and client is not None
+        and settings.observe_enabled
+        and feature_row is not None
+    )
+    md0 = trade.trade_metadata or {}
+    extensions = int(md0.get("hold_extensions", 0))
+    window_s = float(md0.get("hold_window_seconds", 0.0))
     bars = 0
     for candle in candles:
         if trade.entry_time >= candle["open_time"]:
@@ -200,10 +218,46 @@ async def _advance_trade(
             scale_out_frac=settings.scale_out_frac,
             trail_atr_mult=settings.trail_atr_mult,
             atr=atr,
+            breakeven_arm_atr=settings.breakeven_arm_atr,
+            breakeven_arm_cost_mult=settings.breakeven_arm_cost_mult,
+            cost_bps=cost_bps,
+            review_on_expiry=can_review,
             liq_price=liq_price,
         )
         if step.closed:
             await _close_trade(session, client, trade, step.exit_result, report, atr_at_close=atr)
+            return
+        if step.expiry_due:
+            # Time-stop reached: review the thesis instead of a blind close. A clear reversal
+            # closes via EXIT_NOW; otherwise grant one more full hold window, up to a backstop.
+            if await _observe_and_adjust(
+                session, client, trade, trade_d, candle, state, report, feature_row=feature_row
+            ):
+                return  # exit manager closed it (EXIT_NOW)
+            if extensions < settings.max_hold_extensions and window_s > 0:
+                extensions += 1
+                expires_at = candle["open_time"] + timedelta(seconds=window_s)
+                new_md = dict(trade.trade_metadata or {})
+                new_md.update(expires_at=expires_at.isoformat(), hold_extensions=extensions)
+                trade.trade_metadata = new_md
+                await session.flush()
+                report.notes.append(
+                    f"hold extended {extensions}/{settings.max_hold_extensions} (thesis intact)"
+                )
+                bars += 1
+                continue
+            # Backstop: extensions exhausted → honour the time-stop close (net of costs).
+            close_px = float(candle["close"])
+            total = state.realized_pnl_pct + net_of_costs(
+                state.remaining_frac,
+                _pnl_pct(trade.direction, _f(trade.entry_price), close_px),
+                cost_bps,
+            )
+            await _close_trade(
+                session, client, trade,
+                ExitResult(close_px, candle["open_time"], "expiry", total),
+                report, atr_at_close=atr,
+            )
             return
         if step.partial is not None:
             await record_partial_exit(
@@ -333,11 +387,12 @@ async def _observe_and_adjust(
             trace.outcome(f"OBSERVE raise tp -> {tps[final]:g} ({obs.reason})")
         return False
 
+    cost_bps = settings.fee_bps + settings.slippage_bps
     if obs.action == "SCALE_OUT" and obs.scale_frac and state.remaining_frac > 0:
         frac = min(max(float(obs.scale_frac), 0.0), 1.0) * state.remaining_frac
         if frac > 0:
             leg = leg_pnl(close)
-            state.realized_pnl_pct += frac * leg
+            state.realized_pnl_pct += net_of_costs(frac, leg, cost_bps)
             state.remaining_frac -= frac
             state.working_stop = entry  # protect the runner at breakeven
             state.breakeven = True
@@ -352,7 +407,9 @@ async def _observe_and_adjust(
     if obs.action == "EXIT_NOW":
         conf = float(obs.confidence) if obs.confidence is not None else 0.0
         if conf >= settings.observe_exit_min_conf:
-            total = state.realized_pnl_pct + state.remaining_frac * leg_pnl(close)
+            total = state.realized_pnl_pct + net_of_costs(
+                state.remaining_frac, leg_pnl(close), cost_bps
+            )
             raw_atr = feature_row.get("atr_14")
             await _close_trade(
                 session, client, trade,
@@ -584,7 +641,11 @@ async def _confirm_and_execute(
     trade = await session.get(PaperTrade, trade_id)
     if trade is not None and settings.max_hold_bars > 0:
         hold = timeframe_to_timedelta(tf) * settings.max_hold_bars
-        trade.trade_metadata = {"expires_at": (now + hold).isoformat()}
+        trade.trade_metadata = {
+            "expires_at": (now + hold).isoformat(),
+            # Window length each thesis-review extension grants (see _advance_trade).
+            "hold_window_seconds": hold.total_seconds(),
+        }
     setup.status = "realized"
     setup.detected_at = now
     open_positions.append({"symbol": setup.symbol})

@@ -29,6 +29,29 @@ def _pnl_pct(direction: str, entry: float, exit_price: float) -> float:
     return raw if direction == "long" else -raw
 
 
+def net_of_costs(frac: float, gross_pnl: float, cost_bps: float) -> float:
+    """Position-weighted pnl for a leg of size ``frac`` after round-trip trading costs.
+
+    A leg pays ``cost_bps`` on entry and again on exit, so the round-trip cost in
+    position-weighted terms is ``frac * 2 * cost_bps/10_000``. Returns the leg's
+    contribution to total pnl (``frac * gross_pnl``) net of that cost. ``cost_bps=0``
+    is a no-op, preserving the cost-free golden-value tests.
+    """
+    return frac * gross_pnl - frac * 2.0 * cost_bps / 10_000.0
+
+
+def breakeven_stop(direction: str, entry: float, cost_bps: float) -> float:
+    """The stop price that nets ~zero after round-trip costs (a true breakeven).
+
+    A stop exactly at ``entry`` still loses the round-trip fee, so a trade that arms
+    breakeven and immediately retraces dies at ``-2*cost_bps``. Shifting the breakeven
+    stop just past entry (up for longs, down for shorts) by the round-trip cost makes a
+    stop-out there net flat instead of a fee-only loss. ``cost_bps=0`` → returns ``entry``.
+    """
+    rt = 2.0 * cost_bps / 10_000.0
+    return entry * (1.0 + rt) if direction == "long" else entry * (1.0 - rt)
+
+
 def _liq_hit(direction: str, candle_high: float, candle_low: float, liq_price: float) -> bool:
     return candle_low <= liq_price if direction == "long" else candle_high >= liq_price
 
@@ -155,6 +178,7 @@ class BarStep:
     state: TradeState
     exit_result: ExitResult | None = None  # set when the trade fully closes this bar
     partial: PartialFill | None = None  # set when a scale-out leg fills this bar
+    expiry_due: bool = False  # time-stop reached but deferred to a thesis review (caller decides)
     notes: list[str] = field(default_factory=list)
 
     @property
@@ -171,13 +195,26 @@ def step_trade(
     scale_out_frac: float,
     trail_atr_mult: float = 0.0,
     atr: float | None = None,
+    breakeven_arm_atr: float = 0.0,
+    breakeven_arm_cost_mult: float = 0.0,
+    cost_bps: float = 0.0,
+    review_on_expiry: bool = False,
     hard_invalidation: bool = False,
     liq_price: float | None = None,
 ) -> BarStep:
     """Advance one open trade by a single bar. Returns the resulting :class:`BarStep`.
 
     Exit priority per bar: hard-invalidation → working stop → liquidation → current
-    take-profit → expiry (skipped for breakeven-protected runners) → trail update.
+    take-profit → early breakeven arm → expiry (skipped for breakeven-protected runners
+    and for in-profit trades) → trail update.
+
+    ``breakeven_arm_atr`` (with ``atr``) moves the stop to breakeven once the favorable
+    excursion reaches that ATR multiple, without scaling out; ``breakeven_arm_cost_mult``
+    additionally requires that excursion to clear that many round-trip costs of profit so
+    the arm doesn't scratch trades at entry for a fee-only loss. ``cost_bps`` charges
+    round-trip trading costs at each leg-banking site (see :func:`net_of_costs`).
+    ``review_on_expiry``: when the time-stop is reached, return ``expiry_due=True`` for the
+    caller to run a thesis review instead of closing here.
 
     ``liq_price`` is a hard backstop: sizing guarantees the stop sits inside it, so the
     stop normally fills first; liquidation only fires if the working stop is somehow looser.
@@ -197,7 +234,7 @@ def step_trade(
         return _pnl_pct(direction, entry, px)
 
     def close_all(px: float, reason: str) -> BarStep:
-        total = state.realized_pnl_pct + state.remaining_frac * pnl(px)
+        total = state.realized_pnl_pct + net_of_costs(state.remaining_frac, pnl(px), cost_bps)
         new = replace(state, remaining_frac=0.0, realized_pnl_pct=total)
         return BarStep(state=new, exit_result=ExitResult(px, ts, reason, total))
 
@@ -227,11 +264,11 @@ def step_trade(
             return close_all(target, "tp")
         # Partial scale-out: bank a fraction, move stop to breakeven, advance the target.
         close_frac = state.remaining_frac * scale_out_frac
-        realized = state.realized_pnl_pct + close_frac * pnl(target)
+        realized = state.realized_pnl_pct + net_of_costs(close_frac, pnl(target), cost_bps)
         new = TradeState(
             remaining_frac=state.remaining_frac - close_frac,
             realized_pnl_pct=realized,
-            working_stop=entry,  # breakeven
+            working_stop=breakeven_stop(direction, entry, cost_bps),  # breakeven, net of costs
             tp_index=tp_idx + 1,
             breakeven=True,
         )
@@ -241,17 +278,38 @@ def step_trade(
             notes=[f"scaled out {close_frac:.2f} at tp{tp_idx + 1}; stop→breakeven"],
         )
 
-    # Time-stop: let breakeven-protected runners keep going; close anything still at risk.
+    # Early breakeven arm: once the trade has run breakeven_arm_atr * ATR in our favor,
+    # move the stop to entry WITHOUT scaling out. This protects a green runner from the
+    # time-stop below and lets the trail engage before the first target is tagged.
+    arm_notes: list[str] = []
+    if not state.breakeven and breakeven_arm_atr and atr:
+        favorable = (high - entry) if direction == "long" else (entry - low)
+        # Require both: the ATR excursion AND a profit cushion beyond round-trip costs, so a
+        # straight retrace to entry doesn't bank a fee-only loss.
+        profit_floor = entry * (2.0 * cost_bps / 10_000.0) * breakeven_arm_cost_mult
+        if favorable >= breakeven_arm_atr * atr and favorable >= profit_floor:
+            state = replace(
+                state, working_stop=breakeven_stop(direction, entry, cost_bps), breakeven=True
+            )
+            arm_notes = [f"armed breakeven early at {breakeven_arm_atr:g}x ATR"]
+
+    # Time-stop: let breakeven-protected runners keep going, and never cut a trade that is
+    # currently in profit; close only what is still flat/at risk and unprotected. When
+    # review_on_expiry is set, hand the decision to the caller (thesis review) instead.
     # expires_at is None when the time-stop is disabled (settings.max_hold_bars <= 0).
-    if expires_at is not None and ts >= expires_at and not state.breakeven:
+    if expires_at is not None and ts >= expires_at and not state.breakeven and pnl(close) <= 0:
+        if review_on_expiry:
+            return BarStep(state=state, expiry_due=True, notes=arm_notes)
         return close_all(close, "expiry")
 
-    # Trail the runner once it is protected.
+    # Trail the runner once it is protected. Base off the CURRENT working stop, which may
+    # have just been set to entry by the early arm above.
     new_state = state
     if state.breakeven and trail_atr_mult and atr:
+        cur_ws = state.working_stop if state.working_stop is not None else full_stop
         if direction == "long":
-            ws = max(working_stop, close - trail_atr_mult * atr)
+            ws = max(cur_ws, close - trail_atr_mult * atr)
         else:
-            ws = min(working_stop, close + trail_atr_mult * atr)
+            ws = min(cur_ws, close + trail_atr_mult * atr)
         new_state = replace(state, working_stop=ws)
-    return BarStep(state=new_state)
+    return BarStep(state=new_state, notes=arm_notes)
