@@ -32,6 +32,12 @@ class Settings(BaseSettings):
     risk_per_trade_pct: float = 0.01
     # Cap on notional / equity. Leverage emerges from risk-based sizing up to this ceiling.
     max_leverage: float = 3.0
+    # Isolated margin/risk heat caps. ``margin`` is the capital committed before leverage;
+    # notional exposure is margin * leverage. These caps prevent the risk sizer from using
+    # the whole account as margin for every tight-stop setup.
+    max_margin_pct_per_trade: float = 0.20
+    max_total_margin_pct: float = 0.60
+    max_portfolio_risk_pct: float = 0.03
     # Minimum stop distance as a multiple of ATR. Stops tighter than this multiple are noise-stops
     # that get swept by normal bar wiggle; the risk layer rejects them before they waste a confirm
     # call or execute into a structural loss. 0 = disabled.

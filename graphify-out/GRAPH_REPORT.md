@@ -1,16 +1,16 @@
-# Graph Report - agent-orchestration  (2026-06-05)
+# Graph Report - trade-with-me  (2026-06-06)
 
 ## Corpus Check
-- 120 files · ~79,378 words
+- 126 files · ~82,542 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1452 nodes · 1940 edges · 117 communities (94 shown, 23 thin omitted)
-- Extraction: 84% EXTRACTED · 16% INFERRED · 0% AMBIGUOUS · INFERRED: 315 edges (avg confidence: 0.76)
+- 1652 nodes · 2147 edges · 135 communities (110 shown, 25 thin omitted)
+- Extraction: 85% EXTRACTED · 15% INFERRED · 0% AMBIGUOUS · INFERRED: 322 edges (avg confidence: 0.76)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `206edb43`
+- Built from commit: `0d4cf458`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -119,18 +119,35 @@
 - [[_COMMUNITY_Community 112|Community 112]]
 - [[_COMMUNITY_Community 113|Community 113]]
 - [[_COMMUNITY_Community 114|Community 114]]
+- [[_COMMUNITY_Community 117|Community 117]]
+- [[_COMMUNITY_Community 118|Community 118]]
+- [[_COMMUNITY_Community 119|Community 119]]
+- [[_COMMUNITY_Community 120|Community 120]]
+- [[_COMMUNITY_Community 121|Community 121]]
+- [[_COMMUNITY_Community 122|Community 122]]
+- [[_COMMUNITY_Community 123|Community 123]]
+- [[_COMMUNITY_Community 124|Community 124]]
+- [[_COMMUNITY_Community 125|Community 125]]
+- [[_COMMUNITY_Community 126|Community 126]]
+- [[_COMMUNITY_Community 127|Community 127]]
+- [[_COMMUNITY_Community 128|Community 128]]
+- [[_COMMUNITY_Community 129|Community 129]]
+- [[_COMMUNITY_Community 130|Community 130]]
+- [[_COMMUNITY_Community 131|Community 131]]
+- [[_COMMUNITY_Community 132|Community 132]]
+- [[_COMMUNITY_Community 134|Community 134]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `compute_features_frame()` - 25 edges
 2. `TradeState` - 23 edges
 3. `_step()` - 18 edges
 4. `Agentic Trading System — Architecture` - 18 edges
-5. `_c()` - 17 edges
-6. `Base` - 17 edges
-7. `LlmClient` - 16 edges
-8. `MockClient` - 15 edges
-9. `Spec 07 — LLM Layer · Milestone M2` - 15 edges
-10. `OpenAIClient` - 14 edges
+5. `Agentic Trading System — Architecture` - 18 edges
+6. `_c()` - 17 edges
+7. `Base` - 17 edges
+8. `LlmClient` - 16 edges
+9. `_assess()` - 15 edges
+10. `MockClient` - 15 edges
 
 ## Surprising Connections (you probably didn't know these)
 - `test_mock_create_plan_is_schema_valid()` --calls--> `MockClient`  [INFERRED]
@@ -139,12 +156,12 @@
   tests/test_llm_schemas.py → src/ats/llm/client.py
 - `test_mock_confirm_thresholds()` --calls--> `MockClient`  [INFERRED]
   tests/test_llm_schemas.py → src/ats/llm/client.py
-- `test_macd_returns_three_series()` --calls--> `macd()`  [INFERRED]
-  tests/test_indicators.py → src/ats/processing/indicators.py
 - `test_rsi70_boundary()` --calls--> `momentum_composite()`  [INFERRED]
   tests/test_composite.py → src/ats/processing/composite.py
+- `test_numeric_operators()` --calls--> `eval_rule()`  [INFERRED]
+  tests/test_rule_engine.py → src/ats/engine/rule_engine.py
 
-## Communities (117 total, 23 thin omitted)
+## Communities (135 total, 25 thin omitted)
 
 ### Community 0 - "Community 0"
 Cohesion: 0.05
@@ -163,12 +180,12 @@ Cohesion: 0.05
 Nodes (36): Acceptance criteria, Agent specifics (the M2 additions), `ats llm validate`, CLI added, code:bash (uv add anthropic                          # Claude SDK with ), code:bash (uv run ats analyze BTCUSDT       # now shows llm_δ column, s), code:sql (ALTER TABLE agent_runs), code:sql (ALTER TABLE paper_trades ADD COLUMN narrative_ids UUID[] NOT) (+28 more)
 
 ### Community 4 - "Community 4"
-Cohesion: 0.07
-Nodes (30): Timeframe string → duration. Matches the M1 universe (15m / 1h / 4h)., timeframe_to_timedelta(), Retrieve the most-similar prior learnings for a setup (cosine over the fingerpri, Top-k learnings nearest to ``fingerprint`` by cosine distance.      ``direction`, retrieve_relevant_learnings(), _admissible_setups(), build_envelope(), create_plan() (+22 more)
+Cohesion: 0.18
+Nodes (15): _admissible_setups(), create_plan(), _json_safe(), _persist(), PlanResult, create_plan orchestration — the strategist step.  Builds a structured market env, Feature names referenced by a rule list (string operands, excluding ``price``)., Log (once per plan) any setup rule that references a feature absent from the env (+7 more)
 
 ### Community 5 - "Community 5"
-Cohesion: 0.10
-Nodes (32): eval_hard_rules(), eval_rule(), evaluate_setup(), in_entry_zone(), Deterministic rule engine — the real-time detector.  Evaluates a plan's setups a, All hard rules must pass. Returns (all_passed, list of failed rule descriptions), Weighted fraction of soft rules that pass. No soft rules → 1.0 (neutral)., Combine entry-zone + hard rules + soft threshold into a detection decision. (+24 more)
+Cohesion: 0.07
+Nodes (42): evaluate_invalidation(), Deterministic plan/setup invalidation.  Invalidation is evaluated by CODE, never, Return the highest-severity triggered level, or None.      A rule with ``on_clos, eval_hard_rules(), eval_rule(), evaluate_setup(), in_entry_zone(), Deterministic rule engine — the real-time detector.  Evaluates a plan's setups a (+34 more)
 
 ### Community 6 - "Community 6"
 Cohesion: 0.06
@@ -179,16 +196,16 @@ Cohesion: 0.06
 Nodes (32): Acceptance criteria, API endpoints (read-only), `ats serve validate` / `ats skills validate` / `ats mcp validate`, Body sections (fixed order, so prompt extraction is mechanical), CLI added, CLI parity test pattern, code:bash (uv add fastapi 'uvicorn[standard]'), code:bash (mkdir ui && cd ui) (+24 more)
 
 ### Community 8 - "Community 8"
-Cohesion: 0.10
-Nodes (31): assess(), Deterministic risk manager — the safety layer before execution.  Runs after a se, Reward:risk to the FIRST take-profit. Returns 0.0 if risk is non-positive., Approve/reject a detected+confirmed setup and size it by risk.      Constraints:, Output of risk-based sizing. ``size_pct`` is notional / equity (== leverage)., Size a position so a stop-out loses ~``risk_pct`` of equity, capped by ``max_lev, reward_risk(), RiskDecision (+23 more)
+Cohesion: 0.08
+Nodes (41): assess(), _open_margin_usd(), _open_risk_usd(), Deterministic risk manager — the safety layer before execution.  Runs after a se, Reward:risk to the FIRST take-profit. Returns 0.0 if risk is non-positive., Approve/reject a detected+confirmed setup and size it by risk.      Constraints:, Reward:risk to the FIRST take-profit. Returns 0.0 if risk is non-positive., Approve/reject a detected+confirmed setup and size it by risk.      Constraints: (+33 more)
 
 ### Community 9 - "Community 9"
 Cohesion: 0.08
 Nodes (29): basis(), candles(), funding(), media(), oi(), _parse_since(), _print_series(), Show backfill coverage: row counts, time ranges, and latest values per symbol/tf (+21 more)
 
 ### Community 10 - "Community 10"
-Cohesion: 0.10
-Nodes (27): _default_timeframes(), _now_ms(), Decision timeframes plus the finer observe timeframe (for dynamic exit managemen, run(), _since_ms(), upsert_heartbeat(), _entry_id(), _load_feeds() (+19 more)
+Cohesion: 0.22
+Nodes (15): _align_8h(), fetch_bybit_funding(), fetch_hyperliquid_funding(), fetch_okx_funding(), pull_all(), Snap a datetime down to the nearest 00/08/16 UTC boundary., Fetch and store cross-venue funding for all symbols. Non-fatal on per-venue erro, _upsert_xvenue() (+7 more)
 
 ### Community 11 - "Community 11"
 Cohesion: 0.06
@@ -199,8 +216,8 @@ Cohesion: 0.06
 Nodes (28): Acceptance criteria, Algorithms, `ats process validate`, CLI added, code:bash (uv add pandas numpy pandas-ta), code:python (def percentile_rank(series: pd.Series, lookback: int) -> pd.), code:python (def momentum_composite(rsi: float, macd_hist: float, roc_5: ), code:text (ats process run                        # one-shot: compute f) (+20 more)
 
 ### Community 13 - "Community 13"
-Cohesion: 0.11
-Nodes (26): build_fingerprint(), _clamp01(), _get(), Numeric setup fingerprint — the vector episodic memory is retrieved by.  A fixed, Map an unbounded z-score-like value into [0, 1] via tanh (0.5 = neutral/missing), Build the fixed-length setup fingerprint. ``regime`` is accepted for future use., Render a fingerprint as a pgvector text literal, e.g. ``[0.1,0.2,...]``., _squash() (+18 more)
+Cohesion: 0.05
+Nodes (44): Timeframe string → duration. Matches the M1 universe (15m / 1h / 4h)., timeframe_to_timedelta(), build_fingerprint(), _clamp01(), _get(), Numeric setup fingerprint — the vector episodic memory is retrieved by.  A fixed, Map an unbounded z-score-like value into [0, 1] via tanh (0.5 = neutral/missing), Build the fixed-length setup fingerprint. ``regime`` is accepted for future use. (+36 more)
 
 ### Community 14 - "Community 14"
 Cohesion: 0.07
@@ -215,8 +232,8 @@ Cohesion: 0.07
 Nodes (26): Acceptance criteria, `ats ops validate`, CLI added, code:bash (uv add 'redis[hiredis]' arq), code:yaml (redis:), code:cron (*/15 * * * *  cd /path/to/ats && uv run ats session run >> l), code:bash (docker compose -f ops/docker-compose.yml up -d        # Post), code:text (ats ingest start                     # WS + continuous polle) (+18 more)
 
 ### Community 17 - "Community 17"
-Cohesion: 0.15
-Nodes (25): Base, Basis, Candle, Feature, FundingRate, FundingRateXVenue, Heartbeat, Liquidation (+17 more)
+Cohesion: 0.26
+Nodes (13): Base, Basis, Candle, Feature, FundingRate, FundingRateXVenue, Heartbeat, Liquidation (+5 more)
 
 ### Community 18 - "Community 18"
 Cohesion: 0.10
@@ -227,32 +244,32 @@ Cohesion: 0.24
 Nodes (23): Mutable per-trade exit state carried across bars., The keys to merge back into ``trade_metadata`` (alongside ``expires_at``)., TradeState, _c(), Tests for the scale-out / breakeven / trailing exit stepper (step_trade)., _step(), test_breakeven_runner_stops_flat_not_at_loss(), test_breakeven_runner_survives_expiry() (+15 more)
 
 ### Community 20 - "Community 20"
-Cohesion: 0.14
-Nodes (23): clamp_extended_tp(), clamp_tightened_stop(), Clamp an observation's proposed stop so it can only tighten, never widen risk., Clamp a proposed take-profit so the final target can only extend outward., canned_observation(), Deterministic exit-management decision from unrealized P&L + momentum.      Mirr, _env(), Tests for the observation agent's risk clamps + the deterministic mock decisions (+15 more)
+Cohesion: 0.12
+Nodes (27): clamp_extended_tp(), clamp_tightened_stop(), Clamp a proposed take-profit so the final target can only extend outward., Clamp an observation's proposed stop so it can only tighten, never widen risk., Clamp an observation's proposed stop so it can only tighten, never widen risk., Clamp an observation's proposed stop so it can only tighten, never widen risk., Clamp a proposed take-profit so the final target can only extend outward., Clamp a proposed take-profit so the final target can only extend outward. (+19 more)
 
 ### Community 21 - "Community 21"
 Cohesion: 0.12
 Nodes (22): basis_premium_from_rows(), basis_z_from_series(), get_basis_for_bar(), Perp basis premium — causal lookup + z-score., Pure core: most recent premium_index with row_ts <= ts.      basis_rows: list of, Rolling 30d z-score of basis premium.      lookback default: 30d × 288 bars/day, DB wrapper: fetch most recent basis_premium ≤ open_time and its z-score.      Re, _dt() (+14 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.09
-Nodes (21): Agentic Trading System (ATS), code:bash (docker compose -f ops/docker-compose.yml up -d), code:bash (uv sync), code:bash (cp .env.example .env              # set DATABASE_URL; leave ), code:text (agent-orchestration/), code:bash (uv sync                     # install / update deps), Development commands, How to work a spec (+13 more)
+Cohesion: 0.05
+Nodes (42): Agentic Trading System (ATS), code:bash (docker compose -f ops/docker-compose.yml up -d), code:bash (uv sync), code:bash (cp .env.example .env              # set DATABASE_URL; leave ), code:text (agent-orchestration/), code:bash (uv sync                     # install / update deps), Development commands, How to work a spec (+34 more)
 
 ### Community 23 - "Community 23"
-Cohesion: 0.18
-Nodes (21): _advance_trade(), _close_trade(), evaluate_now(), _f(), _handle_invalidation(), _observe_and_adjust(), _open_trades_for(), Detector — the glue between the rule engine and the trade lifecycle.  For a give (+13 more)
+Cohesion: 0.14
+Nodes (20): _confirm_and_execute(), evaluate_now(), _f(), _handle_invalidation(), _open_trades_for(), Detector — the glue between the rule engine and the trade lifecycle.  For a give, Advance each open trade. Uses ``fine_candles`` (finer-tf) when given, else this, Advance each open trade. Uses ``fine_candles`` (finer-tf) when given, else this (+12 more)
 
 ### Community 24 - "Community 24"
 Cohesion: 0.09
 Nodes (21): code:bash (docker compose -f ops/docker-compose.yml up -d), code:bash (# One-time), code:bash (docker compose -f ops/docker-compose.yml up -d        # Post), Cross-spec conventions, Cumulative state at each spec, Current progress (2026-05-26), Errors, How to use these specs (+13 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.10
-Nodes (20): Agent inventory, Agentic Trading System — Architecture, Anti-goals, Build status (as of 2026-05-26), code:text (┌───────────────────────────────┐), Core principles, Definition of done, LLM model tiering (+12 more)
+Cohesion: 0.05
+Nodes (40): Agent inventory, Agentic Trading System — Architecture, Anti-goals, Build status (as of 2026-05-26), code:text (┌───────────────────────────────┐), Core principles, Definition of done, LLM model tiering (+32 more)
 
 ### Community 26 - "Community 26"
-Cohesion: 0.12
-Nodes (20): atr(), Average True Range (pandas-ta)., Relative Strength Index (pandas-ta)., Rate of Change (pandas-ta)., roc(), rsi(), df200(), _make_df() (+12 more)
+Cohesion: 0.13
+Nodes (18): atr(), Average True Range (pandas-ta)., Relative Strength Index (pandas-ta)., rsi(), df200(), _make_df(), Tests for pure indicator functions on synthetic 200-bar series., Create a synthetic OHLCV DataFrame with realistic price dynamics. (+10 more)
 
 ### Community 27 - "Community 27"
 Cohesion: 0.14
@@ -271,16 +288,16 @@ Cohesion: 0.13
 Nodes (17): momentum_composite(), Composite momentum indicator., Blend RSI, MACD histogram and ROC into a [0, 1] composite momentum score.      r, Tests for momentum_composite with pinned MACD_SCALE golden values., MACD_SCALE must be pinned at 1.0 (golden value freeze)., rsi=30 → rsi_n = 0.0; with macd_hist=0 → macd_n=0.5; roc_5=0 → roc_n=0.5.      r, macd_hist=0 → macd_n=0.5 (tanh(0)=0, so 0.5+0.5*0=0.5)., Very high RSI, strong positive MACD hist, positive ROC → near 1.0. (+9 more)
 
 ### Community 31 - "Community 31"
-Cohesion: 0.16
-Nodes (16): _accumulate(), _ensure_plan(), Engine orchestration: replay, single-tick, and live-poll loops.  All three share, Append this tick's notes, collapsing sticky states to start/resume transitions., Refresh the plan if there is none, it expired, or the refresh cadence elapsed., Walk historical feature rows, running the full loop on each as if live., Single evaluation against the most recent feature row., Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon (+8 more)
+Cohesion: 0.14
+Nodes (16): _accumulate(), Engine orchestration: replay, single-tick, and live-poll loops.  All three share, Append this tick's notes, collapsing sticky states to start/resume transitions., Append this tick's notes, collapsing sticky states to start/resume transitions., Append this tick's notes, collapsing sticky states to start/resume transitions., Walk historical feature rows, running the full loop on each as if live., Walk historical feature rows, running the full loop on each as if live., Walk historical feature rows, running the full loop on each as if live. (+8 more)
 
 ### Community 32 - "Community 32"
 Cohesion: 0.18
 Nodes (17): backfill(), _default_timeframes(), _fetch_candles(), _fetch_funding(), _fetch_xvenue(), Feature orchestrator — compute + upsert features rows., Rolling OLS slope of close price over last `window` bars (closed='left')., Upsert feature rows. ON CONFLICT (symbol, timeframe, open_time) DO UPDATE SET .. (+9 more)
 
 ### Community 33 - "Community 33"
-Cohesion: 0.17
-Nodes (14): BarStep, breakeven_stop(), check_bar_exit(), _liq_hit(), net_of_costs(), PartialFill, _pnl_pct(), Paper-trade reconciliation — pure exit logic over candles.  Given an open trade (+6 more)
+Cohesion: 0.10
+Nodes (23): _default_timeframes(), _now_ms(), Decision timeframes plus the finer observe timeframe (for dynamic exit managemen, run(), _since_ms(), check_freshness(), compute_status(), get_data_class_counts() (+15 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.12
@@ -291,12 +308,12 @@ Cohesion: 0.12
 Nodes (16): Acceptance criteria, `ats gate check`, `ats gate validate`, code:text (ats gate check [--window 90d]        # evaluate the gate aga), code:block2 (DECISION GATE — 2026-05-13  (replay window 2026-02-12 → 2026), Components, Dependencies on prior specs, Goal (+8 more)
 
 ### Community 36 - "Community 36"
-Cohesion: 0.14
-Nodes (14): apply_profile(), Named strategy profiles — bundles of engine/risk knobs applied as a unit.  A pro, Apply a named profile's overrides onto ``target`` (defaults to the live singleto, invalidate_check(), _parse_since(), CLI: ats engine — run the trading loop (replay / tick / live)., Single evaluation against the latest computed features., Evaluate the active plan's invalidation rules against the latest closed bar. (+6 more)
+Cohesion: 0.09
+Nodes (21): apply_profile(), Named strategy profiles — bundles of engine/risk knobs applied as a unit.  A pro, Apply a named profile's overrides onto ``target`` (defaults to the live singleto, Apply a named profile's overrides onto ``target`` (defaults to the live singleto, invalidate_check(), _parse_since(), CLI: ats engine — run the trading loop (replay / tick / live)., Single evaluation against the latest computed features. (+13 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.12
-Nodes (16): ema(), macd(), MACDResult, obv(), Pure indicator functions — DataFrame in, Series (or dataclass) out. No DB., Rolling OLS slope using numpy.polyfit over `window` bars (closed='left')., MACD (12/26/9). Returns MACDResult with .macd, .signal, .hist Series., Exponential Moving Average. (+8 more)
+Cohesion: 0.15
+Nodes (13): ema(), macd(), MACDResult, obv(), Pure indicator functions — DataFrame in, Series (or dataclass) out. No DB., MACD (12/26/9). Returns MACDResult with .macd, .signal, .hist Series., Exponential Moving Average., Annualized realized volatility: rolling std of log returns * sqrt(252*bars_per_d (+5 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.17
@@ -311,8 +328,8 @@ Cohesion: 0.12
 Nodes (15): AI / agentic trading — *the methodological foil*, code:text (High rigor (deterministic, replayable, gated)), Commercial signal bots — *the output-shape competitors*, Competitive Landscape, Derivatives-data tools — *the input-layer overlap*, Head-to-head comparison, Market map — the four peer groups, Open items to verify (live) (+7 more)
 
 ### Community 41 - "Community 41"
-Cohesion: 0.20
-Nodes (12): candles_between(), _coerce(), _feature_dict(), feature_rows_since(), latest_feature_row(), latest_regime(), open_positions(), DB read helpers shared by planning + the engine loop.  Reads the spec-01/02 tabl (+4 more)
+Cohesion: 0.18
+Nodes (13): candles_between(), _coerce(), _feature_dict(), feature_rows_since(), latest_feature_row(), latest_regime(), open_positions(), DB read helpers shared by planning + the engine loop.  Reads the spec-01/02 tabl (+5 more)
 
 ### Community 42 - "Community 42"
 Cohesion: 0.30
@@ -331,12 +348,12 @@ Cohesion: 0.21
 Nodes (7): _cost_usd(), get_client(), OpenAIClient, LLM client abstraction: a deterministic mock and a real OpenAI implementation., Real OpenAI implementation using the Responses API structured-output parser., Return the mock unless real OpenAI calls are explicitly enabled with a key., test_get_client_returns_mock_by_default()
 
 ### Community 46 - "Community 46"
-Cohesion: 0.24
-Nodes (11): check_freshness(), compute_status(), get_data_class_counts(), Row count backing each freshness data_class, for the status table., _ago(), Test freshness status computation., test_funding_budget(), test_missing_beyond_2x() (+3 more)
+Cohesion: 0.10
+Nodes (20): 1. New client conforming to the Protocol, 2. Config flag + factory route, 3. Mapping spec-04 → PlanOutput, code:block1 (features/regimes/candles), code:python (# e.g. src/ats/signal/deterministic_client.py), code:python (# config.py), Conclusion reached, Handover — Deterministic Plan Engine (replace the LLM with spec-04 agents) (+12 more)
 
 ### Community 47 - "Community 47"
-Cohesion: 0.22
-Nodes (13): cvd(), Cumulative Volume Delta and 10-bar OLS slope.      CVD formula: cumsum(2 * taker, _make_candles(), Tests for CVD (Cumulative Volume Delta) indicator., Create a synthetic candle DataFrame with optional taker_buy_vol overrides., cvd_30[i] == cvd_30[i-1] + (2*tbv[i] - vol[i]) for all non-null bars., cvd_slope_10 should be positive for steadily increasing CVD., If any taker_buy_vol in the trailing 30-bar window is NULL, CVD must be NULL. (+5 more)
+Cohesion: 0.18
+Nodes (15): cvd(), Rolling OLS slope using numpy.polyfit over `window` bars (closed='left')., Cumulative Volume Delta and 10-bar OLS slope.      CVD formula: cumsum(2 * taker, _rolling_ols_slope(), _make_candles(), Tests for CVD (Cumulative Volume Delta) indicator., Create a synthetic candle DataFrame with optional taker_buy_vol overrides., cvd_30[i] == cvd_30[i-1] + (2*tbv[i] - vol[i]) for all non-null bars. (+7 more)
 
 ### Community 48 - "Community 48"
 Cohesion: 0.22
@@ -347,16 +364,16 @@ Cohesion: 0.23
 Nodes (11): _make_candles(), Tests that compute_features_frame is deterministic (same input → identical frame, Create a synthetic candle DataFrame for feature tests., Same candles input → byte-identical output DataFrame., Output has same number of rows as input and expected columns., All pr_* columns that are non-NaN must be in [0, 1]., Inject an extreme spike at bar 100; verify it doesn't affect bars before 100., test_compute_features_is_deterministic() (+3 more)
 
 ### Community 50 - "Community 50"
-Cohesion: 0.24
-Nodes (10): evaluate_invalidation(), Deterministic plan/setup invalidation.  Invalidation is evaluated by CODE, never, Return the highest-severity triggered level, or None.      A rule with ``on_clos, Tests for deterministic plan/setup invalidation., test_highest_severity_wins(), test_intrabar_rule_fires_without_close(), test_no_rules_returns_none(), test_none_triggered_returns_none() (+2 more)
+Cohesion: 0.12
+Nodes (15): AI Crypto Trader Architecture Summary, code:text (AI decides WHAT to trade), code:text (Market Stream (WebSocket)), code:json ({), code:python (if now > expires_at:), code:text (create_plan     = strategist), code:text (LLM defines the trading plan.), code:json ({) (+7 more)
 
 ### Community 51 - "Community 51"
 Cohesion: 0.20
 Nodes (10): Acceptance criteria — Tier 1, Acceptance criteria — Tier 3 (only required when promoting), `ats data validate`, code:bash (# 1. Postgres up (local, Neon, or Supabase free tier)), code:block13 (data_class              status         last_seen           r), code:bash (docker compose -f ops/docker-compose.yml up -d        # Post), pytest, Tier 1 smoke test — under 2 minutes (+2 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.22
-Nodes (8): _confirm_and_execute(), close_paper_trade(), _merge_state(), open_paper_trade(), Paper executor — records simulated trades. NEVER places a live order.  This is t, Mark a trade closed and record realized pnl., Insert an open paper trade for a detected+confirmed+risk-approved setup.      ``, Persist updated exit state into ``trade_metadata`` (preserving other keys).
+Cohesion: 0.15
+Nodes (16): _advance_trade(), _close_trade(), _observe_and_adjust(), Single close path: record the close, then run the episodic post-mortem.      Cen, Single close path: record the close, then run the episodic post-mortem.      Cen, Single close path: record the close, then run the episodic post-mortem.      Cen, Walk one open trade across a sequence of candles (finer-tf bars or a single bar), Walk one open trade across a sequence of candles (finer-tf bars or a single bar) (+8 more)
 
 ### Community 53 - "Community 53"
 Cohesion: 0.22
@@ -367,8 +384,8 @@ Cohesion: 0.22
 Nodes (9): 1. create_plan, 2. confirm_setup, code:json ({), code:json ({), code:json ({), code:json ({), code:json ({), code:json ({) (+1 more)
 
 ### Community 55 - "Community 55"
-Cohesion: 0.22
-Nodes (8): code:bash (uv add sqlalchemy[asyncio] asyncpg alembic), Components, Dependencies on prior phases, Freshness budgets, New deps to add, Risks / open questions, Scope, Spec 01 — Data Collection · Milestone M1
+Cohesion: 0.17
+Nodes (11): code:bash (uv add sqlalchemy[asyncio] asyncpg alembic), Components, Dependencies on prior phases, Freshness budgets, Goal, New deps to add, Risks / open questions, Scope (+3 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.25
@@ -391,8 +408,8 @@ Cohesion: 0.29
 Nodes (3): main_callback(), ATS CLI entrypoint.  Phase 0: --version, --help. Spec 01 adds: ats db, ats inges, configure_logging()
 
 ### Community 61 - "Community 61"
-Cohesion: 0.33
-Nodes (5): _parse_since(), CLI: ats trades — inspect paper trades., Aggregate stats over closed trades., Parse strings like '7d', '120d', '2h', '30m' into timedelta., stats()
+Cohesion: 0.29
+Nodes (6): _parse_since(), CLI: ats trades — inspect paper trades., Aggregate stats over closed trades., Aggregate stats over closed trades., Parse strings like '7d', '120d', '2h', '30m' into timedelta., stats()
 
 ### Community 62 - "Community 62"
 Cohesion: 0.29
@@ -403,8 +420,8 @@ Cohesion: 0.40
 Nodes (5): _parse_since(), CLI commands for regime inspection., Parse strings like '7d', '120d', '2h', '30m' into timedelta., Show current regime + recent history., show()
 
 ### Community 65 - "Community 65"
-Cohesion: 0.33
-Nodes (5): plan_system_prompt(), Static system prompts + user-message rendering for the LLM-plan layer.  The syst, Render the per-call envelope as a compact JSON user message., Render the strategist system prompt with the live risk posture baked in.      Th, user_message()
+Cohesion: 0.29
+Nodes (6): plan_system_prompt(), Static system prompts + user-message rendering for the LLM-plan layer.  The syst, Render the per-call envelope as a compact JSON user message., Render the per-call envelope as a compact JSON user message., Render the strategist system prompt with the live risk posture baked in.      Th, user_message()
 
 ### Community 66 - "Community 66"
 Cohesion: 0.33
@@ -467,28 +484,88 @@ Cohesion: 0.67
 Nodes (3): code:text (Every tick), code:text (LLM creates invalidation rules), Why Not Use LLM for Invalidation?
 
 ### Community 89 - "Community 89"
+Cohesion: 0.17
+Nodes (14): BarStep, breakeven_stop(), check_bar_exit(), _liq_hit(), net_of_costs(), PartialFill, _pnl_pct(), Paper-trade reconciliation — pure exit logic over candles.  Given an open trade (+6 more)
+
+### Community 117 - "Community 117"
+Cohesion: 0.22
+Nodes (9): 1. create_plan, 2. confirm_setup, code:json ({), code:json ({), code:json ({), code:json ({), code:json ({), code:json ({) (+1 more)
+
+### Community 118 - "Community 118"
+Cohesion: 0.25
+Nodes (8): code:text (Spread increasing), code:text (Price below level for 60 seconds), code:text (5m candle closes below support), code:text (Disable plan), Hard Invalidation, Invalidation Levels, Soft Invalidation, Warning
+
+### Community 119 - "Community 119"
+Cohesion: 0.29
+Nodes (7): Better Approach, code:python (if price < 67200:), code:text (Warning:), code:json ({), Example, Important Insight, Plan Invalidation
+
+### Community 120 - "Community 120"
+Cohesion: 0.27
+Nodes (6): code:json ({), code:python (if setup.plan_id != current_plan.plan_id:), code:text (create_plan), code:text (confirm_setup), Cost Optimization Strategy, Plan Versioning
+
+### Community 121 - "Community 121"
+Cohesion: 0.40
+Nodes (5): code:json ({), code:json ({), Hard Rules, Hard Rules vs Soft Rules, Soft Rules
+
+### Community 122 - "Community 122"
+Cohesion: 0.40
+Nodes (5): code:text (Python), code:text (Python), Minimal Version, Recommended Tech Stack, Scaling Version
+
+### Community 124 - "Community 124"
 Cohesion: 0.67
-Nodes (3): Goal, Tier 1 behavior (default, $0 idle — M1), Tier 3 behavior (live, opt-in — M4)
+Nodes (3): code:json ({), code:text (price > ema_50_5m), Rule Engine
+
+### Community 125 - "Community 125"
+Cohesion: 0.67
+Nodes (3): code:text ("RSI recovers above 45"), code:json ({), Rule Structure
+
+### Community 126 - "Community 126"
+Cohesion: 0.67
+Nodes (3): code:text (Redis), code:text (active_plan), Shared State
+
+### Community 127 - "Community 127"
+Cohesion: 0.67
+Nodes (3): code:text (Every tick), code:text (LLM creates invalidation rules), Why Not Use LLM for Invalidation?
+
+### Community 129 - "Community 129"
+Cohesion: 0.21
+Nodes (12): LlmCall, PaperTrade, Plan, One row per create_plan() output — the versioned strategic context., An allowed_setup[] of a plan; inherits plan_id., Executor output — PAPER only, never a live order., Audit + cost for each LLM invocation (real or mock)., Audit + cost for each LLM invocation (real or mock). (+4 more)
+
+### Community 130 - "Community 130"
+Cohesion: 0.17
+Nodes (12): _ensure_plan(), Refresh the plan if there is none, it expired, or the refresh cadence elapsed., Refresh the plan if there is none, it expired, or the refresh cadence elapsed., Refresh the plan if there is none, it expired, or the refresh cadence elapsed., Single evaluation against the most recent feature row., Single evaluation against the most recent feature row., Single evaluation against the most recent feature row., Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon (+4 more)
+
+### Community 131 - "Community 131"
+Cohesion: 0.24
+Nodes (9): _merge_state(), Paper executor — records simulated trades. NEVER places a live order.  This is t, Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open., Persist a no-fill state change (e.g. a trailing-stop move) for an open trade., Persist a no-fill state change (e.g. a trailing-stop move) for an open trade., Persist updated exit state into ``trade_metadata`` (preserving other keys)., Persist updated exit state into ``trade_metadata`` (preserving other keys)., record_partial_exit() (+1 more)
+
+### Community 132 - "Community 132"
+Cohesion: 0.40
+Nodes (5): margin_close_values(), Return ``(pnl_usd, margin_pnl_pct)`` from an internal notional-return result., Tests for paper executor PnL accounting helpers., test_margin_close_values_loss(), test_margin_close_values_profit()
+
+### Community 134 - "Community 134"
+Cohesion: 0.67
+Nodes (3): Rate of Change (pandas-ta)., roc(), test_roc_shape()
 
 ## Knowledge Gaps
-- **314 isolated node(s):** `list`, `symbol`, `markPrice`, `indexPrice`, `lastFundingRate` (+309 more)
+- **399 isolated node(s):** `list`, `symbol`, `markPrice`, `indexPrice`, `lastFundingRate` (+394 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **23 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **25 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `compute_features_frame()` connect `Community 44` to `Community 32`, `Community 1`, `Community 37`, `Community 47`, `Community 49`, `Community 18`, `Community 26`, `Community 30`?**
-  _High betweenness centrality (0.153) - this node is a cross-community bridge._
+- **Why does `compute_features_frame()` connect `Community 44` to `Community 32`, `Community 1`, `Community 37`, `Community 134`, `Community 47`, `Community 49`, `Community 18`, `Community 26`, `Community 30`?**
+  _High betweenness centrality (0.125) - this node is a cross-community bridge._
+- **Why does `evaluate_now()` connect `Community 23` to `Community 129`, `Community 130`, `Community 5`, `Community 13`, `Community 31`?**
+  _High betweenness centrality (0.079) - this node is a cross-community bridge._
 - **Why does `evaluate_setup()` connect `Community 5` to `Community 44`, `Community 23`?**
-  _High betweenness centrality (0.092) - this node is a cross-community bridge._
-- **Why does `evaluate_now()` connect `Community 23` to `Community 4`, `Community 5`, `Community 17`, `Community 52`, `Community 31`?**
-  _High betweenness centrality (0.088) - this node is a cross-community bridge._
+  _High betweenness centrality (0.078) - this node is a cross-community bridge._
 - **Are the 19 inferred relationships involving `compute_features_frame()` (e.g. with `test_funding_columns_populated_when_funding_df_passed()` and `test_funding_columns_nan_without_funding_df()`) actually correct?**
   _`compute_features_frame()` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 19 inferred relationships involving `TradeState` (e.g. with `ClosedTradeInfo` and `TickReport`) actually correct?**
   _`TradeState` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Tests for momentum_composite with pinned MACD_SCALE golden values.`, `MACD_SCALE must be pinned at 1.0 (golden value freeze).`, `rsi=30 → rsi_n = 0.0; with macd_hist=0 → macd_n=0.5; roc_5=0 → roc_n=0.5.      r` to the rest of the system?**
-  _610 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _744 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `Community 0` be split into smaller, more focused modules?**
   _Cohesion score 0.05442176870748299 - nodes in this community are weakly interconnected._

@@ -19,7 +19,7 @@ class ExitResult:
     exit_price: float
     exit_time: datetime
     exit_reason: str  # sl|tp|expiry|invalidation|breakeven|trail
-    pnl_pct: float  # signed return on the FULL position (sums all scaled-out legs)
+    pnl_pct: float  # internal signed return on notional (sums all scaled-out legs)
 
 
 def _pnl_pct(direction: str, entry: float, exit_price: float) -> float:

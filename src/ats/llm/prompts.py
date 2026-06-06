@@ -76,7 +76,8 @@ Each setup must be directly executable by a deterministic rule engine:
 - take_profit: list of target prices; stop_loss: a single price
 - size_pct: include a nominal value (e.g. 0.05) — it is IGNORED. Position size and leverage
   are set deterministically by the risk manager: it sizes each trade so a stop-out loses at
-  most risk_limits.risk_per_trade_pct of equity, using leverage up to risk_limits.max_leverage.
+  most risk_limits.risk_per_trade_pct of equity, using isolated margin/leverage caps from
+  risk_limits.
   Your job is the stop and targets, not the size.
 - hard_rules / soft_rules / invalidation_rules using the grammar below
 

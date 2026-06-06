@@ -20,6 +20,15 @@ from ats.logging import get_logger
 log = get_logger(__name__)
 
 
+def margin_close_values(
+    *, notional_usd: float, margin_usd: float, notional_pnl_pct: float
+) -> tuple[float, float]:
+    """Return ``(pnl_usd, margin_pnl_pct)`` from an internal notional-return result."""
+    pnl_usd = round(notional_usd * notional_pnl_pct, 2)
+    margin_pnl_pct = pnl_usd / margin_usd if margin_usd > 0 else 0.0
+    return pnl_usd, margin_pnl_pct
+
+
 async def open_paper_trade(
     session: AsyncSession,
     setup: dict[str, Any],
@@ -29,14 +38,16 @@ async def open_paper_trade(
     size_pct: float,
     reasons: list[str],
     leverage: float | None = None,
+    margin_usd: float | None = None,
+    notional_usd: float | None = None,
     liq_price: float | None = None,
     risk_usd: float | None = None,
 ) -> uuid.UUID:
     """Insert an open paper trade for a detected+confirmed+risk-approved setup.
 
     ``setup`` is a dict with setup_id, plan_id, symbol, direction, stop_loss, take_profit.
-    ``size_pct`` is notional / equity (>= 1.0 when leveraged); ``leverage``/``liq_price``/
-    ``risk_usd`` come from the risk-based sizer.
+    ``size_pct`` is notional / equity; ``margin_usd`` is committed capital before
+    leverage, and ``notional_usd`` is market exposure after leverage.
     """
     trade = PaperTrade(
         trade_id=uuid.uuid4(),
@@ -46,6 +57,8 @@ async def open_paper_trade(
         direction=setup["direction"],
         size_pct=size_pct,
         leverage=leverage,
+        margin_usd=margin_usd,
+        notional_usd=notional_usd,
         liq_price=liq_price,
         risk_usd=risk_usd,
         entry_price=entry_price,
@@ -64,6 +77,8 @@ async def open_paper_trade(
         direction=trade.direction,
         entry=entry_price,
         size_pct=size_pct,
+        margin_usd=margin_usd,
+        notional_usd=notional_usd,
     )
     trace.trade_opened(
         now=entry_time,
@@ -98,7 +113,10 @@ async def record_partial_exit(
     if trade is None:
         log.warning("paper_trade_missing_on_partial", trade_id=str(trade_id))
         return
-    leg_usd = round(equity_usd * size_pct * partial.frac * partial.pnl_pct, 2)
+    notional_usd = (
+        float(trade.notional_usd) if trade.notional_usd is not None else equity_usd * size_pct
+    )
+    leg_usd = round(notional_usd * partial.frac * partial.pnl_pct, 2)
     md = dict(trade.trade_metadata or {})
     md.update(state.to_metadata())
     legs = list(md.get("partials", []))
@@ -145,29 +163,49 @@ async def close_paper_trade(
     *,
     equity_usd: float,
     size_pct: float,
-) -> None:
-    """Mark a trade closed and record realized pnl."""
+) -> ExitResult | None:
+    """Mark a trade closed and record realized pnl.
+
+    ``exit_result.pnl_pct`` is the internal return on notional. Persisted ``pnl_pct`` is
+    return on margin, i.e. ``pnl_usd / margin_usd``.
+    """
     trade = await session.get(PaperTrade, trade_id)
     if trade is None:
         log.warning("paper_trade_missing_on_close", trade_id=str(trade_id))
-        return
+        return None
+    notional_usd = (
+        float(trade.notional_usd) if trade.notional_usd is not None else equity_usd * size_pct
+    )
+    if trade.margin_usd is not None:
+        margin_usd = float(trade.margin_usd)
+    elif trade.leverage is not None and float(trade.leverage) > 0:
+        margin_usd = notional_usd / float(trade.leverage)
+    else:
+        margin_usd = notional_usd
+    pnl_usd, margin_pnl_pct = margin_close_values(
+        notional_usd=notional_usd, margin_usd=margin_usd, notional_pnl_pct=exit_result.pnl_pct
+    )
     trade.exit_price = exit_result.exit_price
     trade.exit_time = exit_result.exit_time
     trade.exit_reason = exit_result.exit_reason
-    trade.pnl_pct = exit_result.pnl_pct
-    trade.pnl_usd = round(equity_usd * size_pct * exit_result.pnl_pct, 2)
+    trade.pnl_pct = margin_pnl_pct
+    trade.pnl_usd = pnl_usd
     trade.status = "closed"
     await session.flush()
     log.info(
         "paper_trade_closed",
         trade_id=str(trade_id),
         reason=exit_result.exit_reason,
-        pnl_pct=round(exit_result.pnl_pct, 4),
+        pnl_pct=round(margin_pnl_pct, 4),
+    )
+    closed = ExitResult(
+        exit_result.exit_price, exit_result.exit_time, exit_result.exit_reason, margin_pnl_pct
     )
     trace.trade_closed(
         now=exit_result.exit_time,
         trade_id=trade_id,
         plan_id=trade.plan_id,
         reason=exit_result.exit_reason,
-        pnl_pct=exit_result.pnl_pct,
+        pnl_pct=closed.pnl_pct,
     )
+    return closed

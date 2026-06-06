@@ -137,7 +137,8 @@ async def open_positions(
     session: AsyncSession, *, symbol: str | None = None
 ) -> list[dict[str, Any]]:
     sql = (
-        "SELECT trade_id, symbol, direction, size_pct, entry_price "
+        "SELECT trade_id, symbol, direction, size_pct, leverage, margin_usd, "
+        "notional_usd, risk_usd, entry_price "
         "FROM paper_trades WHERE status = 'open'"
     )
     params: dict[str, Any] = {}

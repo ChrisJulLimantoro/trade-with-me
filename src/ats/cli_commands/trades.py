@@ -52,7 +52,8 @@ def show(
             res = await session.execute(
                 text(
                     "SELECT trade_id, symbol, direction, status, entry_price, exit_price, "
-                    "exit_reason, pnl_pct, pnl_usd, leverage, risk_usd, entry_time "
+                    "exit_reason, pnl_pct, pnl_usd, leverage, margin_usd, notional_usd, "
+                    "risk_usd, entry_time "
                     f"FROM paper_trades{clause} ORDER BY entry_time DESC LIMIT :lim"
                 ),
                 params,
@@ -71,10 +72,12 @@ def show(
     t.add_column("status")
     t.add_column("entry", justify="right")
     t.add_column("exit", justify="right")
+    t.add_column("margin$", justify="right")
+    t.add_column("notional$", justify="right")
     t.add_column("lev", justify="right")
     t.add_column("risk$", justify="right")
     t.add_column("reason")
-    t.add_column("pnl%", justify="right")
+    t.add_column("margin pnl%", justify="right")
     t.add_column("pnl$", justify="right")
     dir_color = {"long": "green", "short": "red"}
     for r in rows:
@@ -89,6 +92,8 @@ def show(
             r["status"],
             f"{float(r['entry_price']):.2f}",
             f"{float(r['exit_price']):.2f}" if r["exit_price"] is not None else "-",
+            f"{float(r['margin_usd']):.2f}" if r["margin_usd"] is not None else "-",
+            f"{float(r['notional_usd']):.2f}" if r["notional_usd"] is not None else "-",
             f"{float(r['leverage']):.2f}x" if r["leverage"] is not None else "-",
             f"{float(r['risk_usd']):.2f}" if r["risk_usd"] is not None else "-",
             r["exit_reason"] or "-",
@@ -153,13 +158,14 @@ def stats(
     expectancy = avg_win * win_rate + avg_loss * (1 - win_rate)
     console.print(
         f"\n[bold cyan]Trade stats[/bold cyan] (last {since}{', ' + symbol if symbol else ''})\n"
-        f"  n={n}  win_rate={win_rate * 100:.0f}%  avg_pnl={float(agg['avg_pnl'] or 0) * 100:+.3f}%  "
-        f"expectancy={expectancy * 100:+.3f}%  total_pnl=${agg['pnl_usd']}"
+        f"  n={n}  win_rate={win_rate * 100:.0f}%  "
+        f"avg_margin_pnl={float(agg['avg_pnl'] or 0) * 100:+.3f}%  "
+        f"margin_expectancy={expectancy * 100:+.3f}%  total_pnl=${agg['pnl_usd']}"
     )
     t = Table(title="By exit reason")
     t.add_column("reason")
     t.add_column("n", justify="right")
-    t.add_column("avg_pnl%", justify="right")
+    t.add_column("avg margin pnl%", justify="right")
     for r in by_reason:
         t.add_row(r["exit_reason"] or "-", str(r["n"]), f"{float(r['avg_pnl'] or 0) * 100:+.2f}")
     console.print(t)

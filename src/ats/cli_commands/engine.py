@@ -136,8 +136,8 @@ def replay(
             console.print(
                 f"  [bold]trade metrics[/bold]  "
                 f"win_rate={rep.win_rate * 100:.0f}%  "
-                f"avg_pnl={rep.avg_pnl_pct * 100:+.3f}%  "
-                f"expectancy={rep.expectancy_pct * 100:+.3f}%"
+                f"avg_margin_pnl={rep.avg_pnl_pct * 100:+.3f}%  "
+                f"margin_expectancy={rep.expectancy_pct * 100:+.3f}%"
                 + atr_str
             )
             from rich.table import Table
@@ -148,7 +148,11 @@ def replay(
             t.add_column("stop", justify="right")
             t.add_column("exit", justify="right")
             t.add_column("reason")
-            t.add_column("pnl%", justify="right")
+            t.add_column("margin$", justify="right")
+            t.add_column("notional$", justify="right")
+            t.add_column("lev", justify="right")
+            t.add_column("margin pnl%", justify="right")
+            t.add_column("pnl$", justify="right")
             t.add_column("stop_dist/ATR", justify="right")
             for oc in rep.trade_outcomes:
                 pnl_color = "green" if oc.pnl_pct > 0 else "red"
@@ -163,7 +167,11 @@ def replay(
                     f"{oc.stop_loss:.1f}",
                     f"{oc.exit_price:.1f}",
                     oc.exit_reason,
+                    f"{oc.margin_usd:,.2f}",
+                    f"{oc.notional_usd:,.2f}",
+                    f"{oc.leverage:.2f}x" if oc.leverage is not None else "-",
                     f"[{pnl_color}]{oc.pnl_pct * 100:+.3f}%[/{pnl_color}]",
+                    f"[{pnl_color}]{oc.pnl_usd:+.2f}[/{pnl_color}]",
                     atr_ratio,
                 )
             console.print(t)
@@ -308,5 +316,6 @@ async def _print_trade_summary(symbol: str, since: datetime | None = None) -> No
     scope = f" (since {str(since)[:19]})" if since is not None else ""
     console.print(
         f"  trades{scope}: closed={closed} open={rows['open'] or 0} "
-        f"win_rate={win_rate:.0f}% avg_pnl={rows['avg_pnl'] or 0} pnl_usd=${rows['pnl_usd'] or 0}"
+        f"win_rate={win_rate:.0f}% avg_margin_pnl={rows['avg_pnl'] or 0} "
+        f"pnl_usd=${rows['pnl_usd'] or 0}"
     )

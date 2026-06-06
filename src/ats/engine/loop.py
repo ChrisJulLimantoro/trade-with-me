@@ -34,7 +34,11 @@ class TradeOutcome:
     stop_loss: float
     exit_price: float
     exit_reason: str
-    pnl_pct: float  # raw price return (unlevered), signed
+    margin_usd: float
+    notional_usd: float
+    leverage: float | None
+    pnl_pct: float  # return on committed margin, signed
+    pnl_usd: float
     atr_at_entry: float | None  # atr_14 at the bar we entered
     stop_dist_pts: float  # abs(entry - stop_loss) in price points
 
@@ -57,8 +61,8 @@ class ReplayReport:
 
     # --- derived metrics (populated by finalise()) ---
     win_rate: float = 0.0
-    avg_pnl_pct: float = 0.0
-    expectancy_pct: float = 0.0  # avg_win * win_rate - avg_loss * loss_rate
+    avg_pnl_pct: float = 0.0  # average return on committed margin
+    expectancy_pct: float = 0.0  # margin avg_win * win_rate + avg_loss * loss_rate
     avg_stop_dist_atr: float | None = None  # avg stop distance in ATR multiples
 
     def finalise(self) -> None:
@@ -106,7 +110,11 @@ def _accumulate(report: ReplayReport, tick: TickReport) -> None:
                 stop_loss=ct.stop_loss,
                 exit_price=ct.exit_price,
                 exit_reason=ct.exit_reason,
+                margin_usd=ct.margin_usd,
+                notional_usd=ct.notional_usd,
+                leverage=ct.leverage,
                 pnl_pct=ct.pnl_pct,
+                pnl_usd=ct.pnl_usd,
                 atr_at_entry=ct.atr_at_close,  # best proxy we have; entry ATR is not threaded
                 stop_dist_pts=abs(ct.entry_price - ct.stop_loss),
             )

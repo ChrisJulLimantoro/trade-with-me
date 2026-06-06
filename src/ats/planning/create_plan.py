@@ -205,6 +205,9 @@ async def build_envelope(
         "risk_limits": {
             "risk_per_trade_pct": settings.risk_per_trade_pct,
             "max_leverage": settings.max_leverage,
+            "max_margin_pct_per_trade": settings.max_margin_pct_per_trade,
+            "max_total_margin_pct": settings.max_total_margin_pct,
+            "max_portfolio_risk_pct": settings.max_portfolio_risk_pct,
             "min_rr": settings.min_rr,
             "one_position_per_symbol": True,
             # Directions the runtime regime filter will allow. Propose ONLY these.

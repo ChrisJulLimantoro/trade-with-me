@@ -57,7 +57,11 @@ class ClosedTradeInfo:
     stop_loss: float
     exit_price: float
     exit_reason: str
+    margin_usd: float
+    notional_usd: float
+    leverage: float | None
     pnl_pct: float
+    pnl_usd: float
     atr_at_close: float | None  # atr_14 from the bar that closed the trade
 
 
@@ -135,22 +139,39 @@ async def _close_trade(
     Centralised so every exit route (stop/target/expiry, hard invalidation, observe-exit)
     reflects exactly once. Reflection failures never break the trade close.
     """
-    await close_paper_trade(
+    closed_result = await close_paper_trade(
         session,
         trade.trade_id,
         exit_result,
         equity_usd=settings.paper_equity_usd,
         size_pct=_f(trade.size_pct),
     )
+    if closed_result is None:
+        return
+    notional_usd = (
+        _f(trade.notional_usd)
+        if trade.notional_usd is not None
+        else settings.paper_equity_usd * _f(trade.size_pct)
+    )
+    if trade.margin_usd is not None:
+        margin_usd = _f(trade.margin_usd)
+    elif trade.leverage is not None and _f(trade.leverage) > 0:
+        margin_usd = notional_usd / _f(trade.leverage)
+    else:
+        margin_usd = notional_usd
     report.closed += 1
     report.closed_trades.append(
         ClosedTradeInfo(
             direction=trade.direction,
             entry_price=_f(trade.entry_price),
             stop_loss=_f(trade.stop_loss),
-            exit_price=exit_result.exit_price,
-            exit_reason=exit_result.exit_reason,
-            pnl_pct=exit_result.pnl_pct,
+            exit_price=closed_result.exit_price,
+            exit_reason=closed_result.exit_reason,
+            margin_usd=margin_usd,
+            notional_usd=notional_usd,
+            leverage=_f(trade.leverage) if trade.leverage is not None else None,
+            pnl_pct=closed_result.pnl_pct,
+            pnl_usd=round(notional_usd * exit_result.pnl_pct, 2),
             atr_at_close=atr_at_close,
         )
     )
@@ -158,7 +179,7 @@ async def _close_trade(
         try:
             from ats.learning.post_mortem import reflect_and_store
 
-            await reflect_and_store(session, client, trade, exit_result)
+            await reflect_and_store(session, client, trade, closed_result)
         except Exception as exc:  # noqa: BLE001 — reflection must never break the close
             log.warning("reflect_failed", trade_id=str(trade.trade_id), error=str(exc))
 
@@ -453,7 +474,10 @@ async def _handle_invalidation(
                     raw = (price - entry) / entry if entry else 0.0
                     leg = raw if direction == "long" else -raw
                     st = TradeState.from_metadata(trade.trade_metadata)
-                    total = st.realized_pnl_pct + st.remaining_frac * leg
+                    cost_bps = settings.fee_bps + settings.slippage_bps
+                    total = st.realized_pnl_pct + net_of_costs(
+                        st.remaining_frac, leg, cost_bps
+                    )
                     raw_atr = feature_row.get("atr_14")
                     await _close_trade(
                         session,
@@ -614,6 +638,9 @@ async def _confirm_and_execute(
         risk_per_trade_pct=settings.risk_per_trade_pct,
         max_leverage=settings.max_leverage,
         min_rr=settings.min_rr,
+        max_margin_pct_per_trade=settings.max_margin_pct_per_trade,
+        max_total_margin_pct=settings.max_total_margin_pct,
+        max_portfolio_risk_pct=settings.max_portfolio_risk_pct,
         size_multiplier=multiplier,
         atr=float(raw_atr) if raw_atr is not None else None,
         min_stop_atr_mult=settings.min_stop_atr_mult,
@@ -632,6 +659,8 @@ async def _confirm_and_execute(
         size_pct=decision.size_pct,
         reasons=[f"confirm:{confirm.action}", *decision.reasons],
         leverage=decision.leverage,
+        margin_usd=decision.margin_usd,
+        notional_usd=decision.notional_usd,
         liq_price=decision.liq_price,
         risk_usd=decision.risk_usd,
     )
@@ -648,7 +677,16 @@ async def _confirm_and_execute(
         }
     setup.status = "realized"
     setup.detected_at = now
-    open_positions.append({"symbol": setup.symbol})
+    open_positions.append(
+        {
+            "symbol": setup.symbol,
+            "margin_usd": decision.margin_usd,
+            "notional_usd": decision.notional_usd,
+            "risk_usd": decision.risk_usd,
+            "leverage": decision.leverage,
+            "size_pct": decision.size_pct,
+        }
+    )
     report.opened += 1
     trace.outcome(f"EXECUTED — {'; '.join(decision.reasons)}")
     await session.flush()
