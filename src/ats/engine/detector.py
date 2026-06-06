@@ -367,6 +367,22 @@ async def _observe_and_adjust(
     }
     obs, llm = await client.observe_trade(env, symbol=trade.symbol)
     report.observe_calls += 1
+    trace.observe(
+        now=ts,
+        trade_id=trade.trade_id,
+        plan_id=trade.plan_id,
+        action=obs.action if llm.parse_ok and obs is not None else "PARSE_FAIL",
+        parse_ok=llm.parse_ok,
+        price=close,
+        unrealized_pct=unrealized,
+        working_stop=cur_ws,
+        remaining_frac=state.remaining_frac,
+        confidence=float(obs.confidence) if obs is not None else None,
+        reason=obs.reason if obs is not None else None,
+        new_stop=float(obs.new_stop) if obs is not None and obs.new_stop is not None else None,
+        new_tp=list(obs.new_tp) if obs is not None and obs.new_tp else None,
+        scale_frac=float(obs.scale_frac) if obs is not None and obs.scale_frac else None,
+    )
     session.add(
         LlmCall(
             call_id=uuid.uuid4(),

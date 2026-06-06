@@ -131,6 +131,7 @@ class OpenAIClient:
                 max_tokens=settings.llm_max_tokens,
                 # opencode zen / OpenRouter convention: disable the reasoning trace so
                 # the token budget goes to the JSON answer, not hidden chain-of-thought.
+                temperature=0.0,
                 extra_body={
                     # "reasoning": {"enabled": False},
                     "thinking": {"type": "disabled"}

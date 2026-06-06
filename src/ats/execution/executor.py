@@ -88,6 +88,9 @@ async def open_paper_trade(
         direction=trade.direction,
         entry=entry_price,
         size_pct=size_pct,
+        margin_usd=margin_usd,
+        notional_usd=notional_usd,
+        leverage=leverage,
     )
     return trade.trade_id
 

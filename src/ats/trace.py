@@ -138,14 +138,67 @@ def trade_opened(
     direction: str,
     entry: float,
     size_pct: float,
+    margin_usd: float | None = None,
+    notional_usd: float | None = None,
+    leverage: float | None = None,
 ) -> None:
     if _logger is None:
         return
-    _w(
+    line = (
         f"TRADE OPENED  {_ts(now)}  trade={_sid(trade_id)}  "
         f"plan={_sid(plan_id)} setup={_sid(setup_id)}  "
         f"{direction.upper()} @ {_num(entry)}  size={_num(size_pct)}"
     )
+    if margin_usd is not None:
+        line += f"  margin=${float(margin_usd):.2f}"
+    if notional_usd is not None:
+        line += f"  notional=${float(notional_usd):.2f}"
+    if leverage is not None:
+        line += f"  lev={float(leverage):.2f}x"
+    _w(line)
+
+
+def observe(
+    *,
+    now: datetime | None,
+    trade_id: Any,
+    plan_id: Any,
+    action: str,
+    parse_ok: bool,
+    price: float,
+    unrealized_pct: float,
+    working_stop: float,
+    remaining_frac: float,
+    confidence: float | None = None,
+    reason: str | None = None,
+    new_stop: float | None = None,
+    new_tp: list[float] | None = None,
+    scale_frac: float | None = None,
+) -> None:
+    """Record every observe_trade decision, including HOLD and parse failures."""
+    if _logger is None:
+        return
+    _w("-" * 88)
+    conf = "" if confidence is None else f"  conf={_num(confidence)}"
+    _w(
+        f"OBSERVE  {_ts(now)}  trade={_sid(trade_id)}  plan={_sid(plan_id)}  "
+        f"action={action}  parse_ok={parse_ok}{conf}"
+    )
+    _w(
+        f"  price={_num(price)}  unrealized_notional={unrealized_pct * 100:+.2f}%  "
+        f"stop={_num(working_stop)}  remaining={_num(remaining_frac)}"
+    )
+    details: list[str] = []
+    if new_stop is not None:
+        details.append(f"new_stop={_num(new_stop)}")
+    if new_tp:
+        details.append("new_tp=[" + ", ".join(_num(x) for x in new_tp) + "]")
+    if scale_frac is not None:
+        details.append(f"scale_frac={_num(scale_frac)}")
+    if details:
+        _w("  proposal: " + "  ".join(details))
+    if reason:
+        _w(f"  reason: {reason}")
 
 
 def trade_closed(
@@ -160,5 +213,5 @@ def trade_closed(
         return
     _w(
         f"TRADE CLOSED  {_ts(now)}  trade={_sid(trade_id)}  plan={_sid(plan_id)}  "
-        f"reason={reason}  pnl={pnl_pct * 100:+.2f}%"
+        f"reason={reason}  margin_pnl={pnl_pct * 100:+.2f}%"
     )

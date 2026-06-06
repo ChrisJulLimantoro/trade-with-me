@@ -333,7 +333,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L1",
       "id": "tests_test_xvenue_funding_parse_py",
-      "community": 10,
+      "community": 18,
       "norm_label": "test_xvenue_funding_parse.py"
     },
     {
@@ -342,7 +342,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L23",
       "id": "tests_test_xvenue_funding_parse_is_8h_boundary",
-      "community": 10,
+      "community": 18,
       "norm_label": "_is_8h_boundary()"
     },
     {
@@ -351,7 +351,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L27",
       "id": "tests_test_xvenue_funding_parse_test_align_8h_snaps_correctly",
-      "community": 10,
+      "community": 18,
       "norm_label": "test_align_8h_snaps_correctly()"
     },
     {
@@ -360,7 +360,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L34",
       "id": "tests_test_xvenue_funding_parse_test_align_8h_already_aligned",
-      "community": 10,
+      "community": 18,
       "norm_label": "test_align_8h_already_aligned()"
     },
     {
@@ -369,7 +369,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L40",
       "id": "tests_test_xvenue_funding_parse_test_bybit_funding_parse",
-      "community": 10,
+      "community": 18,
       "norm_label": "test_bybit_funding_parse()"
     },
     {
@@ -378,7 +378,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L53",
       "id": "tests_test_xvenue_funding_parse_test_okx_funding_parse",
-      "community": 10,
+      "community": 18,
       "norm_label": "test_okx_funding_parse()"
     },
     {
@@ -387,7 +387,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L65",
       "id": "tests_test_xvenue_funding_parse_test_hyperliquid_funding_parse",
-      "community": 10,
+      "community": 18,
       "norm_label": "test_hyperliquid_funding_parse()"
     },
     {
@@ -396,7 +396,7 @@
       "source_file": "tests/test_xvenue_funding_parse.py",
       "source_location": "L1",
       "id": "tests_test_xvenue_funding_parse_rationale_1",
-      "community": 10,
+      "community": 18,
       "norm_label": "test cross-venue funding parsing \u2014 alignment to 8h utc boundaries."
     },
     {
@@ -1152,7 +1152,7 @@
       "source_file": "tests/test_dead_features.py",
       "source_location": "L118",
       "id": "tests_test_dead_features_test_prune_missing_drops_none_and_nan",
-      "community": 13,
+      "community": 4,
       "norm_label": "test_prune_missing_drops_none_and_nan()"
     },
     {
@@ -1971,7 +1971,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L1",
       "id": "tests_test_htf_context_py",
-      "community": 13,
+      "community": 10,
       "norm_label": "test_htf_context.py"
     },
     {
@@ -1980,7 +1980,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L25",
       "id": "tests_test_htf_context_patch_state",
-      "community": 13,
+      "community": 10,
       "norm_label": "_patch_state()"
     },
     {
@@ -1989,7 +1989,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L62",
       "id": "tests_test_htf_context_test_htf_block_present_for_each_context_tf",
-      "community": 13,
+      "community": 10,
       "norm_label": "test_htf_block_present_for_each_context_tf()"
     },
     {
@@ -1998,7 +1998,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L69",
       "id": "tests_test_htf_context_test_htf_bar_is_already_closed_no_lookahead",
-      "community": 13,
+      "community": 10,
       "norm_label": "test_htf_bar_is_already_closed_no_lookahead()"
     },
     {
@@ -2007,7 +2007,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L84",
       "id": "tests_test_htf_context_test_base_tf_excluded_from_context",
-      "community": 13,
+      "community": 10,
       "norm_label": "test_base_tf_excluded_from_context()"
     },
     {
@@ -2016,7 +2016,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L92",
       "id": "tests_test_htf_context_test_missing_htf_features_skipped_not_fatal",
-      "community": 13,
+      "community": 10,
       "norm_label": "test_missing_htf_features_skipped_not_fatal()"
     },
     {
@@ -2025,7 +2025,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L1",
       "id": "tests_test_htf_context_rationale_1",
-      "community": 13,
+      "community": 10,
       "norm_label": "higher-timeframe context in build_envelope: the look-ahead guard.  a slower-char"
     },
     {
@@ -2034,7 +2034,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L26",
       "id": "tests_test_htf_context_rationale_26",
-      "community": 13,
+      "community": 10,
       "norm_label": "stub the db readers with an in-memory candle store keyed by timeframe.      each"
     },
     {
@@ -2196,7 +2196,7 @@
       "source_file": "tests/test_indicators.py",
       "source_location": "L77",
       "id": "tests_test_indicators_test_macd_returns_three_series",
-      "community": 37,
+      "community": 26,
       "norm_label": "test_macd_returns_three_series()"
     },
     {
@@ -2205,7 +2205,7 @@
       "source_file": "tests/test_indicators.py",
       "source_location": "L84",
       "id": "tests_test_indicators_test_macd_hist_is_macd_minus_signal",
-      "community": 26,
+      "community": 37,
       "norm_label": "test_macd_hist_is_macd_minus_signal()"
     },
     {
@@ -2232,7 +2232,7 @@
       "source_file": "tests/test_indicators.py",
       "source_location": "L120",
       "id": "tests_test_indicators_test_roc_shape",
-      "community": 134,
+      "community": 26,
       "norm_label": "test_roc_shape()"
     },
     {
@@ -2277,7 +2277,7 @@
       "source_file": "tests/test_indicators.py",
       "source_location": "L85",
       "id": "tests_test_indicators_rationale_85",
-      "community": 26,
+      "community": 37,
       "norm_label": "macd histogram = macd line - signal line."
     },
     {
@@ -2619,7 +2619,7 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L190",
       "id": "tests_test_step_trade_test_regime_gate",
-      "community": 13,
+      "community": 8,
       "norm_label": "test_regime_gate()"
     },
     {
@@ -3658,10 +3658,19 @@
       "norm_label": "trade_opened()"
     },
     {
+      "label": "observe()",
+      "file_type": "code",
+      "source_file": "src/ats/trace.py",
+      "source_location": "L161",
+      "id": "ats_trace_observe",
+      "community": 28,
+      "norm_label": "observe()"
+    },
+    {
       "label": "trade_closed()",
       "file_type": "code",
       "source_file": "src/ats/trace.py",
-      "source_location": "L151",
+      "source_location": "L204",
       "id": "ats_trace_trade_closed",
       "community": 28,
       "norm_label": "trade_closed()"
@@ -3710,6 +3719,15 @@
       "id": "ats_trace_rationale_128",
       "community": 28,
       "norm_label": "record what happened after the confirm (executed / skipped + why)."
+    },
+    {
+      "label": "Record every observe_trade decision, including HOLD and parse failures.",
+      "file_type": "rationale",
+      "source_file": "src/ats/trace.py",
+      "source_location": "L178",
+      "id": "ats_trace_rationale_178",
+      "community": 28,
+      "norm_label": "record every observe_trade decision, including hold and parse failures."
     },
     {
       "label": "config.py",
@@ -3897,7 +3915,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L1",
       "id": "src_ats_ingestion_xvenue_funding_py",
-      "community": 10,
+      "community": 18,
       "norm_label": "xvenue_funding.py"
     },
     {
@@ -3906,7 +3924,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L22",
       "id": "ingestion_xvenue_funding_align_8h",
-      "community": 10,
+      "community": 18,
       "norm_label": "_align_8h()"
     },
     {
@@ -3915,7 +3933,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L28",
       "id": "ingestion_xvenue_funding_fetch_bybit_funding",
-      "community": 10,
+      "community": 18,
       "norm_label": "fetch_bybit_funding()"
     },
     {
@@ -3924,7 +3942,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L43",
       "id": "ingestion_xvenue_funding_fetch_okx_funding",
-      "community": 10,
+      "community": 18,
       "norm_label": "fetch_okx_funding()"
     },
     {
@@ -3933,7 +3951,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L58",
       "id": "ingestion_xvenue_funding_fetch_hyperliquid_funding",
-      "community": 10,
+      "community": 18,
       "norm_label": "fetch_hyperliquid_funding()"
     },
     {
@@ -3942,7 +3960,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L76",
       "id": "ingestion_xvenue_funding_upsert_xvenue",
-      "community": 10,
+      "community": 18,
       "norm_label": "_upsert_xvenue()"
     },
     {
@@ -3951,7 +3969,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L94",
       "id": "ingestion_xvenue_funding_pull_all",
-      "community": 10,
+      "community": 18,
       "norm_label": "pull_all()"
     },
     {
@@ -3960,7 +3978,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L23",
       "id": "ingestion_xvenue_funding_rationale_23",
-      "community": 10,
+      "community": 18,
       "norm_label": "snap a datetime down to the nearest 00/08/16 utc boundary."
     },
     {
@@ -3969,7 +3987,7 @@
       "source_file": "src/ats/ingestion/xvenue_funding.py",
       "source_location": "L99",
       "id": "ingestion_xvenue_funding_rationale_99",
-      "community": 10,
+      "community": 18,
       "norm_label": "fetch and store cross-venue funding for all symbols. non-fatal on per-venue erro"
     },
     {
@@ -5616,7 +5634,7 @@
       "source_file": "src/ats/processing/indicators.py",
       "source_location": "L79",
       "id": "processing_indicators_roc",
-      "community": 134,
+      "community": 26,
       "norm_label": "roc()"
     },
     {
@@ -5634,7 +5652,7 @@
       "source_file": "src/ats/processing/indicators.py",
       "source_location": "L117",
       "id": "processing_indicators_rolling_ols_slope",
-      "community": 47,
+      "community": 37,
       "norm_label": "_rolling_ols_slope()"
     },
     {
@@ -5697,7 +5715,7 @@
       "source_file": "src/ats/processing/indicators.py",
       "source_location": "L80",
       "id": "processing_indicators_rationale_80",
-      "community": 134,
+      "community": 26,
       "norm_label": "rate of change (pandas-ta)."
     },
     {
@@ -5715,7 +5733,7 @@
       "source_file": "src/ats/processing/indicators.py",
       "source_location": "L118",
       "id": "processing_indicators_rationale_118",
-      "community": 47,
+      "community": 37,
       "norm_label": "rolling ols slope using numpy.polyfit over `window` bars (closed='left')."
     },
     {
@@ -7029,7 +7047,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L82",
       "id": "planning_create_plan_prune_missing",
-      "community": 13,
+      "community": 4,
       "norm_label": "_prune_missing()"
     },
     {
@@ -7056,7 +7074,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L136",
       "id": "planning_create_plan_build_envelope",
-      "community": 13,
+      "community": 4,
       "norm_label": "build_envelope()"
     },
     {
@@ -7110,7 +7128,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L83",
       "id": "planning_create_plan_rationale_83",
-      "community": 13,
+      "community": 4,
       "norm_label": "drop feature keys whose value is none or nan before sending to the strategist."
     },
     {
@@ -7137,7 +7155,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L144",
       "id": "planning_create_plan_rationale_144",
-      "community": 13,
+      "community": 4,
       "norm_label": "assemble the json-only context passed to create_plan."
     },
     {
@@ -7200,7 +7218,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L18",
       "id": "execution_reconcile_exitresult",
-      "community": 52,
+      "community": 132,
       "norm_label": "exitresult"
     },
     {
@@ -7416,14 +7434,14 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L32",
       "id": "execution_executor_open_paper_trade",
-      "community": 23,
+      "community": 52,
       "norm_label": "open_paper_trade()"
     },
     {
       "label": "_merge_state()",
       "file_type": "code",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L95",
+      "source_location": "L98",
       "id": "execution_executor_merge_state",
       "community": 131,
       "norm_label": "_merge_state()"
@@ -7432,7 +7450,7 @@
       "label": "record_partial_exit()",
       "file_type": "code",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L102",
+      "source_location": "L105",
       "id": "execution_executor_record_partial_exit",
       "community": 131,
       "norm_label": "record_partial_exit()"
@@ -7441,7 +7459,7 @@
       "label": "update_trade_state()",
       "file_type": "code",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L148",
+      "source_location": "L151",
       "id": "execution_executor_update_trade_state",
       "community": 131,
       "norm_label": "update_trade_state()"
@@ -7450,9 +7468,9 @@
       "label": "close_paper_trade()",
       "file_type": "code",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L159",
+      "source_location": "L162",
       "id": "execution_executor_close_paper_trade",
-      "community": 52,
+      "community": 132,
       "norm_label": "close_paper_trade()"
     },
     {
@@ -7479,15 +7497,15 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L46",
       "id": "execution_executor_rationale_46",
-      "community": 23,
+      "community": 52,
       "norm_label": "insert an open paper trade for a detected+confirmed+risk-approved setup.      ``"
     },
     {
       "label": "Persist updated exit state into ``trade_metadata`` (preserving other keys).",
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L96",
-      "id": "execution_executor_rationale_96",
+      "source_location": "L99",
+      "id": "execution_executor_rationale_99",
       "community": 131,
       "norm_label": "persist updated exit state into ``trade_metadata`` (preserving other keys)."
     },
@@ -7495,8 +7513,8 @@
       "label": "Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open.",
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L111",
-      "id": "execution_executor_rationale_111",
+      "source_location": "L114",
+      "id": "execution_executor_rationale_114",
       "community": 131,
       "norm_label": "bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open."
     },
@@ -7504,8 +7522,8 @@
       "label": "Persist a no-fill state change (e.g. a trailing-stop move) for an open trade.",
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L151",
-      "id": "execution_executor_rationale_151",
+      "source_location": "L154",
+      "id": "execution_executor_rationale_154",
       "community": 131,
       "norm_label": "persist a no-fill state change (e.g. a trailing-stop move) for an open trade."
     },
@@ -7513,9 +7531,9 @@
       "label": "Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the",
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L167",
-      "id": "execution_executor_rationale_167",
-      "community": 52,
+      "source_location": "L170",
+      "id": "execution_executor_rationale_170",
+      "community": 132,
       "norm_label": "mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the"
     },
     {
@@ -7650,7 +7668,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L194",
       "id": "db_models_plan",
-      "community": 129,
+      "community": 17,
       "norm_label": "plan"
     },
     {
@@ -7659,7 +7677,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L218",
       "id": "db_models_setup",
-      "community": 129,
+      "community": 4,
       "norm_label": "setup"
     },
     {
@@ -7668,7 +7686,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L253",
       "id": "db_models_papertrade",
-      "community": 129,
+      "community": 17,
       "norm_label": "papertrade"
     },
     {
@@ -7677,7 +7695,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L288",
       "id": "db_models_llmcall",
-      "community": 129,
+      "community": 17,
       "norm_label": "llmcall"
     },
     {
@@ -7686,7 +7704,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L195",
       "id": "db_models_rationale_195",
-      "community": 129,
+      "community": 17,
       "norm_label": "one row per create_plan() output \u2014 the versioned strategic context."
     },
     {
@@ -7695,7 +7713,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L219",
       "id": "db_models_rationale_219",
-      "community": 129,
+      "community": 4,
       "norm_label": "an allowed_setup[] of a plan; inherits plan_id."
     },
     {
@@ -7704,7 +7722,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L254",
       "id": "db_models_rationale_254",
-      "community": 129,
+      "community": 17,
       "norm_label": "executor output \u2014 paper only, never a live order."
     },
     {
@@ -7713,7 +7731,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L289",
       "id": "db_models_rationale_289",
-      "community": 129,
+      "community": 17,
       "norm_label": "audit + cost for each llm invocation (real or mock)."
     },
     {
@@ -7758,7 +7776,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L52",
       "id": "engine_detector_closedtradeinfo",
-      "community": 129,
+      "community": 17,
       "norm_label": "closedtradeinfo"
     },
     {
@@ -7767,7 +7785,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L69",
       "id": "engine_detector_tickreport",
-      "community": 129,
+      "community": 23,
       "norm_label": "tickreport"
     },
     {
@@ -7821,7 +7839,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L128",
       "id": "engine_detector_close_trade",
-      "community": 52,
+      "community": 23,
       "norm_label": "_close_trade()"
     },
     {
@@ -7830,7 +7848,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L187",
       "id": "engine_detector_advance_trade",
-      "community": 52,
+      "community": 23,
       "norm_label": "_advance_trade()"
     },
     {
@@ -7848,14 +7866,14 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L326",
       "id": "engine_detector_observe_and_adjust",
-      "community": 52,
+      "community": 131,
       "norm_label": "_observe_and_adjust()"
     },
     {
       "label": "_handle_invalidation()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L448",
+      "source_location": "L464",
       "id": "engine_detector_handle_invalidation",
       "community": 23,
       "norm_label": "_handle_invalidation()"
@@ -7864,16 +7882,16 @@
       "label": "_confirm_and_execute()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L519",
+      "source_location": "L535",
       "id": "engine_detector_confirm_and_execute",
-      "community": 23,
+      "community": 52,
       "norm_label": "_confirm_and_execute()"
     },
     {
       "label": "evaluate_now()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L695",
+      "source_location": "L711",
       "id": "engine_detector_evaluate_now",
       "community": 23,
       "norm_label": "evaluate_now()"
@@ -7893,7 +7911,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L53",
       "id": "engine_detector_rationale_53",
-      "community": 129,
+      "community": 17,
       "norm_label": "minimal closed-trade data emitted by _close_trade for metrics collection."
     },
     {
@@ -7920,7 +7938,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L137",
       "id": "engine_detector_rationale_137",
-      "community": 52,
+      "community": 23,
       "norm_label": "single close path: record the close, then run the episodic post-mortem.      cen"
     },
     {
@@ -7929,7 +7947,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L197",
       "id": "engine_detector_rationale_197",
-      "community": 52,
+      "community": 23,
       "norm_label": "walk one open trade across a sequence of candles (finer-tf bars or a single bar)"
     },
     {
@@ -7947,15 +7965,15 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L337",
       "id": "engine_detector_rationale_337",
-      "community": 52,
+      "community": 131,
       "norm_label": "consult the observation agent for an open trade; apply a code-clamped adjustment"
     },
     {
       "label": "Evaluate invalidation across the plan's setups. Returns True if plan was killed.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L458",
-      "id": "engine_detector_rationale_458",
+      "source_location": "L474",
+      "id": "engine_detector_rationale_474",
       "community": 23,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed."
     },
@@ -7963,8 +7981,8 @@
       "label": "Run one full evaluation of the active plan against the current feature row.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L707",
-      "id": "engine_detector_rationale_707",
+      "source_location": "L723",
+      "id": "engine_detector_rationale_723",
       "community": 23,
       "norm_label": "run one full evaluation of the active plan against the current feature row."
     },
@@ -7974,7 +7992,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L1",
       "id": "src_ats_engine_timeframes_py",
-      "community": 13,
+      "community": 52,
       "norm_label": "timeframes.py"
     },
     {
@@ -7983,7 +8001,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L11",
       "id": "engine_timeframes_timeframe_to_timedelta",
-      "community": 13,
+      "community": 52,
       "norm_label": "timeframe_to_timedelta()"
     },
     {
@@ -7992,7 +8010,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L1",
       "id": "engine_timeframes_rationale_1",
-      "community": 13,
+      "community": 52,
       "norm_label": "timeframe string \u2192 duration. matches the m1 universe (15m / 1h / 4h)."
     },
     {
@@ -8253,7 +8271,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L144",
       "id": "engine_loop_ensure_plan",
-      "community": 130,
+      "community": 31,
       "norm_label": "_ensure_plan()"
     },
     {
@@ -8271,7 +8289,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L234",
       "id": "engine_loop_run_tick",
-      "community": 130,
+      "community": 31,
       "norm_label": "run_tick()"
     },
     {
@@ -8280,7 +8298,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L266",
       "id": "engine_loop_run_live",
-      "community": 130,
+      "community": 31,
       "norm_label": "run_live()"
     },
     {
@@ -8325,7 +8343,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L153",
       "id": "engine_loop_rationale_153",
-      "community": 130,
+      "community": 31,
       "norm_label": "refresh the plan if there is none, it expired, or the refresh cadence elapsed."
     },
     {
@@ -8343,7 +8361,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L237",
       "id": "engine_loop_rationale_237",
-      "community": 130,
+      "community": 31,
       "norm_label": "single evaluation against the most recent feature row."
     },
     {
@@ -8352,7 +8370,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L276",
       "id": "engine_loop_rationale_276",
-      "community": 130,
+      "community": 31,
       "norm_label": "poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon"
     },
     {
@@ -8568,7 +8586,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L143",
       "id": "risk_manager_regime_allows",
-      "community": 13,
+      "community": 8,
       "norm_label": "regime_allows()"
     },
     {
@@ -8622,7 +8640,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L144",
       "id": "risk_manager_rationale_144",
-      "community": 13,
+      "community": 8,
       "norm_label": "whether a setup's direction is aligned with the current regime.      the losing"
     },
     {
@@ -11925,7 +11943,7 @@
       "source_file": "specs/01-data-collection.md",
       "source_location": "L20",
       "id": "specs_01_data_collection_goal",
-      "community": 55,
+      "community": 129,
       "norm_label": "goal"
     },
     {
@@ -11934,7 +11952,7 @@
       "source_file": "specs/01-data-collection.md",
       "source_location": "L29",
       "id": "specs_01_data_collection_tier_1_behavior_default_0_idle_m1",
-      "community": 55,
+      "community": 129,
       "norm_label": "tier 1 behavior (default, $0 idle \u2014 m1)"
     },
     {
@@ -11943,7 +11961,7 @@
       "source_file": "specs/01-data-collection.md",
       "source_location": "L42",
       "id": "specs_01_data_collection_tier_3_behavior_live_opt_in_m4",
-      "community": 55,
+      "community": 129,
       "norm_label": "tier 3 behavior (live, opt-in \u2014 m4)"
     },
     {
@@ -14044,6 +14062,60 @@
       "norm_label": "code:bash (uv run ats engine run --symbol btcusdt --timeframe 15m --onc)"
     },
     {
+      "label": "Persist updated exit state into ``trade_metadata`` (preserving other keys).",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/executor.py",
+      "source_location": "L96",
+      "community": 131,
+      "norm_label": "persist updated exit state into ``trade_metadata`` (preserving other keys).",
+      "id": "execution_executor_rationale_96"
+    },
+    {
+      "label": "Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open.",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/executor.py",
+      "source_location": "L111",
+      "community": 131,
+      "norm_label": "bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open.",
+      "id": "execution_executor_rationale_111"
+    },
+    {
+      "label": "Persist a no-fill state change (e.g. a trailing-stop move) for an open trade.",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/executor.py",
+      "source_location": "L151",
+      "community": 131,
+      "norm_label": "persist a no-fill state change (e.g. a trailing-stop move) for an open trade.",
+      "id": "execution_executor_rationale_151"
+    },
+    {
+      "label": "Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/executor.py",
+      "source_location": "L167",
+      "community": 132,
+      "norm_label": "mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the",
+      "id": "execution_executor_rationale_167"
+    },
+    {
+      "label": "Evaluate invalidation across the plan's setups. Returns True if plan was killed.",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L458",
+      "community": 23,
+      "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
+      "id": "engine_detector_rationale_458"
+    },
+    {
+      "label": "Run one full evaluation of the active plan against the current feature row.",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L707",
+      "community": 23,
+      "norm_label": "run one full evaluation of the active plan against the current feature row.",
+      "id": "engine_detector_rationale_707"
+    },
+    {
       "label": "test_sizing_capped_by_leverage_lowers_realized_risk()",
       "file_type": "code",
       "source_file": "tests/test_risk.py",
@@ -14129,7 +14201,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L35",
-      "community": 23,
+      "community": 52,
       "norm_label": "insert an open paper trade for a detected+confirmed+risk-approved setup.      ``",
       "id": "execution_executor_rationale_35"
     },
@@ -14156,7 +14228,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L149",
-      "community": 52,
+      "community": 132,
       "norm_label": "mark a trade closed and record realized pnl.",
       "id": "execution_executor_rationale_149"
     },
@@ -14165,7 +14237,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/db/models.py",
       "source_location": "L287",
-      "community": 129,
+      "community": 17,
       "norm_label": "audit + cost for each llm invocation (real or mock).",
       "id": "db_models_rationale_287"
     },
@@ -14192,7 +14264,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L136",
-      "community": 52,
+      "community": 23,
       "norm_label": "single close path: record the close, then run the episodic post-mortem.      cen",
       "id": "engine_detector_rationale_136"
     },
@@ -14201,7 +14273,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L182",
-      "community": 52,
+      "community": 23,
       "norm_label": "walk one open trade across a sequence of candles (finer-tf bars or a single bar)",
       "id": "engine_detector_rationale_182"
     },
@@ -14219,7 +14291,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L322",
-      "community": 52,
+      "community": 131,
       "norm_label": "consult the observation agent for an open trade; apply a code-clamped adjustment",
       "id": "engine_detector_rationale_322"
     },
@@ -14264,7 +14336,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L151",
-      "community": 130,
+      "community": 31,
       "norm_label": "refresh the plan if there is none, it expired, or the refresh cadence elapsed.",
       "id": "engine_loop_rationale_151"
     },
@@ -14282,7 +14354,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L235",
-      "community": 130,
+      "community": 31,
       "norm_label": "single evaluation against the most recent feature row.",
       "id": "engine_loop_rationale_235"
     },
@@ -14291,7 +14363,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L274",
-      "community": 130,
+      "community": 31,
       "norm_label": "poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon",
       "id": "engine_loop_rationale_274"
     },
@@ -14318,7 +14390,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L86",
-      "community": 13,
+      "community": 8,
       "norm_label": "whether a setup's direction is aligned with the current regime.      the losing",
       "id": "risk_manager_rationale_86"
     },
@@ -14390,7 +14462,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L133",
-      "community": 52,
+      "community": 23,
       "norm_label": "single close path: record the close, then run the episodic post-mortem.      cen",
       "id": "engine_detector_rationale_133"
     },
@@ -14399,7 +14471,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L176",
-      "community": 52,
+      "community": 23,
       "norm_label": "walk one open trade across a sequence of candles (finer-tf bars or a single bar)",
       "id": "engine_detector_rationale_176"
     },
@@ -14417,7 +14489,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L316",
-      "community": 52,
+      "community": 131,
       "norm_label": "consult the observation agent for an open trade; apply a code-clamped adjustment",
       "id": "engine_detector_rationale_316"
     },
@@ -14462,7 +14534,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L145",
-      "community": 130,
+      "community": 31,
       "norm_label": "refresh the plan if there is none, it expired, or the refresh cadence elapsed.",
       "id": "engine_loop_rationale_145"
     },
@@ -14480,7 +14552,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L229",
-      "community": 130,
+      "community": 31,
       "norm_label": "single evaluation against the most recent feature row.",
       "id": "engine_loop_rationale_229"
     },
@@ -14489,7 +14561,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L268",
-      "community": 130,
+      "community": 31,
       "norm_label": "poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon",
       "id": "engine_loop_rationale_268"
     },
@@ -17371,9 +17443,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L63",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_py",
-      "target": "tests_test_risk_test_sizing_capped_by_margin_and_leverage_lowers_realized_risk",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_test_sizing_capped_by_margin_and_leverage_lowers_realized_risk"
     },
     {
       "relation": "contains",
@@ -17391,9 +17463,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_py",
-      "target": "tests_test_risk_test_sizing_caps_unsafe_leverage_inside_liquidation",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_test_sizing_caps_unsafe_leverage_inside_liquidation"
     },
     {
       "relation": "contains",
@@ -17471,9 +17543,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_py",
-      "target": "tests_test_risk_test_total_margin_heat_rejects_when_exhausted",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_test_total_margin_heat_rejects_when_exhausted"
     },
     {
       "relation": "contains",
@@ -17481,9 +17553,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L150",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_py",
-      "target": "tests_test_risk_test_portfolio_risk_heat_rejects_when_exhausted",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_test_portfolio_risk_heat_rejects_when_exhausted"
     },
     {
       "relation": "contains",
@@ -17491,9 +17563,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_py",
-      "target": "tests_test_risk_test_scalper_tight_stop_caps_near_600_notional",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_test_scalper_tight_stop_caps_near_600_notional"
     },
     {
       "relation": "contains",
@@ -17648,9 +17720,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L140",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_test_total_margin_heat_rejects_when_exhausted",
-      "target": "tests_test_risk_assess",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_assess"
     },
     {
       "relation": "calls",
@@ -17659,9 +17731,9 @@
       "source_file": "tests/test_risk.py",
       "source_location": "L151",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_risk_test_portfolio_risk_heat_rejects_when_exhausted",
-      "target": "tests_test_risk_assess",
-      "confidence_score": 1.0
+      "target": "tests_test_risk_assess"
     },
     {
       "relation": "calls",
@@ -19364,9 +19436,9 @@
       "source_file": "tests/test_executor_pnl.py",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_executor_pnl_py",
-      "target": "tests_test_executor_pnl_test_margin_close_values_profit",
-      "confidence_score": 1.0
+      "target": "tests_test_executor_pnl_test_margin_close_values_profit"
     },
     {
       "relation": "contains",
@@ -19374,9 +19446,9 @@
       "source_file": "tests/test_executor_pnl.py",
       "source_location": "L18",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_executor_pnl_py",
-      "target": "tests_test_executor_pnl_test_margin_close_values_loss",
-      "confidence_score": 1.0
+      "target": "tests_test_executor_pnl_test_margin_close_values_loss"
     },
     {
       "relation": "rationale_for",
@@ -19384,9 +19456,9 @@
       "source_file": "tests/test_executor_pnl.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_executor_pnl_rationale_1",
-      "target": "tests_test_executor_pnl_py",
-      "confidence_score": 1.0
+      "target": "tests_test_executor_pnl_py"
     },
     {
       "relation": "calls",
@@ -21508,9 +21580,9 @@
       "source_file": "alembic/versions/0006_margin_notional.py",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "alembic_versions_0006_margin_notional_py",
-      "target": "versions_0006_margin_notional_upgrade",
-      "confidence_score": 1.0
+      "target": "versions_0006_margin_notional_upgrade"
     },
     {
       "relation": "contains",
@@ -21518,9 +21590,9 @@
       "source_file": "alembic/versions/0006_margin_notional.py",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "alembic_versions_0006_margin_notional_py",
-      "target": "versions_0006_margin_notional_downgrade",
-      "confidence_score": 1.0
+      "target": "versions_0006_margin_notional_downgrade"
     },
     {
       "relation": "contains",
@@ -21677,6 +21749,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/trace.py",
+      "source_location": "L161",
+      "weight": 1.0,
+      "source": "src_ats_trace_py",
+      "target": "ats_trace_observe",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/trace.py",
       "source_location": "L151",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -21763,6 +21845,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/trace.py",
+      "source_location": "L181",
+      "weight": 1.0,
+      "source": "ats_trace_observe",
+      "target": "ats_trace_w",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/trace.py",
       "source_location": "L161",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -21807,6 +21900,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/trace.py",
+      "source_location": "L184",
+      "weight": 1.0,
+      "source": "ats_trace_observe",
+      "target": "ats_trace_ts",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/trace.py",
       "source_location": "L162",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -21845,6 +21949,17 @@
       "confidence_score": 1.0,
       "source": "ats_trace_trade_opened",
       "target": "ats_trace_sid"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/trace.py",
+      "source_location": "L184",
+      "weight": 1.0,
+      "source": "ats_trace_observe",
+      "target": "ats_trace_sid",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -21906,6 +22021,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/trace.py",
+      "source_location": "L182",
+      "weight": 1.0,
+      "source": "ats_trace_observe",
+      "target": "ats_trace_num",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/trace.py",
       "source_location": "L94",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -21941,6 +22067,16 @@
       "confidence_score": 1.0,
       "source": "ats_trace_rationale_128",
       "target": "ats_trace_outcome"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/trace.py",
+      "source_location": "L178",
+      "weight": 1.0,
+      "source": "ats_trace_rationale_178",
+      "target": "ats_trace_observe",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -21988,9 +22124,9 @@
       "source_file": "src/ats/strategy_profiles.py",
       "source_location": "L48",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ats_strategy_profiles_rationale_48",
-      "target": "ats_strategy_profiles_apply_profile",
-      "confidence_score": 1.0
+      "target": "ats_strategy_profiles_apply_profile"
     },
     {
       "relation": "calls",
@@ -23748,9 +23884,9 @@
       "source_file": "src/ats/llm/prompts.py",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_prompts_rationale_237",
-      "target": "llm_prompts_user_message",
-      "confidence_score": 1.0
+      "target": "llm_prompts_user_message"
     },
     {
       "relation": "rationale_for",
@@ -26221,9 +26357,9 @@
       "source_file": "src/ats/cli_commands/engine.py",
       "source_location": "L190",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cli_commands_engine_rationale_190",
-      "target": "cli_commands_engine_tick",
-      "confidence_score": 1.0
+      "target": "cli_commands_engine_tick"
     },
     {
       "relation": "rationale_for",
@@ -26262,9 +26398,9 @@
       "source_file": "src/ats/cli_commands/engine.py",
       "source_location": "L214",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cli_commands_engine_rationale_214",
-      "target": "cli_commands_engine_invalidate_check",
-      "confidence_score": 1.0
+      "target": "cli_commands_engine_invalidate_check"
     },
     {
       "relation": "rationale_for",
@@ -26292,9 +26428,9 @@
       "source_file": "src/ats/cli_commands/engine.py",
       "source_location": "L256",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cli_commands_engine_rationale_256",
-      "target": "cli_commands_engine_run",
-      "confidence_score": 1.0
+      "target": "cli_commands_engine_run"
     },
     {
       "relation": "rationale_for",
@@ -26383,9 +26519,9 @@
       "source_file": "src/ats/cli_commands/trades.py",
       "source_location": "L111",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "cli_commands_trades_rationale_111",
-      "target": "cli_commands_trades_stats",
-      "confidence_score": 1.0
+      "target": "cli_commands_trades_stats"
     },
     {
       "relation": "rationale_for",
@@ -27411,9 +27547,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L283",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_283",
-      "target": "planning_create_plan_create_plan",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_create_plan"
     },
     {
       "relation": "calls",
@@ -27962,9 +28098,9 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L23",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_execution_executor_py",
-      "target": "execution_executor_margin_close_values",
-      "confidence_score": 1.0
+      "target": "execution_executor_margin_close_values"
     },
     {
       "relation": "contains",
@@ -28033,9 +28169,9 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L185",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "execution_executor_close_paper_trade",
-      "target": "execution_executor_margin_close_values",
-      "confidence_score": 1.0
+      "target": "execution_executor_margin_close_values"
     },
     {
       "relation": "rationale_for",
@@ -28043,9 +28179,9 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L26",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "execution_executor_rationale_26",
-      "target": "execution_executor_margin_close_values",
-      "confidence_score": 1.0
+      "target": "execution_executor_margin_close_values"
     },
     {
       "relation": "rationale_for",
@@ -28053,9 +28189,9 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L46",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "execution_executor_rationale_46",
-      "target": "execution_executor_open_paper_trade",
-      "confidence_score": 1.0
+      "target": "execution_executor_open_paper_trade"
     },
     {
       "relation": "calls",
@@ -28104,11 +28240,21 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L96",
+      "source_location": "L99",
       "weight": 1.0,
-      "source": "execution_executor_rationale_96",
+      "source": "execution_executor_rationale_99",
       "target": "execution_executor_merge_state",
       "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/executor.py",
+      "source_location": "L96",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "execution_executor_rationale_96",
+      "target": "execution_executor_merge_state"
     },
     {
       "relation": "rationale_for",
@@ -28124,9 +28270,9 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L111",
+      "source_location": "L114",
       "weight": 1.0,
-      "source": "execution_executor_rationale_111",
+      "source": "execution_executor_rationale_114",
       "target": "execution_executor_record_partial_exit",
       "confidence_score": 1.0
     },
@@ -28156,6 +28302,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/executor.py",
+      "source_location": "L111",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "execution_executor_rationale_111",
+      "target": "execution_executor_record_partial_exit"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/executor.py",
       "source_location": "L96",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -28166,9 +28322,9 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L151",
+      "source_location": "L154",
       "weight": 1.0,
-      "source": "execution_executor_rationale_151",
+      "source": "execution_executor_rationale_154",
       "target": "execution_executor_update_trade_state",
       "confidence_score": 1.0
     },
@@ -28209,6 +28365,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/executor.py",
+      "source_location": "L151",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "execution_executor_rationale_151",
+      "target": "execution_executor_update_trade_state"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/executor.py",
       "source_location": "L133",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -28219,9 +28385,9 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/executor.py",
-      "source_location": "L167",
+      "source_location": "L170",
       "weight": 1.0,
-      "source": "execution_executor_rationale_167",
+      "source": "execution_executor_rationale_170",
       "target": "execution_executor_close_paper_trade",
       "confidence_score": 1.0
     },
@@ -28234,6 +28400,16 @@
       "source_location": "L138",
       "weight": 1.0,
       "source": "engine_detector_close_trade",
+      "target": "execution_executor_close_paper_trade"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/executor.py",
+      "source_location": "L167",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "execution_executor_rationale_167",
       "target": "execution_executor_close_paper_trade"
     },
     {
@@ -28662,9 +28838,9 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L289",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "db_models_rationale_289",
-      "target": "db_models_llmcall",
-      "confidence_score": 1.0
+      "target": "db_models_llmcall"
     },
     {
       "relation": "uses",
@@ -29033,9 +29209,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L89",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_89",
-      "target": "engine_detector_clamp_tightened_stop",
-      "confidence_score": 1.0
+      "target": "engine_detector_clamp_tightened_stop"
     },
     {
       "relation": "rationale_for",
@@ -29074,9 +29250,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_100",
-      "target": "engine_detector_clamp_extended_tp",
-      "confidence_score": 1.0
+      "target": "engine_detector_clamp_extended_tp"
     },
     {
       "relation": "rationale_for",
@@ -29170,9 +29346,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L137",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_137",
-      "target": "engine_detector_close_trade",
-      "confidence_score": 1.0
+      "target": "engine_detector_close_trade"
     },
     {
       "relation": "rationale_for",
@@ -29222,9 +29398,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L197",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_197",
-      "target": "engine_detector_advance_trade",
-      "confidence_score": 1.0
+      "target": "engine_detector_advance_trade"
     },
     {
       "relation": "rationale_for",
@@ -29263,9 +29439,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L318",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_318",
-      "target": "engine_detector_reconcile_open_trades",
-      "confidence_score": 1.0
+      "target": "engine_detector_reconcile_open_trades"
     },
     {
       "relation": "rationale_for",
@@ -29293,9 +29469,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L337",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_337",
-      "target": "engine_detector_observe_and_adjust",
-      "confidence_score": 1.0
+      "target": "engine_detector_observe_and_adjust"
     },
     {
       "relation": "rationale_for",
@@ -29332,9 +29508,9 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L458",
+      "source_location": "L474",
       "weight": 1.0,
-      "source": "engine_detector_rationale_458",
+      "source": "engine_detector_rationale_474",
       "target": "engine_detector_handle_invalidation",
       "confidence_score": 1.0
     },
@@ -29348,6 +29524,16 @@
       "weight": 1.0,
       "source": "engine_detector_handle_invalidation",
       "target": "engine_invalidation_evaluate_invalidation"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L458",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_458",
+      "target": "engine_detector_handle_invalidation"
     },
     {
       "relation": "rationale_for",
@@ -29406,9 +29592,9 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L707",
+      "source_location": "L723",
       "weight": 1.0,
-      "source": "engine_detector_rationale_707",
+      "source": "engine_detector_rationale_723",
       "target": "engine_detector_evaluate_now",
       "confidence_score": 1.0
     },
@@ -29454,6 +29640,16 @@
       "source_location": "L248",
       "weight": 1.0,
       "source": "engine_loop_run_tick",
+      "target": "engine_detector_evaluate_now"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L707",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_707",
       "target": "engine_detector_evaluate_now"
     },
     {
@@ -29945,9 +30141,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L69",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_69",
-      "target": "engine_loop_replayreport_finalise",
-      "confidence_score": 1.0
+      "target": "engine_loop_replayreport_finalise"
     },
     {
       "relation": "rationale_for",
@@ -29997,9 +30193,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L125",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_125",
-      "target": "engine_loop_record_notes",
-      "confidence_score": 1.0
+      "target": "engine_loop_record_notes"
     },
     {
       "relation": "rationale_for",
@@ -30049,9 +30245,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L153",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_153",
-      "target": "engine_loop_ensure_plan",
-      "confidence_score": 1.0
+      "target": "engine_loop_ensure_plan"
     },
     {
       "relation": "rationale_for",
@@ -30079,9 +30275,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L178",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_178",
-      "target": "engine_loop_run_replay",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_replay"
     },
     {
       "relation": "rationale_for",
@@ -30120,9 +30316,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_237",
-      "target": "engine_loop_run_tick",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_tick"
     },
     {
       "relation": "rationale_for",
@@ -30150,9 +30346,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L276",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_276",
-      "target": "engine_loop_run_live",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_live"
     },
     {
       "relation": "rationale_for",
@@ -30387,9 +30583,9 @@
       "source_file": "src/ats/engine/state.py",
       "source_location": "L168",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_state_rationale_168",
-      "target": "engine_state_supersede_active_plan",
-      "confidence_score": 1.0
+      "target": "engine_state_supersede_active_plan"
     },
     {
       "relation": "rationale_for",
@@ -30447,9 +30643,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_risk_manager_py",
-      "target": "risk_manager_open_margin_usd",
-      "confidence_score": 1.0
+      "target": "risk_manager_open_margin_usd"
     },
     {
       "relation": "contains",
@@ -30457,9 +30653,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L139",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_risk_manager_py",
-      "target": "risk_manager_open_risk_usd",
-      "confidence_score": 1.0
+      "target": "risk_manager_open_risk_usd"
     },
     {
       "relation": "contains",
@@ -30550,9 +30746,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L60",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "risk_manager_rationale_60",
-      "target": "risk_manager_size_for_risk",
-      "confidence_score": 1.0
+      "target": "risk_manager_size_for_risk"
     },
     {
       "relation": "calls",
@@ -30593,9 +30789,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L232",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "risk_manager_assess",
-      "target": "risk_manager_open_margin_usd",
-      "confidence_score": 1.0
+      "target": "risk_manager_open_margin_usd"
     },
     {
       "relation": "calls",
@@ -30604,9 +30800,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L233",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "risk_manager_assess",
-      "target": "risk_manager_open_risk_usd",
-      "confidence_score": 1.0
+      "target": "risk_manager_open_risk_usd"
     },
     {
       "relation": "rationale_for",
@@ -30614,9 +30810,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L144",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "risk_manager_rationale_144",
-      "target": "risk_manager_regime_allows",
-      "confidence_score": 1.0
+      "target": "risk_manager_regime_allows"
     },
     {
       "relation": "rationale_for",
@@ -30645,9 +30841,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L165",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "risk_manager_rationale_165",
-      "target": "risk_manager_reward_risk",
-      "confidence_score": 1.0
+      "target": "risk_manager_reward_risk"
     },
     {
       "relation": "rationale_for",
@@ -30665,9 +30861,9 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L196",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "risk_manager_rationale_196",
-      "target": "risk_manager_assess",
-      "confidence_score": 1.0
+      "target": "risk_manager_assess"
     },
     {
       "relation": "rationale_for",
@@ -36901,5 +37097,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0d4cf4583e340d2896a842aae654246720b40d74"
+  "built_at_commit": "4c3b2d450079d2c50a05354856717da799dbcb3e"
 }
