@@ -8,10 +8,23 @@ raw price prose — and must answer with JSON matching the Pydantic schema.
 
 from __future__ import annotations
 
+import functools
 import json
+from pathlib import Path
 from typing import Any
 
 from ats.config import settings
+
+
+@functools.lru_cache(maxsize=1)
+def _strategy_catalog() -> str:
+    """Load the named-setup reference catalog (read once; constant across calls).
+
+    Co-located with this module so it resolves regardless of cwd and ships with the
+    package. Caching keeps it part of the stable cacheable system-prompt prefix and
+    avoids per-call I/O.
+    """
+    return Path(__file__).with_name("strategies.md").read_text(encoding="utf-8").strip()
 
 # The rule grammar shared by hard/soft/invalidation rules. Kept terse and explicit
 # so the model emits rules the deterministic engine can evaluate without ambiguity.
@@ -124,6 +137,10 @@ Rules:
   higher-timeframe trend and avoid fighting it. All hard_rules, soft_rules, and
   invalidation_rules MUST reference base-timeframe features only (rsi_14, ema_50, atr_14,
   price, …) — NEVER higher-timeframe values.
+
+SETUP REFERENCE (use to choose market_bias and place entry_zone/stop; executable rules still
+reference features only, never a setup name):
+{_strategy_catalog()}
 
 You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.
 The object must exactly match this schema:
