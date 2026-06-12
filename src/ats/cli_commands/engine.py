@@ -112,15 +112,26 @@ def replay(
         help="Delete existing paper_trades for this symbol before replaying "
         "(clears stale open positions and prior-run P&L).",
     ),
+    run_label: str = typer.Option(
+        None,
+        "--run-label",
+        help="Human tag for this run (e.g. baseline, mfe-on). Trades are tagged with a "
+        "unique run_id + this label + a config hash for the A/B harness "
+        "(see 'ats trades runs' / 'ats trades compare').",
+    ),
 ) -> None:
     """Replay the full loop over historical features (the primary POC demo)."""
+    import hashlib
+    import json
     from pathlib import Path
+    from uuid import uuid4
 
     from sqlalchemy import text
 
     from ats import trace
     from ats.config import settings
     from ats.engine.loop import run_replay
+    from ats.execution.executor import RunTag
     from ats.strategy_profiles import apply_profile
 
     from_dt = _parse_dt(from_)
@@ -132,6 +143,36 @@ def replay(
         applied = apply_profile(profile)
     except (KeyError, AttributeError) as exc:
         raise typer.BadParameter(str(exc)) from exc
+    # Build the run tag AFTER the profile is applied: hash the behavior-affecting knobs so
+    # two runs with identical config share a config_hash, and a knob change is visible.
+    behavior_knobs = {
+        "profile": profile,
+        "symbol": symbol,
+        "timeframe": timeframe,
+        "max_leverage": settings.max_leverage,
+        "risk_per_trade_pct": settings.risk_per_trade_pct,
+        "min_rr": settings.min_rr,
+        "min_stop_atr_mult": settings.min_stop_atr_mult,
+        "max_hold_bars": settings.max_hold_bars,
+        "scale_out_frac": settings.scale_out_frac,
+        "trail_atr_mult": settings.trail_atr_mult,
+        "early_stop_mode": settings.early_stop_mode,
+        "early_trail_arm_atr": settings.early_trail_arm_atr,
+        "early_trail_atr_mult": settings.early_trail_atr_mult,
+        "breakeven_arm_atr": settings.breakeven_arm_atr,
+        "regime_filter": settings.regime_filter,
+        "fee_bps": settings.fee_bps,
+        "slippage_bps": settings.slippage_bps,
+    }
+    config_hash = hashlib.sha256(
+        json.dumps(behavior_knobs, sort_keys=True, default=str).encode()
+    ).hexdigest()[:12]
+    run = RunTag(run_id=uuid4().hex, run_label=run_label, config_hash=config_hash)
+    console.print(
+        f"[bold green]run[/bold green] id={run.run_id[:8]} "
+        f"label={run_label or '-'} config={config_hash}"
+    )
+
     if applied:
         knobs = "  ".join(f"{k}={v}" for k, v in applied.items())
         console.print(f"[bold magenta]profile[/bold magenta] {profile}: {knobs}")
@@ -150,7 +191,8 @@ def replay(
         trace.init(path)
         trace.header(
             f"REPLAY  {symbol} {timeframe}  "
-            f"{str(from_dt)[:19]} → {str(to_dt)[:19]}  profile={profile}"
+            f"{str(from_dt)[:19]} → {str(to_dt)[:19]}  profile={profile}  "
+            f"run={run.run_id[:8]} label={run_label or '-'} config={config_hash}"
         )
         console.print(f"[dim]trace -> {path}  (tail -f to watch live)[/dim]")
 
@@ -168,14 +210,29 @@ def replay(
                 await session.commit()
                 console.print(f"[dim]reset: deleted {deleted} paper_trades for {symbol}[/dim]")
             rep = await run_replay(
-                session, client, symbol=symbol, tf=timeframe, since=from_dt, until=to_dt
+                session, client, symbol=symbol, tf=timeframe, since=from_dt, until=to_dt,
+                run=run,
             )
 
-        console.print(
+        # Mirror the end-of-replay summary + trade table into the trace file so the
+        # log captures the same PnL view that's shown on the console.
+        from io import StringIO
+
+        trace_buf = StringIO()
+        trace_console = (
+            Console(file=trace_buf, width=140, no_color=True) if trace.is_active() else None
+        )
+
+        def emit(renderable: Any) -> None:
+            console.print(renderable)
+            if trace_console is not None:
+                trace_console.print(renderable)
+
+        emit(
             f"\n[bold cyan]Replay {symbol} {timeframe}[/bold cyan] "
             f"{str(from_dt)[:19]} → {str(to_dt)[:19]}"
         )
-        console.print(
+        emit(
             f"  bars={rep.bars}  plans={rep.plans_created}  detections={rep.detections}  "
             f"opened={rep.opened}  closed={rep.closed}  invalidations={rep.invalidations}  "
             f"confirm_calls={rep.confirm_calls}  observe_calls={rep.observe_calls}  "
@@ -187,7 +244,7 @@ def replay(
                 if rep.avg_stop_dist_atr is not None
                 else ""
             )
-            console.print(
+            emit(
                 f"  [bold]trade metrics[/bold]  "
                 f"win_rate={rep.win_rate * 100:.0f}%  "
                 f"avg_margin_pnl={rep.avg_pnl_pct * 100:+.3f}%  "
@@ -228,10 +285,13 @@ def replay(
                     f"[{pnl_color}]{oc.pnl_usd:+.2f}[/{pnl_color}]",
                     atr_ratio,
                 )
-            console.print(t)
+            emit(t)
         for note in rep.notes:
-            console.print(f"  [dim]- {note}[/dim]")
-        await _print_trade_summary(symbol, from_dt)
+            emit(f"  [dim]- {note}[/dim]")
+        await _print_trade_summary(symbol, from_dt, emit=emit)
+
+        if trace_console is not None:
+            trace.block(trace_buf.getvalue())
 
     asyncio.run(_run())
 
@@ -342,8 +402,15 @@ def run(
         console.print("\n[dim]stopped.[/dim]")
 
 
-async def _print_trade_summary(symbol: str, since: datetime | None = None) -> None:
+async def _print_trade_summary(
+    symbol: str,
+    since: datetime | None = None,
+    emit: Any = None,
+) -> None:
     from sqlalchemy import text
+
+    if emit is None:
+        emit = console.print
 
     params: dict[str, Any] = {"s": symbol}
     where = "symbol = :s"
@@ -368,7 +435,7 @@ async def _print_trade_summary(symbol: str, since: datetime | None = None) -> No
     wins = rows["wins"] or 0
     win_rate = (wins / closed * 100) if closed else 0.0
     scope = f" (since {str(since)[:19]})" if since is not None else ""
-    console.print(
+    emit(
         f"  trades{scope}: closed={closed} open={rows['open'] or 0} "
         f"win_rate={win_rate:.0f}% avg_margin_pnl={rows['avg_pnl'] or 0} "
         f"pnl_usd=${rows['pnl_usd'] or 0}"

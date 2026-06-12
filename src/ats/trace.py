@@ -70,6 +70,15 @@ def header(title: str) -> None:
     _w("=" * 88)
 
 
+def block(text: str) -> None:
+    """Write a pre-rendered multi-line block verbatim (e.g. the end-of-replay
+    summary and trade table). No-op when the trace is inactive."""
+    if _logger is None:
+        return
+    for line in text.rstrip("\n").splitlines():
+        _w(line)
+
+
 def plan(plan_obj: Any, setups: list[Any]) -> None:
     """Record a freshly created plan and its setups."""
     if _logger is None:

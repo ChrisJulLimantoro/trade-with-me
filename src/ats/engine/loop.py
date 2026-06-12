@@ -19,6 +19,7 @@ from ats.config import settings
 from ats.engine import state
 from ats.engine.detector import ClosedTradeInfo, TickReport, evaluate_now
 from ats.engine.timeframes import timeframe_to_timedelta
+from ats.execution.executor import RunTag, current_run
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.planning.create_plan import create_plan
@@ -175,14 +176,35 @@ async def run_replay(
     tf: str,
     since: datetime,
     until: datetime | None = None,
+    run: RunTag | None = None,
 ) -> ReplayReport:
-    """Walk historical feature rows, running the full loop on each as if live."""
+    """Walk historical feature rows, running the full loop on each as if live.
+
+    ``run`` tags every trade opened during the walk (run_id / run_label / config_hash) so
+    overlapping replay windows stay isolated and A/B-comparable.
+    """
     rows = await state.feature_rows_since(session, symbol, tf, since, until=until)
     report = ReplayReport(symbol=symbol, timeframe=tf)
     if not rows:
         report.notes.append("no feature rows in window")
         return report
 
+    token = current_run.set(run)
+    try:
+        return await _walk_replay(session, client, symbol=symbol, tf=tf, rows=rows, report=report)
+    finally:
+        current_run.reset(token)
+
+
+async def _walk_replay(
+    session: AsyncSession,
+    client: LlmClient,
+    *,
+    symbol: str,
+    tf: str,
+    rows: list,
+    report: ReplayReport,
+) -> ReplayReport:
     bars_since_plan = settings.plan_refresh_bars  # force a plan on the first bar
     active_sticky: str | None = None
     observe_tf = settings.observe_timeframe

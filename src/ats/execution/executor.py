@@ -7,6 +7,8 @@ exchange client here: the system is paper-only by design.
 from __future__ import annotations
 
 import uuid
+from contextvars import ContextVar
+from dataclasses import dataclass
 from datetime import datetime
 from typing import Any
 
@@ -18,6 +20,21 @@ from ats.execution.reconcile import ExitResult, PartialFill, TradeState
 from ats.logging import get_logger
 
 log = get_logger(__name__)
+
+
+@dataclass(frozen=True)
+class RunTag:
+    """Identifies the replay run that opened a trade (for the A/B harness)."""
+
+    run_id: str
+    run_label: str | None = None
+    config_hash: str | None = None
+
+
+# Set by the replay loop around its bar walk; unset (None) for the live/tick path, so live
+# trades persist with NULL run columns. ContextVar keeps the shared executor/detector
+# signatures untouched.
+current_run: ContextVar[RunTag | None] = ContextVar("current_run", default=None)
 
 
 def margin_close_values(
@@ -49,6 +66,7 @@ async def open_paper_trade(
     ``size_pct`` is notional / equity; ``margin_usd`` is committed capital before
     leverage, and ``notional_usd`` is market exposure after leverage.
     """
+    run = current_run.get()
     trade = PaperTrade(
         trade_id=uuid.uuid4(),
         setup_id=setup["setup_id"],
@@ -67,6 +85,9 @@ async def open_paper_trade(
         take_profit=[float(x) for x in setup["take_profit"]],
         status="open",
         reasons=reasons,
+        run_id=run.run_id if run else None,
+        run_label=run.run_label if run else None,
+        config_hash=run.config_hash if run else None,
     )
     session.add(trade)
     await session.flush()

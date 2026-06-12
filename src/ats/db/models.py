@@ -254,7 +254,10 @@ class PaperTrade(Base):
     """Executor output — PAPER only, never a live order."""
 
     __tablename__ = "paper_trades"
-    __table_args__ = (Index("idx_paper_trades_status", "status", "symbol"),)
+    __table_args__ = (
+        Index("idx_paper_trades_status", "status", "symbol"),
+        Index("idx_paper_trades_run", "run_id"),
+    )
 
     trade_id: Mapped[uuid.UUID] = mapped_column(
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
@@ -280,6 +283,10 @@ class PaperTrade(Base):
     pnl_usd: Mapped[float | None] = mapped_column(Numeric, nullable=True)
     status: Mapped[str] = mapped_column(String, nullable=False, default="open")  # open|closed
     reasons: Mapped[list[str]] = mapped_column(ARRAY(Text), nullable=False, default=list)
+    # Run tagging (replay A/B harness). NULL for live/legacy rows.
+    run_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    run_label: Mapped[str | None] = mapped_column(String, nullable=True)
+    config_hash: Mapped[str | None] = mapped_column(String, nullable=True)
     trade_metadata: Mapped[dict[str, object]] = mapped_column(
         "metadata", JSONB, nullable=False, default=dict
     )
