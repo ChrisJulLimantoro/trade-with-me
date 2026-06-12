@@ -18,14 +18,15 @@ from typing import Any
 from sqlalchemy import update
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ats import trace
 from ats.config import settings
 from ats.db.models import LlmCall, Plan, Setup
 from ats.engine import state
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.llm.client import LlmClient
-from ats import trace
 from ats.llm.schemas import InvalidationRule, LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
+from ats.planning.context import build_planner_context
 from ats.risk.manager import regime_allows, reward_risk
 
 log = get_logger(__name__)
@@ -234,6 +235,17 @@ async def build_envelope(
         except Exception as exc:  # noqa: BLE001 — memory is advisory, never block a plan
             log.warning("retrieve_learnings_failed", symbol=symbol, error=str(exc))
 
+    planner_context = await build_planner_context(
+        session,
+        symbol,
+        tf,
+        feature_row,
+        as_of=as_of,
+        regime=regime,
+        recent_candles=candles,
+        higher_timeframes=higher_timeframes,
+    )
+
     return {
         "as_of": as_of,
         "symbol": symbol,
@@ -258,6 +270,7 @@ async def build_envelope(
             "allowed_directions": allowed_directions,
         },
         "prior_lessons": prior_lessons,
+        "planner_context": planner_context,
     }
 
 

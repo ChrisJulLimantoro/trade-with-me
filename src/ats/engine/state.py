@@ -21,7 +21,7 @@ from ats.db.models import Plan, Setup
 # features.* joined with the bar's candle. Selecting f.* keeps us in sync with the
 # schema; the candle columns add price context the rule engine needs.
 _FEATURE_SQL = """
-    SELECT f.*, c.open, c.high, c.low, c.close, c.volume
+    SELECT f.*, c.open, c.high, c.low, c.close, c.volume, c.taker_buy_vol
     FROM features f
     JOIN candles c
       ON c.symbol = f.symbol AND c.timeframe = f.timeframe AND c.open_time = f.open_time
@@ -80,12 +80,30 @@ async def feature_rows_since(
     return [_feature_dict(r) for r in rows]
 
 
+async def recent_feature_rows(
+    session: AsyncSession,
+    symbol: str,
+    tf: str,
+    before_ts: datetime,
+    *,
+    n: int = 50,
+) -> list[dict[str, Any]]:
+    """Recent feature+candle rows up to ``before_ts`` ordered oldest → newest."""
+    sql = _FEATURE_SQL + " AND f.open_time <= :before ORDER BY f.open_time DESC LIMIT :n"
+    rows = (
+        await session.execute(
+            text(sql), {"symbol": symbol, "tf": tf, "before": before_ts, "n": n}
+        )
+    ).mappings().all()
+    return [_feature_dict(r) for r in reversed(rows)]
+
+
 async def recent_candles(
     session: AsyncSession, symbol: str, tf: str, before_ts: datetime, *, n: int = 50
 ) -> list[dict[str, Any]]:
     sql = text(
         """
-        SELECT open_time, open, high, low, close, volume
+        SELECT open_time, open, high, low, close, volume, taker_buy_vol
         FROM candles
         WHERE symbol = :symbol AND timeframe = :tf AND open_time <= :before
         ORDER BY open_time DESC LIMIT :n
@@ -105,7 +123,7 @@ async def candles_between(
 ) -> list[dict[str, Any]]:
     sql = text(
         """
-        SELECT open_time, open, high, low, close, volume
+        SELECT open_time, open, high, low, close, volume, taker_buy_vol
         FROM candles
         WHERE symbol = :symbol AND timeframe = :tf
           AND open_time > :start AND open_time <= :end

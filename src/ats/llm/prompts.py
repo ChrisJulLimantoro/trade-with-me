@@ -149,6 +149,16 @@ Rules:
   - if there is no good retest level, return an EMPTY allowed_setups and wait.
 - Keep reward:risk at or above risk_limits.min_rr. If conditions are unclear,
   return market_bias and an EMPTY allowed_setups list rather than forcing a trade.
+- PLANNER CONTEXT: a "planner_context" object may be present. It is deterministic,
+  interpreted context derived from recent candles/features:
+  - structure: range, swing, support/resistance, ATR-distance, and price-location context.
+  - exhaustion: trend age, EMA distance, RSI/momentum slopes, HTF RSI extremes, squeeze risk.
+  - volume_context: relative volume, taker-flow ratio when available, CVD/price agreement,
+    and breakout-volume quality.
+  - memory_summary: aggregate outcomes from similar prior learning fingerprints. Prefer this
+    compact aggregate over individual prior_lessons when they conflict.
+  Use planner_context to decide whether to stand aside, require a cleaner retest, or place
+  entry/stop/target around actual structure. Do not invent missing planner_context fields.
 - If a "prior_lessons" array is present, it lists structured post-mortems from past trades
   in similar conditions. These are informational hints — NOT mandatory rules. Consider them
   when they point to genuine structural issues (e.g. "stop_too_tight → widen stop"). Ignore
@@ -169,12 +179,13 @@ Rules:
 
 SETUP REFERENCE (use to choose market_bias and place entry_zone/stop; executable rules still
 reference features only, never a setup name):
+{_profile_strategy_addendum()}
+
 {_strategy_catalog()}
 
 You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.
 The object must exactly match this schema:
 {_PLAN_SCHEMA}"""
-# {_profile_strategy_addendum()}
 
 CONFIRM_SYSTEM_PROMPT = f"""\
 You are the tactical reviewer in a crypto perpetuals trading system. A deterministic

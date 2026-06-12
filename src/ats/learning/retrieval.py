@@ -10,6 +10,10 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ats.learning.fingerprint import to_vector_literal
 
 
+def _avg(values: list[float]) -> float | None:
+    return sum(values) / len(values) if values else None
+
+
 async def retrieve_relevant_learnings(
     session: AsyncSession,
     fingerprint: list[float],
@@ -65,3 +69,69 @@ async def retrieve_relevant_learnings(
         )
         category_counts[cat] = category_counts.get(cat, 0) + 1
     return out
+
+
+async def retrieve_memory_summary(
+    session: AsyncSession,
+    fingerprint: list[float],
+    *,
+    k: int = 50,
+    min_confident_count: int = 10,
+) -> dict[str, Any]:
+    """Aggregate nearby learning rows into a compact planner-facing memory signal."""
+    fp = to_vector_literal(fingerprint)
+    rows = (
+        await session.execute(
+            text(
+                "SELECT category, hypothesis, proposed_adjustment, outcome, pnl_pct, "
+                "(fingerprint <=> CAST(:fp AS vector)) AS distance "
+                "FROM learnings "
+                "ORDER BY fingerprint <=> CAST(:fp AS vector) LIMIT :k"
+            ),
+            {"fp": fp, "k": k},
+        )
+    ).mappings().all()
+
+    count = len(rows)
+    pnls = [float(r["pnl_pct"]) for r in rows if r["pnl_pct"] is not None]
+    wins = [
+        r
+        for r in rows
+        if str(r.get("outcome") or "").lower() == "win"
+        or (r["pnl_pct"] is not None and float(r["pnl_pct"]) > 0)
+    ]
+    losses = [
+        r
+        for r in rows
+        if str(r.get("outcome") or "").lower() == "loss"
+        or (r["pnl_pct"] is not None and float(r["pnl_pct"]) < 0)
+    ]
+
+    top_failure: str | None = None
+    lesson: str | None = None
+    if count >= min_confident_count and losses:
+        category_counts: dict[str, int] = {}
+        category_pnl: dict[str, list[float]] = {}
+        for r in losses:
+            cat = str(r["category"])
+            category_counts[cat] = category_counts.get(cat, 0) + 1
+            if r["pnl_pct"] is not None:
+                category_pnl.setdefault(cat, []).append(float(r["pnl_pct"]))
+        top_failure = max(
+            category_counts,
+            key=lambda c: (category_counts[c], -(_avg(category_pnl.get(c, [])) or 0.0)),
+        )
+        for r in losses:
+            if r["category"] == top_failure:
+                lesson = r["proposed_adjustment"] or r["hypothesis"]
+                break
+
+    return {
+        "similar_count": count,
+        "win_rate": (len(wins) / count) if count else None,
+        "avg_pnl_pct": _avg(pnls),
+        "expectancy_pct": _avg(pnls),
+        "top_failure": top_failure,
+        "lesson": lesson,
+        "confidence": "normal" if count >= min_confident_count else "low",
+    }
