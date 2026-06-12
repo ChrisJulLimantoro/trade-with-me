@@ -36,9 +36,15 @@ async def run(
     since: timedelta,
     symbols: list[str],
     timeframes: tuple[str, ...] = TIMEFRAMES,
+    *,
+    start: datetime | None = None,
+    end: datetime | None = None,
 ) -> None:
-    start_ms = _since_ms(since)
-    end_ms = _now_ms()
+    # `start`/`end` override the `since`-relative window for an explicit historical range
+    # (used by replay's auto-backfill). Only the kline fetch is window-bounded; funding / OI
+    # / basis / xvenue below are always "latest/recent" pulls regardless of the window.
+    start_ms = int(start.timestamp() * 1000) if start is not None else _since_ms(since)
+    end_ms = int(end.timestamp() * 1000) if end is not None else _now_ms()
 
     async with httpx.AsyncClient(timeout=30.0) as client:
         for symbol in symbols:

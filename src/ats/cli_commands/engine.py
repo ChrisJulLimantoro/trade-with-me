@@ -3,8 +3,7 @@
 from __future__ import annotations
 
 import asyncio
-import re
-from datetime import datetime, timedelta
+from datetime import UTC, datetime, timedelta
 from typing import Any
 
 import typer
@@ -17,24 +16,82 @@ app = typer.Typer(name="engine", help="Run the rule engine + trade loop.")
 console = Console()
 
 
-def _parse_since(s: str) -> timedelta:
-    """Parse strings like '7d', '120d', '2h', '30m' into timedelta."""
-    m = re.fullmatch(r"(\d+)([dhm])", s.strip())
-    if not m:
-        raise typer.BadParameter(f"Cannot parse duration '{s}'. Use e.g. 7d, 30d, 2h.")
-    n, unit = int(m.group(1)), m.group(2)
-    if unit == "d":
-        return timedelta(days=n)
-    if unit == "h":
-        return timedelta(hours=n)
-    return timedelta(minutes=n)
+def _parse_dt(s: str) -> datetime:
+    """Parse an ISO date ('2026-05-01') or datetime into a UTC-aware datetime."""
+    try:
+        dt = datetime.fromisoformat(s.strip())
+    except ValueError as exc:
+        raise typer.BadParameter(
+            f"Cannot parse date '{s}'. Use ISO format, e.g. 2026-05-01 or "
+            "2026-05-01T12:00:00."
+        ) from exc
+    return dt.replace(tzinfo=UTC) if dt.tzinfo is None else dt.astimezone(UTC)
+
+
+async def _ensure_data(
+    session: Any,
+    symbol: str,
+    timeframe: str,
+    from_dt: datetime,
+    to_dt: datetime,
+) -> None:
+    """Backfill candles + compute features/regimes for [from_dt, to_dt] if not covered.
+
+    Idempotent: skips when the features table already spans the window for this
+    symbol/timeframe; otherwise re-backfills the whole window (upserts on conflict).
+    """
+    from sqlalchemy import text
+
+    from ats.ingestion.backfill import run as ingest_backfill
+    from ats.processing.features import backfill as feature_backfill
+
+    row = (
+        await session.execute(
+            text(
+                "SELECT min(open_time) AS mn, max(open_time) AS mx "
+                "FROM features WHERE symbol=:s AND timeframe=:tf"
+            ),
+            {"s": symbol, "tf": timeframe},
+        )
+    ).mappings().first()
+    mn, mx = (row["mn"], row["mx"]) if row else (None, None)
+    if mn is not None and mn <= from_dt and mx >= to_dt:
+        console.print(f"[dim]data covered for {symbol} {timeframe}; skipping backfill[/dim]")
+        return
+
+    console.print(
+        f"[yellow]backfilling {symbol} {timeframe} "
+        f"{str(from_dt)[:19]} → {str(to_dt)[:19]}…[/yellow]"
+    )
+    # Klines need a 90-day warm-up before from_dt so feature indicators (EMA200/RSI/…)
+    # can be computed for the first bars of the window.
+    await ingest_backfill(
+        session, timedelta(0), [symbol], start=from_dt - timedelta(days=90), end=to_dt
+    )
+    await feature_backfill(session, from_dt, [symbol])
+
+    # Regimes are BTC-1h derived (mirrors `ats process backfill`).
+    if symbol == "BTCUSDT":
+        from ats.processing.features import _fetch_candles
+        from ats.processing.regime import compute_regime, upsert_regime
+
+        btc_df = await _fetch_candles(session, "BTCUSDT", "1h", since=from_dt)
+        if not btc_df.empty and len(btc_df) >= 31:
+            prev_vol: str | None = None
+            for i in range(30, len(btc_df)):
+                regime = compute_regime(btc_df.iloc[: i + 1], prev_volatility=prev_vol)
+                prev_vol = regime["volatility"]
+                await upsert_regime(session, regime)
+
+    await session.commit()
 
 
 @app.command()
 def replay(
     symbol: str = typer.Option("BTCUSDT", "--symbol", help="Symbol."),
     timeframe: str = typer.Option("15m", "--timeframe", help="Timeframe, e.g. 15m, 1h, 4h."),
-    since: str = typer.Option("30d", "--since", help="How far back to replay, e.g. 30d."),
+    from_: str = typer.Option(..., "--from", help="Start date, ISO e.g. 2026-05-01."),
+    to: str = typer.Option(None, "--to", help="End date, ISO. Defaults to now."),
     profile: str = typer.Option(
         "baseline",
         "--profile",
@@ -66,6 +123,11 @@ def replay(
     from ats.engine.loop import run_replay
     from ats.strategy_profiles import apply_profile
 
+    from_dt = _parse_dt(from_)
+    to_dt = _parse_dt(to) if to else datetime.now(UTC)
+    if from_dt >= to_dt:
+        raise typer.BadParameter(f"--from ({from_}) must be before --to ({to or 'now'}).")
+
     try:
         applied = apply_profile(profile)
     except (KeyError, AttributeError) as exc:
@@ -86,28 +148,17 @@ def replay(
         path = log_file or f"logs/replay_{symbol}_{timeframe}_{stamp}.log"
         Path(path).parent.mkdir(parents=True, exist_ok=True)
         trace.init(path)
-        trace.header(f"REPLAY  {symbol} {timeframe}  since {since}  profile={profile}")
+        trace.header(
+            f"REPLAY  {symbol} {timeframe}  "
+            f"{str(from_dt)[:19]} → {str(to_dt)[:19]}  profile={profile}"
+        )
         console.print(f"[dim]trace -> {path}  (tail -f to watch live)[/dim]")
 
     client = get_client()
 
     async def _run() -> None:
         async with SessionLocal() as session:
-            latest = (
-                await session.execute(
-                    text(
-                        "SELECT max(open_time) FROM features WHERE symbol=:s AND timeframe=:tf"
-                    ),
-                    {"s": symbol, "tf": timeframe},
-                )
-            ).scalar()
-            if latest is None:
-                console.print(
-                    f"[red]No features for {symbol} {timeframe}. "
-                    f"Run 'ats process backfill' first.[/red]"
-                )
-                raise typer.Exit(1)
-            since_dt = latest - _parse_since(since)
+            await _ensure_data(session, symbol, timeframe, from_dt, to_dt)
             if reset:
                 deleted = (
                     await session.execute(
@@ -116,10 +167,13 @@ def replay(
                 ).rowcount
                 await session.commit()
                 console.print(f"[dim]reset: deleted {deleted} paper_trades for {symbol}[/dim]")
-            rep = await run_replay(session, client, symbol=symbol, tf=timeframe, since=since_dt)
+            rep = await run_replay(
+                session, client, symbol=symbol, tf=timeframe, since=from_dt, until=to_dt
+            )
 
         console.print(
-            f"\n[bold cyan]Replay {symbol} {timeframe}[/bold cyan] since {str(since_dt)[:19]}"
+            f"\n[bold cyan]Replay {symbol} {timeframe}[/bold cyan] "
+            f"{str(from_dt)[:19]} → {str(to_dt)[:19]}"
         )
         console.print(
             f"  bars={rep.bars}  plans={rep.plans_created}  detections={rep.detections}  "
@@ -177,7 +231,7 @@ def replay(
             console.print(t)
         for note in rep.notes:
             console.print(f"  [dim]- {note}[/dim]")
-        await _print_trade_summary(symbol, since_dt)
+        await _print_trade_summary(symbol, from_dt)
 
     asyncio.run(_run())
 

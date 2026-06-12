@@ -522,7 +522,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L65",
       "id": "tests_test_llm_schemas_test_get_client_returns_mock_by_default",
-      "community": 36,
+      "community": 45,
       "norm_label": "test_get_client_returns_mock_by_default()"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L146",
       "id": "tests_test_llm_schemas_test_mock_confirm_thresholds",
-      "community": 43,
+      "community": 57,
       "norm_label": "test_mock_confirm_thresholds()"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L49",
       "id": "tests_test_episodic_memory_test_vector_literal_format",
-      "community": 13,
+      "community": 138,
       "norm_label": "test_vector_literal_format()"
     },
     {
@@ -711,7 +711,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L57",
       "id": "tests_test_episodic_memory_test_reflection_clean_win",
-      "community": 13,
+      "community": 139,
       "norm_label": "test_reflection_clean_win()"
     },
     {
@@ -720,7 +720,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L64",
       "id": "tests_test_episodic_memory_test_reflection_clean_loss",
-      "community": 13,
+      "community": 139,
       "norm_label": "test_reflection_clean_loss()"
     },
     {
@@ -729,7 +729,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L70",
       "id": "tests_test_episodic_memory_test_reflection_regime_shift_on_invalidation",
-      "community": 13,
+      "community": 139,
       "norm_label": "test_reflection_regime_shift_on_invalidation()"
     },
     {
@@ -1197,7 +1197,7 @@
       "source_file": "tests/test_dead_features.py",
       "source_location": "L118",
       "id": "tests_test_dead_features_test_prune_missing_drops_none_and_nan",
-      "community": 4,
+      "community": 141,
       "norm_label": "test_prune_missing_drops_none_and_nan()"
     },
     {
@@ -1854,7 +1854,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L39",
       "id": "tests_test_detector_entries_queueclient_confirm_setup",
-      "community": 66,
+      "community": 48,
       "norm_label": ".confirm_setup()"
     },
     {
@@ -1971,7 +1971,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L400",
       "id": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
-      "community": 48,
+      "community": 70,
       "norm_label": "test_observer_envelope_includes_hold_and_stagnation_context()"
     },
     {
@@ -2259,7 +2259,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L1",
       "id": "tests_test_htf_context_py",
-      "community": 4,
+      "community": 135,
       "norm_label": "test_htf_context.py"
     },
     {
@@ -2268,7 +2268,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L25",
       "id": "tests_test_htf_context_patch_state",
-      "community": 4,
+      "community": 135,
       "norm_label": "_patch_state()"
     },
     {
@@ -2277,7 +2277,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L62",
       "id": "tests_test_htf_context_test_htf_block_present_for_each_context_tf",
-      "community": 4,
+      "community": 135,
       "norm_label": "test_htf_block_present_for_each_context_tf()"
     },
     {
@@ -2286,7 +2286,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L69",
       "id": "tests_test_htf_context_test_htf_bar_is_already_closed_no_lookahead",
-      "community": 4,
+      "community": 135,
       "norm_label": "test_htf_bar_is_already_closed_no_lookahead()"
     },
     {
@@ -2295,7 +2295,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L84",
       "id": "tests_test_htf_context_test_base_tf_excluded_from_context",
-      "community": 4,
+      "community": 135,
       "norm_label": "test_base_tf_excluded_from_context()"
     },
     {
@@ -2304,7 +2304,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L92",
       "id": "tests_test_htf_context_test_missing_htf_features_skipped_not_fatal",
-      "community": 4,
+      "community": 135,
       "norm_label": "test_missing_htf_features_skipped_not_fatal()"
     },
     {
@@ -2313,7 +2313,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L1",
       "id": "tests_test_htf_context_rationale_1",
-      "community": 4,
+      "community": 135,
       "norm_label": "higher-timeframe context in build_envelope: the look-ahead guard.  a slower-char"
     },
     {
@@ -2322,7 +2322,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L26",
       "id": "tests_test_htf_context_rationale_26",
-      "community": 4,
+      "community": 135,
       "norm_label": "stub the db readers with an in-memory candle store keyed by timeframe.      each"
     },
     {
@@ -2925,7 +2925,7 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L223",
       "id": "tests_test_step_trade_test_breakeven_stop_covers_costs",
-      "community": 19,
+      "community": 130,
       "norm_label": "test_breakeven_stop_covers_costs()"
     },
     {
@@ -3042,7 +3042,7 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L361",
       "id": "tests_test_step_trade_test_regime_gate",
-      "community": 4,
+      "community": 137,
       "norm_label": "test_regime_gate()"
     },
     {
@@ -3260,6 +3260,51 @@
       "id": "tests_test_funding_divergence_rationale_58",
       "community": 18,
       "norm_label": "exactly 2 peers (threshold is >= 2) \u2192 should compute."
+    },
+    {
+      "label": "test_replay_ensure_data.py",
+      "file_type": "code",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L1",
+      "id": "tests_test_replay_ensure_data_py",
+      "community": 140,
+      "norm_label": "test_replay_ensure_data.py"
+    },
+    {
+      "label": "_session_with_coverage()",
+      "file_type": "code",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L14",
+      "id": "tests_test_replay_ensure_data_session_with_coverage",
+      "community": 140,
+      "norm_label": "_session_with_coverage()"
+    },
+    {
+      "label": "test_skips_backfill_when_window_covered()",
+      "file_type": "code",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L24",
+      "id": "tests_test_replay_ensure_data_test_skips_backfill_when_window_covered",
+      "community": 140,
+      "norm_label": "test_skips_backfill_when_window_covered()"
+    },
+    {
+      "label": "test_triggers_backfill_when_uncovered()",
+      "file_type": "code",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L41",
+      "id": "tests_test_replay_ensure_data_test_triggers_backfill_when_uncovered",
+      "community": 140,
+      "norm_label": "test_triggers_backfill_when_uncovered()"
+    },
+    {
+      "label": "`_ensure_data` (replay auto-backfill) triggers backfill only when the window is",
+      "file_type": "rationale",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L1",
+      "id": "tests_test_replay_ensure_data_rationale_1",
+      "community": 140,
+      "norm_label": "`_ensure_data` (replay auto-backfill) triggers backfill only when the window is"
     },
     {
       "label": "test_features_idempotency.py",
@@ -4941,7 +4986,7 @@
       "source_file": "src/ats/llm/client.py",
       "source_location": "L232",
       "id": "llm_client_get_client",
-      "community": 36,
+      "community": 45,
       "norm_label": "get_client()"
     },
     {
@@ -4977,7 +5022,7 @@
       "source_file": "src/ats/llm/client.py",
       "source_location": "L233",
       "id": "llm_client_rationale_233",
-      "community": 36,
+      "community": 45,
       "norm_label": "return the mock unless real openai calls are explicitly enabled with a key."
     },
     {
@@ -5058,7 +5103,7 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L201",
       "id": "llm_mock_data_canned_reflection",
-      "community": 13,
+      "community": 139,
       "norm_label": "canned_reflection()"
     },
     {
@@ -5112,7 +5157,7 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L202",
       "id": "llm_mock_data_rationale_202",
-      "community": 13,
+      "community": 139,
       "norm_label": "deterministic post-mortem from the closed trade's exit_reason + pnl.      accept"
     },
     {
@@ -5265,7 +5310,7 @@
       "source_file": "",
       "source_location": "",
       "id": "basemodel",
-      "community": 43,
+      "community": 53,
       "norm_label": "basemodel"
     },
     {
@@ -5274,7 +5319,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L105",
       "id": "llm_schemas_invalidationrule",
-      "community": 43,
+      "community": 53,
       "norm_label": "invalidationrule"
     },
     {
@@ -5310,7 +5355,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L148",
       "id": "llm_schemas_planoutput",
-      "community": 43,
+      "community": 53,
       "norm_label": "planoutput"
     },
     {
@@ -5481,7 +5526,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L106",
       "id": "llm_schemas_rationale_106",
-      "community": 43,
+      "community": 53,
       "norm_label": "a condition that, when true, degrades or kills a plan/setup.      ``on_close`` r"
     },
     {
@@ -5508,7 +5553,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L149",
       "id": "llm_schemas_rationale_149",
-      "community": 43,
+      "community": 53,
       "norm_label": "the full create_plan result."
     },
     {
@@ -6255,7 +6300,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L1",
       "id": "src_ats_learning_post_mortem_py",
-      "community": 13,
+      "community": 138,
       "norm_label": "post_mortem.py"
     },
     {
@@ -6264,7 +6309,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L26",
       "id": "learning_post_mortem_outcome",
-      "community": 13,
+      "community": 138,
       "norm_label": "_outcome()"
     },
     {
@@ -6273,7 +6318,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L30",
       "id": "learning_post_mortem_reflect_and_store",
-      "community": 13,
+      "community": 138,
       "norm_label": "reflect_and_store()"
     },
     {
@@ -6282,7 +6327,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L1",
       "id": "learning_post_mortem_rationale_1",
-      "community": 13,
+      "community": 138,
       "norm_label": "post-mortem: on a closed trade, write one structured ``learning`` row.  called f"
     },
     {
@@ -6291,7 +6336,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L36",
       "id": "learning_post_mortem_rationale_36",
-      "community": 13,
+      "community": 138,
       "norm_label": "run the post-mortem for ``trade`` and persist a learning + audit row."
     },
     {
@@ -6345,7 +6390,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L66",
       "id": "learning_fingerprint_to_vector_literal",
-      "community": 13,
+      "community": 138,
       "norm_label": "to_vector_literal()"
     },
     {
@@ -6381,7 +6426,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L67",
       "id": "learning_fingerprint_rationale_67",
-      "community": 13,
+      "community": 138,
       "norm_label": "render a fingerprint as a pgvector text literal, e.g. ``[0.1,0.2,...]``."
     },
     {
@@ -6408,7 +6453,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L1",
       "id": "src_ats_learning_retrieval_py",
-      "community": 13,
+      "community": 137,
       "norm_label": "retrieval.py"
     },
     {
@@ -6417,7 +6462,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L13",
       "id": "learning_retrieval_retrieve_relevant_learnings",
-      "community": 13,
+      "community": 137,
       "norm_label": "retrieve_relevant_learnings()"
     },
     {
@@ -6426,7 +6471,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L1",
       "id": "learning_retrieval_rationale_1",
-      "community": 13,
+      "community": 137,
       "norm_label": "retrieve the most-similar prior learnings for a setup (cosine over the fingerpri"
     },
     {
@@ -6435,7 +6480,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L21",
       "id": "learning_retrieval_rationale_21",
-      "community": 13,
+      "community": 137,
       "norm_label": "top-k learnings nearest to ``fingerprint`` by cosine distance.      ``direction`"
     },
     {
@@ -6498,7 +6543,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L1",
       "id": "src_ats_cli_commands_plan_py",
-      "community": 36,
+      "community": 129,
       "norm_label": "plan.py"
     },
     {
@@ -6507,7 +6552,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L23",
       "id": "cli_commands_plan_create",
-      "community": 36,
+      "community": 129,
       "norm_label": "create()"
     },
     {
@@ -6516,7 +6561,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L65",
       "id": "cli_commands_plan_show",
-      "community": 36,
+      "community": 129,
       "norm_label": "show()"
     },
     {
@@ -6525,7 +6570,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L111",
       "id": "cli_commands_plan_setups",
-      "community": 36,
+      "community": 129,
       "norm_label": "setups()"
     },
     {
@@ -6534,7 +6579,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L138",
       "id": "cli_commands_plan_detail",
-      "community": 36,
+      "community": 129,
       "norm_label": "detail()"
     },
     {
@@ -6543,7 +6588,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L208",
       "id": "cli_commands_plan_fmt_rule",
-      "community": 36,
+      "community": 129,
       "norm_label": "_fmt_rule()"
     },
     {
@@ -6552,7 +6597,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L220",
       "id": "cli_commands_plan_print_rules",
-      "community": 36,
+      "community": 129,
       "norm_label": "_print_rules()"
     },
     {
@@ -6561,7 +6606,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L236",
       "id": "cli_commands_plan_print_trades",
-      "community": 36,
+      "community": 129,
       "norm_label": "_print_trades()"
     },
     {
@@ -6570,7 +6615,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L263",
       "id": "cli_commands_plan_print_setups",
-      "community": 36,
+      "community": 129,
       "norm_label": "_print_setups()"
     },
     {
@@ -6579,7 +6624,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L1",
       "id": "cli_commands_plan_rationale_1",
-      "community": 36,
+      "community": 129,
       "norm_label": "cli: ats plan \u2014 create and inspect llm trading plans."
     },
     {
@@ -6588,7 +6633,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L28",
       "id": "cli_commands_plan_rationale_28",
-      "community": 36,
+      "community": 129,
       "norm_label": "run one create_plan cycle and persist the plan + setups."
     },
     {
@@ -6597,7 +6642,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L114",
       "id": "cli_commands_plan_rationale_114",
-      "community": 36,
+      "community": 129,
       "norm_label": "show the setups for a plan."
     },
     {
@@ -6606,7 +6651,7 @@
       "source_file": "src/ats/cli_commands/plan.py",
       "source_location": "L141",
       "id": "cli_commands_plan_rationale_141",
-      "community": 36,
+      "community": 129,
       "norm_label": "show full detail for a single plan: header, rationale, setups + rules, and its t"
     },
     {
@@ -6826,19 +6871,28 @@
       "norm_label": "engine.py"
     },
     {
-      "label": "_parse_since()",
+      "label": "_parse_dt()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L20",
-      "id": "cli_commands_engine_parse_since",
+      "source_location": "L19",
+      "id": "cli_commands_engine_parse_dt",
       "community": 36,
-      "norm_label": "_parse_since()"
+      "norm_label": "_parse_dt()"
+    },
+    {
+      "label": "_ensure_data()",
+      "file_type": "code",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L31",
+      "id": "cli_commands_engine_ensure_data",
+      "community": 1,
+      "norm_label": "_ensure_data()"
     },
     {
       "label": "replay()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L34",
+      "source_location": "L90",
       "id": "cli_commands_engine_replay",
       "community": 36,
       "norm_label": "replay()"
@@ -6847,7 +6901,7 @@
       "label": "tick()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L186",
+      "source_location": "L240",
       "id": "cli_commands_engine_tick",
       "community": 36,
       "norm_label": "tick()"
@@ -6856,7 +6910,7 @@
       "label": "invalidate_check()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L210",
+      "source_location": "L264",
       "id": "cli_commands_engine_invalidate_check",
       "community": 36,
       "norm_label": "invalidate_check()"
@@ -6865,7 +6919,7 @@
       "label": "run()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L247",
+      "source_location": "L301",
       "id": "cli_commands_engine_run",
       "community": 36,
       "norm_label": "run()"
@@ -6874,7 +6928,7 @@
       "label": "_print_trade_summary()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L291",
+      "source_location": "L345",
       "id": "cli_commands_engine_print_trade_summary",
       "community": 36,
       "norm_label": "_print_trade_summary()"
@@ -6889,20 +6943,29 @@
       "norm_label": "cli: ats engine \u2014 run the trading loop (replay / tick / live)."
     },
     {
-      "label": "Parse strings like '7d', '120d', '2h', '30m' into timedelta.",
+      "label": "Parse an ISO date ('2026-05-01') or datetime into a UTC-aware datetime.",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L21",
-      "id": "cli_commands_engine_rationale_21",
+      "source_location": "L20",
+      "id": "cli_commands_engine_rationale_20",
       "community": 36,
-      "norm_label": "parse strings like '7d', '120d', '2h', '30m' into timedelta."
+      "norm_label": "parse an iso date ('2026-05-01') or datetime into a utc-aware datetime."
+    },
+    {
+      "label": "Backfill candles + compute features/regimes for [from_dt, to_dt] if not covered.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L38",
+      "id": "cli_commands_engine_rationale_38",
+      "community": 1,
+      "norm_label": "backfill candles + compute features/regimes for [from_dt, to_dt] if not covered."
     },
     {
       "label": "Replay the full loop over historical features (the primary POC demo).",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L59",
-      "id": "cli_commands_engine_rationale_59",
+      "source_location": "L116",
+      "id": "cli_commands_engine_rationale_116",
       "community": 36,
       "norm_label": "replay the full loop over historical features (the primary poc demo)."
     },
@@ -6910,8 +6973,8 @@
       "label": "Single evaluation against the latest computed features.",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L190",
-      "id": "cli_commands_engine_rationale_190",
+      "source_location": "L244",
+      "id": "cli_commands_engine_rationale_244",
       "community": 36,
       "norm_label": "single evaluation against the latest computed features."
     },
@@ -6919,8 +6982,8 @@
       "label": "Evaluate the active plan's invalidation rules against the latest closed bar.",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L214",
-      "id": "cli_commands_engine_rationale_214",
+      "source_location": "L268",
+      "id": "cli_commands_engine_rationale_268",
       "community": 36,
       "norm_label": "evaluate the active plan's invalidation rules against the latest closed bar."
     },
@@ -6928,8 +6991,8 @@
       "label": "Live poll loop: (optionally refresh data,) then tick, repeating every --interval",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L256",
-      "id": "cli_commands_engine_rationale_256",
+      "source_location": "L310",
+      "id": "cli_commands_engine_rationale_310",
       "community": 36,
       "norm_label": "live poll loop: (optionally refresh data,) then tick, repeating every --interval"
     },
@@ -7533,7 +7596,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L126",
       "id": "planning_create_plan_prune_missing",
-      "community": 4,
+      "community": 141,
       "norm_label": "_prune_missing()"
     },
     {
@@ -7560,7 +7623,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L180",
       "id": "planning_create_plan_build_envelope",
-      "community": 4,
+      "community": 137,
       "norm_label": "build_envelope()"
     },
     {
@@ -7623,7 +7686,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L127",
       "id": "planning_create_plan_rationale_127",
-      "community": 4,
+      "community": 141,
       "norm_label": "drop feature keys whose value is none or nan before sending to the strategist."
     },
     {
@@ -7650,7 +7713,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L188",
       "id": "planning_create_plan_rationale_188",
-      "community": 4,
+      "community": 137,
       "norm_label": "assemble the json-only context passed to create_plan."
     },
     {
@@ -7704,7 +7767,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L1",
       "id": "src_ats_execution_reconcile_py",
-      "community": 42,
+      "community": 130,
       "norm_label": "reconcile.py"
     },
     {
@@ -7722,7 +7785,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L25",
       "id": "execution_reconcile_pnl_pct",
-      "community": 42,
+      "community": 130,
       "norm_label": "_pnl_pct()"
     },
     {
@@ -7740,7 +7803,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L43",
       "id": "execution_reconcile_breakeven_stop",
-      "community": 19,
+      "community": 130,
       "norm_label": "breakeven_stop()"
     },
     {
@@ -7749,7 +7812,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L55",
       "id": "execution_reconcile_liq_hit",
-      "community": 42,
+      "community": 130,
       "norm_label": "_liq_hit()"
     },
     {
@@ -7758,7 +7821,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L59",
       "id": "execution_reconcile_check_bar_exit",
-      "community": 42,
+      "community": 130,
       "norm_label": "check_bar_exit()"
     },
     {
@@ -7785,7 +7848,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L148",
       "id": "execution_reconcile_from_metadata",
-      "community": 42,
+      "community": 130,
       "norm_label": "from_metadata()"
     },
     {
@@ -7803,7 +7866,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L177",
       "id": "execution_reconcile_partialfill",
-      "community": 52,
+      "community": 130,
       "norm_label": "partialfill"
     },
     {
@@ -7812,7 +7875,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L186",
       "id": "execution_reconcile_barstep",
-      "community": 48,
+      "community": 130,
       "norm_label": "barstep"
     },
     {
@@ -7821,7 +7884,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L194",
       "id": "execution_reconcile_closed",
-      "community": 42,
+      "community": 130,
       "norm_label": "closed()"
     },
     {
@@ -7830,7 +7893,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L198",
       "id": "execution_reconcile_step_trade",
-      "community": 19,
+      "community": 130,
       "norm_label": "step_trade()"
     },
     {
@@ -7839,7 +7902,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L1",
       "id": "execution_reconcile_rationale_1",
-      "community": 42,
+      "community": 130,
       "norm_label": "paper-trade reconciliation \u2014 pure exit logic over candles.  given an open trade"
     },
     {
@@ -7857,7 +7920,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L44",
       "id": "execution_reconcile_rationale_44",
-      "community": 19,
+      "community": 130,
       "norm_label": "the stop price that nets ~zero after round-trip costs (a true breakeven).      a"
     },
     {
@@ -7866,7 +7929,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L67",
       "id": "execution_reconcile_rationale_67",
-      "community": 42,
+      "community": 130,
       "norm_label": "decide whether a single candle closes the trade. returns none if still open."
     },
     {
@@ -7902,7 +7965,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L219",
       "id": "execution_reconcile_rationale_219",
-      "community": 19,
+      "community": 130,
       "norm_label": "advance one open trade by a single bar. returns the resulting :class:`barstep`."
     },
     {
@@ -7929,7 +7992,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L32",
       "id": "execution_executor_open_paper_trade",
-      "community": 135,
+      "community": 131,
       "norm_label": "open_paper_trade()"
     },
     {
@@ -7992,7 +8055,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L46",
       "id": "execution_executor_rationale_46",
-      "community": 135,
+      "community": 131,
       "norm_label": "insert an open paper trade for a detected+confirmed+risk-approved setup.      ``"
     },
     {
@@ -8181,7 +8244,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L253",
       "id": "db_models_papertrade",
-      "community": 135,
+      "community": 17,
       "norm_label": "papertrade"
     },
     {
@@ -8217,7 +8280,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L254",
       "id": "db_models_rationale_254",
-      "community": 135,
+      "community": 17,
       "norm_label": "executor output \u2014 paper only, never a live order."
     },
     {
@@ -8280,7 +8343,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L70",
       "id": "engine_detector_tickreport",
-      "community": 89,
+      "community": 23,
       "norm_label": "tickreport"
     },
     {
@@ -8586,7 +8649,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L1",
       "id": "src_ats_engine_timeframes_py",
-      "community": 4,
+      "community": 135,
       "norm_label": "timeframes.py"
     },
     {
@@ -8595,7 +8658,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L11",
       "id": "engine_timeframes_timeframe_to_timedelta",
-      "community": 4,
+      "community": 135,
       "norm_label": "timeframe_to_timedelta()"
     },
     {
@@ -8604,7 +8667,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L1",
       "id": "engine_timeframes_rationale_1",
-      "community": 4,
+      "community": 135,
       "norm_label": "timeframe string \u2192 duration. matches the m1 universe (15m / 1h / 4h)."
     },
     {
@@ -9162,7 +9225,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L37",
       "id": "risk_manager_riskdecision",
-      "community": 48,
+      "community": 8,
       "norm_label": "riskdecision"
     },
     {
@@ -9198,7 +9261,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L143",
       "id": "risk_manager_regime_allows",
-      "community": 4,
+      "community": 137,
       "norm_label": "regime_allows()"
     },
     {
@@ -9252,7 +9315,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L144",
       "id": "risk_manager_rationale_144",
-      "community": 4,
+      "community": 137,
       "norm_label": "whether a setup's direction is aligned with the current regime.      rule of thu"
     },
     {
@@ -12555,7 +12618,7 @@
       "source_file": "specs/01-data-collection.md",
       "source_location": "L20",
       "id": "specs_01_data_collection_goal",
-      "community": 129,
+      "community": 55,
       "norm_label": "goal"
     },
     {
@@ -12564,7 +12627,7 @@
       "source_file": "specs/01-data-collection.md",
       "source_location": "L29",
       "id": "specs_01_data_collection_tier_1_behavior_default_0_idle_m1",
-      "community": 129,
+      "community": 55,
       "norm_label": "tier 1 behavior (default, $0 idle \u2014 m1)"
     },
     {
@@ -12573,7 +12636,7 @@
       "source_file": "specs/01-data-collection.md",
       "source_location": "L42",
       "id": "specs_01_data_collection_tier_3_behavior_live_opt_in_m4",
-      "community": 129,
+      "community": 55,
       "norm_label": "tier 3 behavior (live, opt-in \u2014 m4)"
     },
     {
@@ -14206,150 +14269,6 @@
       "norm_label": "code:text (llm defines the trading plan.)"
     },
     {
-      "label": "WIN_RATE_PNL_IMPROVEMENTS.md",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L1",
-      "id": "docs_win_rate_pnl_improvements_md",
-      "community": 79,
-      "norm_label": "win_rate_pnl_improvements.md"
-    },
-    {
-      "label": "Win-Rate / PnL Improvement Report \u2014 BTCUSDT replays",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L1",
-      "id": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
-      "community": 79,
-      "norm_label": "win-rate / pnl improvement report \u2014 btcusdt replays"
-    },
-    {
-      "label": "Where the system stands",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L5",
-      "id": "docs_win_rate_pnl_improvements_where_the_system_stands",
-      "community": 79,
-      "norm_label": "where the system stands"
-    },
-    {
-      "label": "Improvements, ranked by estimated impact vs effort",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L29",
-      "id": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "community": 79,
-      "norm_label": "improvements, ranked by estimated impact vs effort"
-    },
-    {
-      "label": "1. BUG \u2014 Fine-candle window lags the decision bar; invalidation races (and loses to) the stop",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L31",
-      "id": "docs_win_rate_pnl_improvements_1_bug_fine_candle_window_lags_the_decision_bar_invalidation_races_and_loses_to_the_stop",
-      "community": 79,
-      "norm_label": "1. bug \u2014 fine-candle window lags the decision bar; invalidation races (and loses to) the stop"
-    },
-    {
-      "label": "2. BUG/CONFIG \u2014 `scalper.max_hold_bars = 0` silently disables the time-stop",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L48",
-      "id": "docs_win_rate_pnl_improvements_2_bug_config_scalper_max_hold_bars_0_silently_disables_the_time_stop",
-      "community": 79,
-      "norm_label": "2. bug/config \u2014 `scalper.max_hold_bars = 0` silently disables the time-stop"
-    },
-    {
-      "label": "3. Make the observer earn its 3,217 calls \u2014 give it a loss-cutting mandate and deterministic triggers",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L53",
-      "id": "docs_win_rate_pnl_improvements_3_make_the_observer_earn_its_3_217_calls_give_it_a_loss_cutting_mandate_and_deterministic_triggers",
-      "community": 79,
-      "norm_label": "3. make the observer earn its 3,217 calls \u2014 give it a loss-cutting mandate and deterministic triggers"
-    },
-    {
-      "label": "4. Attack the fee bleed: 44 scratch exits and 2.8% margin per round trip",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L64",
-      "id": "docs_win_rate_pnl_improvements_4_attack_the_fee_bleed_44_scratch_exits_and_2_8_margin_per_round_trip",
-      "community": 79,
-      "norm_label": "4. attack the fee bleed: 44 scratch exits and 2.8% margin per round trip"
-    },
-    {
-      "label": "5. Don't short into a 4h-oversold bounce (regime gate is forcing it)",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L73",
-      "id": "docs_win_rate_pnl_improvements_5_don_t_short_into_a_4h_oversold_bounce_regime_gate_is_forcing_it",
-      "community": 79,
-      "norm_label": "5. don't short into a 4h-oversold bounce (regime gate is forcing it)"
-    },
-    {
-      "label": "6. Raise scalper `min_rr` 1.0 \u2192 ~1.3",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L78",
-      "id": "docs_win_rate_pnl_improvements_6_raise_scalper_min_rr_1_0_1_3",
-      "community": 79,
-      "norm_label": "6. raise scalper `min_rr` 1.0 \u2192 ~1.3"
-    },
-    {
-      "label": "7. Stop the plan churn: 1,640 plans for 153 trades",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L83",
-      "id": "docs_win_rate_pnl_improvements_7_stop_the_plan_churn_1_640_plans_for_153_trades",
-      "community": 79,
-      "norm_label": "7. stop the plan churn: 1,640 plans for 153 trades"
-    },
-    {
-      "label": "8. Lint the LLM's rules for direction-coherence",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L88",
-      "id": "docs_win_rate_pnl_improvements_8_lint_the_llm_s_rules_for_direction_coherence",
-      "community": 79,
-      "norm_label": "8. lint the llm's rules for direction-coherence"
-    },
-    {
-      "label": "9. Ratchet the trail after a big MFE",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L93",
-      "id": "docs_win_rate_pnl_improvements_9_ratchet_the_trail_after_a_big_mfe",
-      "community": 79,
-      "norm_label": "9. ratchet the trail after a big mfe"
-    },
-    {
-      "label": "10. Trigger entries on the 5m bars you already fetch",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L98",
-      "id": "docs_win_rate_pnl_improvements_10_trigger_entries_on_the_5m_bars_you_already_fetch",
-      "community": 79,
-      "norm_label": "10. trigger entries on the 5m bars you already fetch"
-    },
-    {
-      "label": "Weirdness log (explicit, as requested)",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L105",
-      "id": "docs_win_rate_pnl_improvements_weirdness_log_explicit_as_requested",
-      "community": 79,
-      "norm_label": "weirdness log (explicit, as requested)"
-    },
-    {
-      "label": "Suggested order of attack",
-      "file_type": "document",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L114",
-      "id": "docs_win_rate_pnl_improvements_suggested_order_of_attack",
-      "community": 79,
-      "norm_label": "suggested order of attack"
-    },
-    {
       "label": "ARCHITECTURE_SUGGESTION.md",
       "file_type": "document",
       "source_file": "docs/ARCHITECTURE_SUGGESTION.md",
@@ -14683,6 +14602,204 @@
       "norm_label": "derivatives / flow (perp-specific features)"
     },
     {
+      "label": "_parse_since()",
+      "file_type": "code",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L20",
+      "community": 36,
+      "norm_label": "_parse_since()",
+      "id": "cli_commands_engine_parse_since"
+    },
+    {
+      "label": "Parse strings like '7d', '120d', '2h', '30m' into timedelta.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L21",
+      "community": 36,
+      "norm_label": "parse strings like '7d', '120d', '2h', '30m' into timedelta.",
+      "id": "cli_commands_engine_rationale_21"
+    },
+    {
+      "label": "Replay the full loop over historical features (the primary POC demo).",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L59",
+      "community": 36,
+      "norm_label": "replay the full loop over historical features (the primary poc demo).",
+      "id": "cli_commands_engine_rationale_59"
+    },
+    {
+      "label": "Single evaluation against the latest computed features.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L190",
+      "community": 36,
+      "norm_label": "single evaluation against the latest computed features.",
+      "id": "cli_commands_engine_rationale_190"
+    },
+    {
+      "label": "Evaluate the active plan's invalidation rules against the latest closed bar.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L214",
+      "community": 36,
+      "norm_label": "evaluate the active plan's invalidation rules against the latest closed bar.",
+      "id": "cli_commands_engine_rationale_214"
+    },
+    {
+      "label": "Live poll loop: (optionally refresh data,) then tick, repeating every --interval",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L256",
+      "community": 36,
+      "norm_label": "live poll loop: (optionally refresh data,) then tick, repeating every --interval",
+      "id": "cli_commands_engine_rationale_256"
+    },
+    {
+      "label": "WIN_RATE_PNL_IMPROVEMENTS.md",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L1",
+      "community": 79,
+      "norm_label": "win_rate_pnl_improvements.md",
+      "id": "docs_win_rate_pnl_improvements_md"
+    },
+    {
+      "label": "Win-Rate / PnL Improvement Report \u2014 BTCUSDT replays",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L1",
+      "community": 79,
+      "norm_label": "win-rate / pnl improvement report \u2014 btcusdt replays",
+      "id": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays"
+    },
+    {
+      "label": "Where the system stands",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L5",
+      "community": 79,
+      "norm_label": "where the system stands",
+      "id": "docs_win_rate_pnl_improvements_where_the_system_stands"
+    },
+    {
+      "label": "Improvements, ranked by estimated impact vs effort",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L29",
+      "community": 79,
+      "norm_label": "improvements, ranked by estimated impact vs effort",
+      "id": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort"
+    },
+    {
+      "label": "1. BUG \u2014 Fine-candle window lags the decision bar; invalidation races (and loses to) the stop",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L31",
+      "community": 79,
+      "norm_label": "1. bug \u2014 fine-candle window lags the decision bar; invalidation races (and loses to) the stop",
+      "id": "docs_win_rate_pnl_improvements_1_bug_fine_candle_window_lags_the_decision_bar_invalidation_races_and_loses_to_the_stop"
+    },
+    {
+      "label": "2. BUG/CONFIG \u2014 `scalper.max_hold_bars = 0` silently disables the time-stop",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L48",
+      "community": 79,
+      "norm_label": "2. bug/config \u2014 `scalper.max_hold_bars = 0` silently disables the time-stop",
+      "id": "docs_win_rate_pnl_improvements_2_bug_config_scalper_max_hold_bars_0_silently_disables_the_time_stop"
+    },
+    {
+      "label": "3. Make the observer earn its 3,217 calls \u2014 give it a loss-cutting mandate and deterministic triggers",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L53",
+      "community": 79,
+      "norm_label": "3. make the observer earn its 3,217 calls \u2014 give it a loss-cutting mandate and deterministic triggers",
+      "id": "docs_win_rate_pnl_improvements_3_make_the_observer_earn_its_3_217_calls_give_it_a_loss_cutting_mandate_and_deterministic_triggers"
+    },
+    {
+      "label": "4. Attack the fee bleed: 44 scratch exits and 2.8% margin per round trip",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L64",
+      "community": 79,
+      "norm_label": "4. attack the fee bleed: 44 scratch exits and 2.8% margin per round trip",
+      "id": "docs_win_rate_pnl_improvements_4_attack_the_fee_bleed_44_scratch_exits_and_2_8_margin_per_round_trip"
+    },
+    {
+      "label": "5. Don't short into a 4h-oversold bounce (regime gate is forcing it)",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L73",
+      "community": 79,
+      "norm_label": "5. don't short into a 4h-oversold bounce (regime gate is forcing it)",
+      "id": "docs_win_rate_pnl_improvements_5_don_t_short_into_a_4h_oversold_bounce_regime_gate_is_forcing_it"
+    },
+    {
+      "label": "6. Raise scalper `min_rr` 1.0 \u2192 ~1.3",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L78",
+      "community": 79,
+      "norm_label": "6. raise scalper `min_rr` 1.0 \u2192 ~1.3",
+      "id": "docs_win_rate_pnl_improvements_6_raise_scalper_min_rr_1_0_1_3"
+    },
+    {
+      "label": "7. Stop the plan churn: 1,640 plans for 153 trades",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L83",
+      "community": 79,
+      "norm_label": "7. stop the plan churn: 1,640 plans for 153 trades",
+      "id": "docs_win_rate_pnl_improvements_7_stop_the_plan_churn_1_640_plans_for_153_trades"
+    },
+    {
+      "label": "8. Lint the LLM's rules for direction-coherence",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L88",
+      "community": 79,
+      "norm_label": "8. lint the llm's rules for direction-coherence",
+      "id": "docs_win_rate_pnl_improvements_8_lint_the_llm_s_rules_for_direction_coherence"
+    },
+    {
+      "label": "9. Ratchet the trail after a big MFE",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L93",
+      "community": 79,
+      "norm_label": "9. ratchet the trail after a big mfe",
+      "id": "docs_win_rate_pnl_improvements_9_ratchet_the_trail_after_a_big_mfe"
+    },
+    {
+      "label": "10. Trigger entries on the 5m bars you already fetch",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L98",
+      "community": 79,
+      "norm_label": "10. trigger entries on the 5m bars you already fetch",
+      "id": "docs_win_rate_pnl_improvements_10_trigger_entries_on_the_5m_bars_you_already_fetch"
+    },
+    {
+      "label": "Weirdness log (explicit, as requested)",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L105",
+      "community": 79,
+      "norm_label": "weirdness log (explicit, as requested)",
+      "id": "docs_win_rate_pnl_improvements_weirdness_log_explicit_as_requested"
+    },
+    {
+      "label": "Suggested order of attack",
+      "file_type": "document",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L114",
+      "community": 79,
+      "norm_label": "suggested order of attack",
+      "id": "docs_win_rate_pnl_improvements_suggested_order_of_attack"
+    },
+    {
       "label": "Apply a named profile's overrides onto ``target`` (defaults to the live singleto",
       "file_type": "rationale",
       "source_file": "src/ats/strategy_profiles.py",
@@ -14732,7 +14849,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L179",
-      "community": 13,
+      "community": 139,
       "norm_label": "deterministic post-mortem from the closed trade's exit_reason + pnl.      accept",
       "id": "llm_mock_data_rationale_179"
     },
@@ -14759,7 +14876,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L83",
-      "community": 4,
+      "community": 141,
       "norm_label": "drop feature keys whose value is none or nan before sending to the strategist.",
       "id": "planning_create_plan_rationale_83"
     },
@@ -14786,7 +14903,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L144",
-      "community": 4,
+      "community": 137,
       "norm_label": "assemble the json-only context passed to create_plan.",
       "id": "planning_create_plan_rationale_144"
     },
@@ -14813,7 +14930,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L205",
-      "community": 19,
+      "community": 130,
       "norm_label": "advance one open trade by a single bar. returns the resulting :class:`barstep`.",
       "id": "execution_reconcile_rationale_205"
     },
@@ -15353,7 +15470,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/llm/client.py",
       "source_location": "L232",
-      "community": 36,
+      "community": 45,
       "norm_label": "return the mock unless real openai calls are explicitly enabled with a key.",
       "id": "llm_client_rationale_232"
     },
@@ -15704,7 +15821,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L35",
-      "community": 135,
+      "community": 131,
       "norm_label": "insert an open paper trade for a detected+confirmed+risk-approved setup.      ``",
       "id": "execution_executor_rationale_35"
     },
@@ -15893,7 +16010,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L86",
-      "community": 4,
+      "community": 137,
       "norm_label": "whether a setup's direction is aligned with the current regime.      the losing",
       "id": "risk_manager_rationale_86"
     },
@@ -16422,9 +16539,9 @@
       "source_file": "tests/test_rule_engine.py",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_rule_engine_py",
-      "target": "tests_test_rule_engine_test_close_inside_zone_triggers_in_both_entry_modes",
-      "confidence_score": 1.0
+      "target": "tests_test_rule_engine_test_close_inside_zone_triggers_in_both_entry_modes"
     },
     {
       "relation": "contains",
@@ -16432,9 +16549,9 @@
       "source_file": "tests/test_rule_engine.py",
       "source_location": "L134",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_rule_engine_py",
-      "target": "tests_test_rule_engine_test_wick_touch_only_triggers_in_wick_limit_mode",
-      "confidence_score": 1.0
+      "target": "tests_test_rule_engine_test_wick_touch_only_triggers_in_wick_limit_mode"
     },
     {
       "relation": "contains",
@@ -16442,9 +16559,9 @@
       "source_file": "tests/test_rule_engine.py",
       "source_location": "L146",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_rule_engine_py",
-      "target": "tests_test_rule_engine_test_wick_limit_long_uses_zone_high_as_fill",
-      "confidence_score": 1.0
+      "target": "tests_test_rule_engine_test_wick_limit_long_uses_zone_high_as_fill"
     },
     {
       "relation": "contains",
@@ -16452,9 +16569,9 @@
       "source_file": "tests/test_rule_engine.py",
       "source_location": "L156",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_rule_engine_py",
-      "target": "tests_test_rule_engine_test_wick_limit_short_uses_zone_low_as_fill",
-      "confidence_score": 1.0
+      "target": "tests_test_rule_engine_test_wick_limit_short_uses_zone_low_as_fill"
     },
     {
       "relation": "contains",
@@ -16462,9 +16579,9 @@
       "source_file": "tests/test_rule_engine.py",
       "source_location": "L166",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_rule_engine_py",
-      "target": "tests_test_rule_engine_test_wick_limit_does_not_trigger_without_range_intersection",
-      "confidence_score": 1.0
+      "target": "tests_test_rule_engine_test_wick_limit_does_not_trigger_without_range_intersection"
     },
     {
       "relation": "contains",
@@ -19656,9 +19773,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L19",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "contains",
@@ -19666,9 +19783,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L34",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_queueclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient"
     },
     {
       "relation": "contains",
@@ -19676,9 +19793,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_observeclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_observeclient"
     },
     {
       "relation": "contains",
@@ -19686,9 +19803,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L64",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_setup"
     },
     {
       "relation": "contains",
@@ -19696,9 +19813,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_patch_detector",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_patch_detector"
     },
     {
       "relation": "contains",
@@ -19706,9 +19823,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L147",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_wick_triggered_setup_opens_at_simulated_entry_price",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_wick_triggered_setup_opens_at_simulated_entry_price"
     },
     {
       "relation": "contains",
@@ -19716,9 +19833,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L172",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens"
     },
     {
       "relation": "contains",
@@ -19726,9 +19843,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L199",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_waited_setup_does_not_block_later_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_waited_setup_does_not_block_later_setup"
     },
     {
       "relation": "contains",
@@ -19736,9 +19853,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L226",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata"
     },
     {
       "relation": "contains",
@@ -19746,9 +19863,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L267",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata"
     },
     {
       "relation": "contains",
@@ -19756,9 +19873,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L307",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_sideways_exit_policy_passes_range_knobs_to_step_trade",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_sideways_exit_policy_passes_range_knobs_to_step_trade"
     },
     {
       "relation": "contains",
@@ -19766,9 +19883,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L355",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_trend_exit_policy_passes_global_knobs_to_step_trade",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_trend_exit_policy_passes_global_knobs_to_step_trade"
     },
     {
       "relation": "contains",
@@ -19776,9 +19893,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L400",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
-      "target": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context"
     },
     {
       "relation": "rationale_for",
@@ -19786,9 +19903,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_rationale_1",
-      "target": "tests_test_detector_entries_py",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_py"
     },
     {
       "relation": "method",
@@ -19796,9 +19913,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "tests_test_detector_entries_fakesession_init",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession_init"
     },
     {
       "relation": "method",
@@ -19806,9 +19923,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L24",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "tests_test_detector_entries_fakesession_add",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession_add"
     },
     {
       "relation": "method",
@@ -19816,9 +19933,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "tests_test_detector_entries_fakesession_flush",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession_flush"
     },
     {
       "relation": "method",
@@ -19826,9 +19943,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L30",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "tests_test_detector_entries_fakesession_get",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession_get"
     },
     {
       "relation": "calls",
@@ -19837,9 +19954,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L154",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_wick_triggered_setup_opens_at_simulated_entry_price",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19848,9 +19965,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L180",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19859,9 +19976,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L207",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_waited_setup_does_not_block_later_setup",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19870,9 +19987,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19881,9 +19998,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L277",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19892,9 +20009,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L337",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_sideways_exit_policy_passes_range_knobs_to_step_trade",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19903,9 +20020,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L382",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_trend_exit_policy_passes_global_knobs_to_step_trade",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "calls",
@@ -19914,9 +20031,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L432",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
-      "target": "tests_test_detector_entries_fakesession",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "uses",
@@ -19924,9 +20041,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L14",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "execution_reconcile_barstep",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_barstep"
     },
     {
       "relation": "uses",
@@ -19934,9 +20051,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L14",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "execution_reconcile_tradestate",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_tradestate"
     },
     {
       "relation": "uses",
@@ -19944,9 +20061,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "llm_schemas_confirmoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_confirmoutput"
     },
     {
       "relation": "uses",
@@ -19954,9 +20071,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "llm_schemas_llmresult",
-      "confidence_score": 0.5
+      "target": "llm_schemas_llmresult"
     },
     {
       "relation": "uses",
@@ -19964,9 +20081,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "llm_schemas_observationoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_observationoutput"
     },
     {
       "relation": "uses",
@@ -19974,9 +20091,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L16",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
-      "target": "risk_manager_riskdecision",
-      "confidence_score": 0.5
+      "target": "risk_manager_riskdecision"
     },
     {
       "relation": "method",
@@ -19984,9 +20101,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L35",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "tests_test_detector_entries_queueclient_init",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient_init"
     },
     {
       "relation": "method",
@@ -19994,9 +20111,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "tests_test_detector_entries_queueclient_confirm_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient_confirm_setup"
     },
     {
       "relation": "calls",
@@ -20005,9 +20122,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_wick_triggered_setup_opens_at_simulated_entry_price",
-      "target": "tests_test_detector_entries_queueclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient"
     },
     {
       "relation": "calls",
@@ -20016,9 +20133,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L177",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens",
-      "target": "tests_test_detector_entries_queueclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient"
     },
     {
       "relation": "calls",
@@ -20027,9 +20144,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L204",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_waited_setup_does_not_block_later_setup",
-      "target": "tests_test_detector_entries_queueclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient"
     },
     {
       "relation": "calls",
@@ -20038,9 +20155,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L241",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata",
-      "target": "tests_test_detector_entries_queueclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient"
     },
     {
       "relation": "calls",
@@ -20049,9 +20166,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L281",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
-      "target": "tests_test_detector_entries_queueclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_queueclient"
     },
     {
       "relation": "uses",
@@ -20059,9 +20176,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L14",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "execution_reconcile_barstep",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_barstep"
     },
     {
       "relation": "uses",
@@ -20069,9 +20186,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L14",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "execution_reconcile_tradestate",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_tradestate"
     },
     {
       "relation": "uses",
@@ -20079,9 +20196,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "llm_schemas_confirmoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_confirmoutput"
     },
     {
       "relation": "uses",
@@ -20089,9 +20206,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "llm_schemas_llmresult",
-      "confidence_score": 0.5
+      "target": "llm_schemas_llmresult"
     },
     {
       "relation": "uses",
@@ -20099,9 +20216,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "llm_schemas_observationoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_observationoutput"
     },
     {
       "relation": "uses",
@@ -20109,9 +20226,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L16",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_queueclient",
-      "target": "risk_manager_riskdecision",
-      "confidence_score": 0.5
+      "target": "risk_manager_riskdecision"
     },
     {
       "relation": "calls",
@@ -20141,9 +20258,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "tests_test_detector_entries_observeclient_init",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_observeclient_init"
     },
     {
       "relation": "method",
@@ -20151,9 +20268,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "tests_test_detector_entries_observeclient_observe_trade",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_observeclient_observe_trade"
     },
     {
       "relation": "calls",
@@ -20162,9 +20279,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L408",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
-      "target": "tests_test_detector_entries_observeclient",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_observeclient"
     },
     {
       "relation": "uses",
@@ -20172,9 +20289,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L14",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "execution_reconcile_barstep",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_barstep"
     },
     {
       "relation": "uses",
@@ -20182,9 +20299,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L14",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "execution_reconcile_tradestate",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_tradestate"
     },
     {
       "relation": "uses",
@@ -20192,9 +20309,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "llm_schemas_confirmoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_confirmoutput"
     },
     {
       "relation": "uses",
@@ -20202,9 +20319,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "llm_schemas_llmresult",
-      "confidence_score": 0.5
+      "target": "llm_schemas_llmresult"
     },
     {
       "relation": "uses",
@@ -20212,9 +20329,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L15",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "llm_schemas_observationoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_observationoutput"
     },
     {
       "relation": "uses",
@@ -20222,9 +20339,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L16",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
-      "target": "risk_manager_riskdecision",
-      "confidence_score": 0.5
+      "target": "risk_manager_riskdecision"
     },
     {
       "relation": "calls",
@@ -20255,9 +20372,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L150",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_wick_triggered_setup_opens_at_simulated_entry_price",
-      "target": "tests_test_detector_entries_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_setup"
     },
     {
       "relation": "calls",
@@ -20266,9 +20383,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L175",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens",
-      "target": "tests_test_detector_entries_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_setup"
     },
     {
       "relation": "calls",
@@ -20277,9 +20394,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L202",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_waited_setup_does_not_block_later_setup",
-      "target": "tests_test_detector_entries_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_setup"
     },
     {
       "relation": "calls",
@@ -20288,9 +20405,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L235",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata",
-      "target": "tests_test_detector_entries_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_setup"
     },
     {
       "relation": "calls",
@@ -20299,9 +20416,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L275",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
-      "target": "tests_test_detector_entries_setup",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_setup"
     },
     {
       "relation": "calls",
@@ -20310,9 +20427,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L151",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_wick_triggered_setup_opens_at_simulated_entry_price",
-      "target": "tests_test_detector_entries_patch_detector",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_patch_detector"
     },
     {
       "relation": "calls",
@@ -20321,9 +20438,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L176",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens",
-      "target": "tests_test_detector_entries_patch_detector",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_patch_detector"
     },
     {
       "relation": "calls",
@@ -20332,9 +20449,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L203",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_waited_setup_does_not_block_later_setup",
-      "target": "tests_test_detector_entries_patch_detector",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_patch_detector"
     },
     {
       "relation": "calls",
@@ -20343,9 +20460,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L236",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata",
-      "target": "tests_test_detector_entries_patch_detector",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_patch_detector"
     },
     {
       "relation": "calls",
@@ -20354,9 +20471,9 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L276",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
-      "target": "tests_test_detector_entries_patch_detector",
-      "confidence_score": 1.0
+      "target": "tests_test_detector_entries_patch_detector"
     },
     {
       "relation": "calls",
@@ -21437,9 +21554,9 @@
       "source_file": "tests/test_strategy_profiles.py",
       "source_location": "L10",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_strategy_profiles_py",
-      "target": "tests_test_strategy_profiles_test_scalper_profile_sets_strategy_metadata",
-      "confidence_score": 1.0
+      "target": "tests_test_strategy_profiles_test_scalper_profile_sets_strategy_metadata"
     },
     {
       "relation": "contains",
@@ -21447,9 +21564,9 @@
       "source_file": "tests/test_strategy_profiles.py",
       "source_location": "L20",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_strategy_profiles_py",
-      "target": "tests_test_strategy_profiles_test_plan_prompt_includes_profile_addendum",
-      "confidence_score": 1.0
+      "target": "tests_test_strategy_profiles_test_plan_prompt_includes_profile_addendum"
     },
     {
       "relation": "rationale_for",
@@ -21457,9 +21574,9 @@
       "source_file": "tests/test_strategy_profiles.py",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_strategy_profiles_rationale_1",
-      "target": "tests_test_strategy_profiles_py",
-      "confidence_score": 1.0
+      "target": "tests_test_strategy_profiles_py"
     },
     {
       "relation": "calls",
@@ -21736,9 +21853,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L66",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_range_mode_banks_larger_fraction_at_tp1",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_range_mode_banks_larger_fraction_at_tp1"
     },
     {
       "relation": "contains",
@@ -21816,9 +21933,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L140",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_range_mode_does_not_early_arm_before_tp1",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_range_mode_does_not_early_arm_before_tp1"
     },
     {
       "relation": "contains",
@@ -21826,9 +21943,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L157",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_early_trail_arms_without_breakeven",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_early_trail_arms_without_breakeven"
     },
     {
       "relation": "contains",
@@ -21836,9 +21953,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L175",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_early_stop_off_does_not_arm_protection",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_early_stop_off_does_not_arm_protection"
     },
     {
       "relation": "contains",
@@ -21846,9 +21963,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L192",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_early_trail_never_loosens_original_stop",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_early_trail_never_loosens_original_stop"
     },
     {
       "relation": "contains",
@@ -21856,9 +21973,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L207",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_short_early_trail_formula",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_short_early_trail_formula"
     },
     {
       "relation": "contains",
@@ -21926,9 +22043,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L285",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_range_mode_does_not_trail_before_tp1",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_range_mode_does_not_trail_before_tp1"
     },
     {
       "relation": "contains",
@@ -21936,9 +22053,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L301",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_range_mode_trails_after_tp1",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_range_mode_trails_after_tp1"
     },
     {
       "relation": "contains",
@@ -21946,9 +22063,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L317",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_cost_adjusted_breakeven_stop_reason_is_breakeven",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_cost_adjusted_breakeven_stop_reason_is_breakeven"
     },
     {
       "relation": "contains",
@@ -21956,9 +22073,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L330",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_pre_tp1_trail_below_cost_breakeven_is_sl",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_pre_tp1_trail_below_cost_breakeven_is_sl"
     },
     {
       "relation": "contains",
@@ -21966,9 +22083,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L339",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_py",
-      "target": "tests_test_step_trade_test_pre_tp1_trail_beyond_cost_breakeven_is_trail",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_test_pre_tp1_trail_beyond_cost_breakeven_is_trail"
     },
     {
       "relation": "contains",
@@ -22050,9 +22167,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_banks_larger_fraction_at_tp1",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22138,9 +22255,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_does_not_early_arm_before_tp1",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22149,9 +22266,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L160",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_early_trail_arms_without_breakeven",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22160,9 +22277,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L178",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_early_stop_off_does_not_arm_protection",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22171,9 +22288,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L195",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_early_trail_never_loosens_original_stop",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22182,9 +22299,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L210",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_short_early_trail_formula",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22248,9 +22365,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L290",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_does_not_trail_before_tp1",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22259,9 +22376,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L302",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_trails_after_tp1",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22270,9 +22387,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L323",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_cost_adjusted_breakeven_stop_reason_is_breakeven",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22281,9 +22398,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L333",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_pre_tp1_trail_below_cost_breakeven_is_sl",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22292,9 +22409,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L342",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_pre_tp1_trail_beyond_cost_breakeven_is_trail",
-      "target": "tests_test_step_trade_c",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_c"
     },
     {
       "relation": "calls",
@@ -22347,9 +22464,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L67",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_banks_larger_fraction_at_tp1",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22435,9 +22552,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L141",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_does_not_early_arm_before_tp1",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22446,9 +22563,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_early_trail_arms_without_breakeven",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22457,9 +22574,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L176",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_early_stop_off_does_not_arm_protection",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22468,9 +22585,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L193",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_early_trail_never_loosens_original_stop",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22479,9 +22596,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L208",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_short_early_trail_formula",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22545,9 +22662,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L288",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_does_not_trail_before_tp1",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22556,9 +22673,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L302",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_range_mode_trails_after_tp1",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22567,9 +22684,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L323",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_cost_adjusted_breakeven_stop_reason_is_breakeven",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22578,9 +22695,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L333",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_pre_tp1_trail_below_cost_breakeven_is_sl",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -22589,9 +22706,9 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L342",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_step_trade_test_pre_tp1_trail_beyond_cost_breakeven_is_trail",
-      "target": "tests_test_step_trade_step",
-      "confidence_score": 1.0
+      "target": "tests_test_step_trade_step"
     },
     {
       "relation": "calls",
@@ -23246,6 +23363,68 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tests_test_replay_ensure_data_py",
+      "target": "tests_test_replay_ensure_data_session_with_coverage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L24",
+      "weight": 1.0,
+      "source": "tests_test_replay_ensure_data_py",
+      "target": "tests_test_replay_ensure_data_test_skips_backfill_when_window_covered",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L41",
+      "weight": 1.0,
+      "source": "tests_test_replay_ensure_data_py",
+      "target": "tests_test_replay_ensure_data_test_triggers_backfill_when_uncovered",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_replay_ensure_data_rationale_1",
+      "target": "tests_test_replay_ensure_data_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "tests_test_replay_ensure_data_test_skips_backfill_when_window_covered",
+      "target": "tests_test_replay_ensure_data_session_with_coverage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_replay_ensure_data.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "tests_test_replay_ensure_data_test_triggers_backfill_when_uncovered",
+      "target": "tests_test_replay_ensure_data_session_with_coverage",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "tests/test_features_idempotency.py",
       "source_location": "L12",
       "weight": 1.0,
@@ -23567,9 +23746,9 @@
       "source_file": "tests/test_observe_clamps.py",
       "source_location": "L78",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_observe_clamps_py",
-      "target": "tests_test_observe_clamps_test_mock_prefers_explicit_margin_unrealized_alias",
-      "confidence_score": 1.0
+      "target": "tests_test_observe_clamps_test_mock_prefers_explicit_margin_unrealized_alias"
     },
     {
       "relation": "contains",
@@ -23577,9 +23756,9 @@
       "source_file": "tests/test_observe_clamps.py",
       "source_location": "L87",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_observe_clamps_py",
-      "target": "tests_test_observe_clamps_test_mock_exits_stale_flat_trade_without_favorable_progress",
-      "confidence_score": 1.0
+      "target": "tests_test_observe_clamps_test_mock_exits_stale_flat_trade_without_favorable_progress"
     },
     {
       "relation": "contains",
@@ -23759,9 +23938,9 @@
       "source_file": "tests/test_observe_clamps.py",
       "source_location": "L79",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_observe_clamps_test_mock_prefers_explicit_margin_unrealized_alias",
-      "target": "tests_test_observe_clamps_env",
-      "confidence_score": 1.0
+      "target": "tests_test_observe_clamps_env"
     },
     {
       "relation": "calls",
@@ -23770,9 +23949,9 @@
       "source_file": "tests/test_observe_clamps.py",
       "source_location": "L88",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "tests_test_observe_clamps_test_mock_exits_stale_flat_trade_without_favorable_progress",
-      "target": "tests_test_observe_clamps_env",
-      "confidence_score": 1.0
+      "target": "tests_test_observe_clamps_env"
     },
     {
       "relation": "calls",
@@ -24725,9 +24904,9 @@
       "source_file": "src/ats/strategy_profiles.py",
       "source_location": "L49",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ats_strategy_profiles_rationale_49",
-      "target": "ats_strategy_profiles_apply_profile",
-      "confidence_score": 1.0
+      "target": "ats_strategy_profiles_apply_profile"
     },
     {
       "relation": "calls",
@@ -25811,9 +25990,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L45",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "llm_client_llmclient",
-      "confidence_score": 0.5
+      "target": "llm_client_llmclient"
     },
     {
       "relation": "uses",
@@ -26348,9 +26527,9 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_mock_data_rationale_39",
-      "target": "llm_mock_data_bias",
-      "confidence_score": 1.0
+      "target": "llm_mock_data_bias"
     },
     {
       "relation": "rationale_for",
@@ -26368,9 +26547,9 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_mock_data_rationale_57",
-      "target": "llm_mock_data_canned_plan",
-      "confidence_score": 1.0
+      "target": "llm_mock_data_canned_plan"
     },
     {
       "relation": "calls",
@@ -26432,9 +26611,9 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L118",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_mock_data_rationale_118",
-      "target": "llm_mock_data_canned_confirm",
-      "confidence_score": 1.0
+      "target": "llm_mock_data_canned_confirm"
     },
     {
       "relation": "calls",
@@ -26463,9 +26642,9 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L133",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_mock_data_rationale_133",
-      "target": "llm_mock_data_canned_observation",
-      "confidence_score": 1.0
+      "target": "llm_mock_data_canned_observation"
     },
     {
       "relation": "calls",
@@ -26494,9 +26673,9 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L202",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_mock_data_rationale_202",
-      "target": "llm_mock_data_canned_reflection",
-      "confidence_score": 1.0
+      "target": "llm_mock_data_canned_reflection"
     },
     {
       "relation": "calls",
@@ -26535,9 +26714,9 @@
       "source_file": "src/ats/llm/prompts.py",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_llm_prompts_py",
-      "target": "llm_prompts_profile_strategy_addendum",
-      "confidence_score": 1.0
+      "target": "llm_prompts_profile_strategy_addendum"
     },
     {
       "relation": "contains",
@@ -26596,9 +26775,9 @@
       "source_file": "src/ats/llm/prompts.py",
       "source_location": "L71",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_prompts_rationale_71",
-      "target": "llm_prompts_profile_strategy_addendum",
-      "confidence_score": 1.0
+      "target": "llm_prompts_profile_strategy_addendum"
     },
     {
       "relation": "rationale_for",
@@ -26606,9 +26785,9 @@
       "source_file": "src/ats/llm/prompts.py",
       "source_location": "L90",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_prompts_rationale_90",
-      "target": "llm_prompts_plan_system_prompt",
-      "confidence_score": 1.0
+      "target": "llm_prompts_plan_system_prompt"
     },
     {
       "relation": "rationale_for",
@@ -26636,9 +26815,9 @@
       "source_file": "src/ats/llm/prompts.py",
       "source_location": "L298",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "llm_prompts_rationale_298",
-      "target": "llm_prompts_user_message",
-      "confidence_score": 1.0
+      "target": "llm_prompts_user_message"
     },
     {
       "relation": "rationale_for",
@@ -27134,9 +27313,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L27",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "planning_create_plan_planresult",
-      "target": "llm_schemas_invalidationrule",
-      "confidence_score": 0.5
+      "target": "llm_schemas_invalidationrule"
     },
     {
       "relation": "rationale_for",
@@ -27214,9 +27393,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L764",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "llm_schemas_confirmoutput",
-      "confidence_score": 0.5
+      "target": "llm_schemas_confirmoutput"
     },
     {
       "relation": "calls",
@@ -27413,6 +27592,17 @@
       "target": "processing_normalize_percentile_rank"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L82",
+      "weight": 1.0,
+      "source": "cli_commands_engine_ensure_data",
+      "target": "processing_regime_compute_regime"
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/processing/regime.py",
@@ -27420,6 +27610,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "processing_regime_rationale_91",
+      "target": "processing_regime_upsert_regime"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L84",
+      "weight": 1.0,
+      "source": "cli_commands_engine_ensure_data",
       "target": "processing_regime_upsert_regime"
     },
     {
@@ -28017,6 +28218,17 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "processing_features_rationale_437",
+      "target": "processing_features_fetch_candles"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L78",
+      "weight": 1.0,
+      "source": "cli_commands_engine_ensure_data",
       "target": "processing_features_fetch_candles"
     },
     {
@@ -29035,11 +29247,21 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L20",
+      "source_location": "L19",
       "weight": 1.0,
-      "confidence_score": 1.0,
       "source": "src_ats_cli_commands_engine_py",
-      "target": "cli_commands_engine_parse_since"
+      "target": "cli_commands_engine_parse_dt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L31",
+      "weight": 1.0,
+      "source": "src_ats_cli_commands_engine_py",
+      "target": "cli_commands_engine_ensure_data",
+      "confidence_score": 1.0
     },
     {
       "relation": "contains",
@@ -29102,14 +29324,45 @@
       "target": "src_ats_cli_commands_engine_py"
     },
     {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L20",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ats_cli_commands_engine_py",
+      "target": "cli_commands_engine_parse_since"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L126",
+      "weight": 1.0,
+      "source": "cli_commands_engine_replay",
+      "target": "cli_commands_engine_parse_dt",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L21",
+      "source_location": "L20",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "cli_commands_engine_rationale_21",
-      "target": "cli_commands_engine_parse_since"
+      "source": "cli_commands_engine_rationale_20",
+      "target": "cli_commands_engine_parse_dt",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_38",
+      "target": "cli_commands_engine_ensure_data",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -29121,6 +29374,16 @@
       "confidence_score": 1.0,
       "source": "cli_commands_engine_replay",
       "target": "cli_commands_engine_run"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_116",
+      "target": "cli_commands_engine_replay",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -29142,6 +29405,16 @@
       "confidence_score": 1.0,
       "source": "cli_commands_engine_tick",
       "target": "cli_commands_engine_run"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L244",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_244",
+      "target": "cli_commands_engine_tick",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -29188,6 +29461,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L268",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_268",
+      "target": "cli_commands_engine_invalidate_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
       "source_location": "L214",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -29213,6 +29496,16 @@
       "confidence_score": 1.0,
       "source": "cli_commands_engine_rationale_206",
       "target": "cli_commands_engine_invalidate_check"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L310",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_310",
+      "target": "cli_commands_engine_run",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -30005,9 +30298,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L76",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_planning_create_plan_py",
-      "target": "planning_create_plan_stripped_invalidation_rules",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_stripped_invalidation_rules"
     },
     {
       "relation": "contains",
@@ -30159,9 +30452,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L310",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_persist",
-      "target": "planning_create_plan_stripped_invalidation_rules",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_stripped_invalidation_rules"
     },
     {
       "relation": "rationale_for",
@@ -30169,9 +30462,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L77",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_77",
-      "target": "planning_create_plan_stripped_invalidation_rules",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_stripped_invalidation_rules"
     },
     {
       "relation": "calls",
@@ -30242,9 +30535,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L127",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_127",
-      "target": "planning_create_plan_prune_missing",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_prune_missing"
     },
     {
       "relation": "rationale_for",
@@ -30273,9 +30566,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L146",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_146",
-      "target": "planning_create_plan_rule_operands",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_rule_operands"
     },
     {
       "relation": "rationale_for",
@@ -30304,9 +30597,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_158",
-      "target": "planning_create_plan_warn_unknown_features",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_warn_unknown_features"
     },
     {
       "relation": "rationale_for",
@@ -30335,9 +30628,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_188",
-      "target": "planning_create_plan_build_envelope",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_build_envelope"
     },
     {
       "relation": "calls",
@@ -30410,9 +30703,9 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L327",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "planning_create_plan_rationale_327",
-      "target": "planning_create_plan_create_plan",
-      "confidence_score": 1.0
+      "target": "planning_create_plan_create_plan"
     },
     {
       "relation": "calls",
@@ -30642,9 +30935,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L36",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "execution_reconcile_exitresult",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_exitresult"
     },
     {
       "relation": "calls",
@@ -30908,9 +31201,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L36",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "execution_reconcile_tradestate",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_tradestate"
     },
     {
       "relation": "calls",
@@ -30929,9 +31222,9 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L163",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "execution_reconcile_rationale_163",
-      "target": "execution_reconcile_tradestate_to_metadata",
-      "confidence_score": 1.0
+      "target": "execution_reconcile_tradestate_to_metadata"
     },
     {
       "relation": "rationale_for",
@@ -30980,9 +31273,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L36",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "execution_reconcile_partialfill",
-      "confidence_score": 0.5
+      "target": "execution_reconcile_partialfill"
     },
     {
       "relation": "calls",
@@ -31012,9 +31305,9 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L219",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "execution_reconcile_rationale_219",
-      "target": "execution_reconcile_step_trade",
-      "confidence_score": 1.0
+      "target": "execution_reconcile_step_trade"
     },
     {
       "relation": "calls",
@@ -31723,9 +32016,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L25",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "db_models_plan",
-      "confidence_score": 0.5
+      "target": "db_models_plan"
     },
     {
       "relation": "rationale_for",
@@ -31763,9 +32056,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L25",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "db_models_setup",
-      "confidence_score": 0.5
+      "target": "db_models_setup"
     },
     {
       "relation": "rationale_for",
@@ -31803,9 +32096,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L25",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "db_models_papertrade",
-      "confidence_score": 0.5
+      "target": "db_models_papertrade"
     },
     {
       "relation": "rationale_for",
@@ -31843,9 +32136,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L25",
       "weight": 0.8,
+      "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "db_models_llmcall",
-      "confidence_score": 0.5
+      "target": "db_models_llmcall"
     },
     {
       "relation": "calls",
@@ -31925,9 +32218,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L89",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_parse_dt",
-      "confidence_score": 1.0
+      "target": "engine_detector_parse_dt"
     },
     {
       "relation": "contains",
@@ -31935,9 +32228,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_round_or_none",
-      "confidence_score": 1.0
+      "target": "engine_detector_round_or_none"
     },
     {
       "relation": "contains",
@@ -31945,9 +32238,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L104",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_trade_notional_margin",
-      "confidence_score": 1.0
+      "target": "engine_detector_trade_notional_margin"
     },
     {
       "relation": "contains",
@@ -31955,9 +32248,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L119",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_margin_pnl_pct",
-      "confidence_score": 1.0
+      "target": "engine_detector_margin_pnl_pct"
     },
     {
       "relation": "contains",
@@ -31965,9 +32258,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_hold_context",
-      "confidence_score": 1.0
+      "target": "engine_detector_hold_context"
     },
     {
       "relation": "contains",
@@ -31975,9 +32268,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_exitpolicy",
-      "confidence_score": 1.0
+      "target": "engine_detector_exitpolicy"
     },
     {
       "relation": "contains",
@@ -31985,9 +32278,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L169",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_is_sideways",
-      "confidence_score": 1.0
+      "target": "engine_detector_is_sideways"
     },
     {
       "relation": "contains",
@@ -31995,9 +32288,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L173",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_exit_policy_for_regime",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_for_regime"
     },
     {
       "relation": "contains",
@@ -32005,9 +32298,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L199",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_exit_policy_metadata",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_metadata"
     },
     {
       "relation": "contains",
@@ -32015,9 +32308,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L213",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_exit_policy_from_metadata",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_from_metadata"
     },
     {
       "relation": "contains",
@@ -32156,9 +32449,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L54",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_54",
-      "target": "engine_detector_closedtradeinfo",
-      "confidence_score": 1.0
+      "target": "engine_detector_closedtradeinfo"
     },
     {
       "relation": "uses",
@@ -32228,9 +32521,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_trade_notional_margin",
-      "target": "engine_detector_f",
-      "confidence_score": 1.0
+      "target": "engine_detector_f"
     },
     {
       "relation": "calls",
@@ -32305,9 +32598,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_hold_context",
-      "target": "engine_detector_parse_dt",
-      "confidence_score": 1.0
+      "target": "engine_detector_parse_dt"
     },
     {
       "relation": "calls",
@@ -32316,9 +32609,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L143",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_hold_context",
-      "target": "engine_detector_round_or_none",
-      "confidence_score": 1.0
+      "target": "engine_detector_round_or_none"
     },
     {
       "relation": "calls",
@@ -32327,9 +32620,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L120",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_margin_pnl_pct",
-      "target": "engine_detector_trade_notional_margin",
-      "confidence_score": 1.0
+      "target": "engine_detector_trade_notional_margin"
     },
     {
       "relation": "calls",
@@ -32338,9 +32631,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L525",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_observe_and_adjust",
-      "target": "engine_detector_trade_notional_margin",
-      "confidence_score": 1.0
+      "target": "engine_detector_trade_notional_margin"
     },
     {
       "relation": "calls",
@@ -32349,9 +32642,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L521",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_observe_and_adjust",
-      "target": "engine_detector_margin_pnl_pct",
-      "confidence_score": 1.0
+      "target": "engine_detector_margin_pnl_pct"
     },
     {
       "relation": "calls",
@@ -32360,9 +32653,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L526",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_observe_and_adjust",
-      "target": "engine_detector_hold_context",
-      "confidence_score": 1.0
+      "target": "engine_detector_hold_context"
     },
     {
       "relation": "calls",
@@ -32371,9 +32664,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L175",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_exit_policy_for_regime",
-      "target": "engine_detector_exitpolicy",
-      "confidence_score": 1.0
+      "target": "engine_detector_exitpolicy"
     },
     {
       "relation": "calls",
@@ -32382,9 +32675,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L217",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_exit_policy_from_metadata",
-      "target": "engine_detector_exitpolicy",
-      "confidence_score": 1.0
+      "target": "engine_detector_exitpolicy"
     },
     {
       "relation": "rationale_for",
@@ -32392,9 +32685,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L156",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_156",
-      "target": "engine_detector_exitpolicy",
-      "confidence_score": 1.0
+      "target": "engine_detector_exitpolicy"
     },
     {
       "relation": "calls",
@@ -32403,9 +32696,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L174",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_exit_policy_for_regime",
-      "target": "engine_detector_is_sideways",
-      "confidence_score": 1.0
+      "target": "engine_detector_is_sideways"
     },
     {
       "relation": "calls",
@@ -32414,9 +32707,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L233",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_exit_policy_from_metadata",
-      "target": "engine_detector_exit_policy_for_regime",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_for_regime"
     },
     {
       "relation": "calls",
@@ -32425,9 +32718,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L891",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_confirm_and_execute",
-      "target": "engine_detector_exit_policy_for_regime",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_for_regime"
     },
     {
       "relation": "calls",
@@ -32436,9 +32729,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L570",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_observe_and_adjust",
-      "target": "engine_detector_exit_policy_metadata",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_metadata"
     },
     {
       "relation": "calls",
@@ -32447,9 +32740,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L910",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_confirm_and_execute",
-      "target": "engine_detector_exit_policy_metadata",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_metadata"
     },
     {
       "relation": "calls",
@@ -32458,9 +32751,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L352",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_advance_trade",
-      "target": "engine_detector_exit_policy_from_metadata",
-      "confidence_score": 1.0
+      "target": "engine_detector_exit_policy_from_metadata"
     },
     {
       "relation": "calls",
@@ -32479,9 +32772,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L237",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_237",
-      "target": "engine_detector_clamp_tightened_stop",
-      "confidence_score": 1.0
+      "target": "engine_detector_clamp_tightened_stop"
     },
     {
       "relation": "rationale_for",
@@ -32530,9 +32823,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L248",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_248",
-      "target": "engine_detector_clamp_extended_tp",
-      "confidence_score": 1.0
+      "target": "engine_detector_clamp_extended_tp"
     },
     {
       "relation": "rationale_for",
@@ -32636,9 +32929,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L285",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_285",
-      "target": "engine_detector_close_trade",
-      "confidence_score": 1.0
+      "target": "engine_detector_close_trade"
     },
     {
       "relation": "rationale_for",
@@ -32698,9 +32991,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L345",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_345",
-      "target": "engine_detector_advance_trade",
-      "confidence_score": 1.0
+      "target": "engine_detector_advance_trade"
     },
     {
       "relation": "rationale_for",
@@ -32749,9 +33042,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L484",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_484",
-      "target": "engine_detector_reconcile_open_trades",
-      "confidence_score": 1.0
+      "target": "engine_detector_reconcile_open_trades"
     },
     {
       "relation": "rationale_for",
@@ -32789,9 +33082,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L504",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_504",
-      "target": "engine_detector_observe_and_adjust",
-      "confidence_score": 1.0
+      "target": "engine_detector_observe_and_adjust"
     },
     {
       "relation": "rationale_for",
@@ -32840,9 +33133,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L680",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_680",
-      "target": "engine_detector_handle_invalidation",
-      "confidence_score": 1.0
+      "target": "engine_detector_handle_invalidation"
     },
     {
       "relation": "calls",
@@ -32934,9 +33227,9 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L953",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_detector_rationale_953",
-      "target": "engine_detector_evaluate_now",
-      "confidence_score": 1.0
+      "target": "engine_detector_evaluate_now"
     },
     {
       "relation": "calls",
@@ -33170,9 +33463,9 @@
       "source_file": "src/ats/engine/rule_engine.py",
       "source_location": "L152",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "src_ats_engine_rule_engine_py",
-      "target": "engine_rule_engine_entry_trigger",
-      "confidence_score": 1.0
+      "target": "engine_rule_engine_entry_trigger"
     },
     {
       "relation": "contains",
@@ -33222,9 +33515,9 @@
       "source_file": "src/ats/engine/rule_engine.py",
       "source_location": "L160",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_rule_engine_entry_trigger",
-      "target": "engine_rule_engine_resolve_operand",
-      "confidence_score": 1.0
+      "target": "engine_rule_engine_resolve_operand"
     },
     {
       "relation": "rationale_for",
@@ -33349,9 +33642,9 @@
       "source_file": "src/ats/engine/rule_engine.py",
       "source_location": "L161",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_rule_engine_entry_trigger",
-      "target": "engine_rule_engine_in_entry_zone",
-      "confidence_score": 1.0
+      "target": "engine_rule_engine_in_entry_zone"
     },
     {
       "relation": "calls",
@@ -33371,9 +33664,9 @@
       "source_file": "src/ats/engine/rule_engine.py",
       "source_location": "L209",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_rule_engine_evaluate_setup",
-      "target": "engine_rule_engine_entry_trigger",
-      "confidence_score": 1.0
+      "target": "engine_rule_engine_entry_trigger"
     },
     {
       "relation": "rationale_for",
@@ -33381,9 +33674,9 @@
       "source_file": "src/ats/engine/rule_engine.py",
       "source_location": "L158",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_rule_engine_rationale_158",
-      "target": "engine_rule_engine_entry_trigger",
-      "confidence_score": 1.0
+      "target": "engine_rule_engine_entry_trigger"
     },
     {
       "relation": "calls",
@@ -33402,9 +33695,9 @@
       "source_file": "src/ats/engine/rule_engine.py",
       "source_location": "L201",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_rule_engine_rationale_201",
-      "target": "engine_rule_engine_evaluate_setup",
-      "confidence_score": 1.0
+      "target": "engine_rule_engine_evaluate_setup"
     },
     {
       "relation": "rationale_for",
@@ -33523,9 +33816,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L31",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_31",
-      "target": "engine_loop_tradeoutcome",
-      "confidence_score": 1.0
+      "target": "engine_loop_tradeoutcome"
     },
     {
       "relation": "rationale_for",
@@ -33575,9 +33868,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L70",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_70",
-      "target": "engine_loop_replayreport_finalise",
-      "confidence_score": 1.0
+      "target": "engine_loop_replayreport_finalise"
     },
     {
       "relation": "rationale_for",
@@ -33637,9 +33930,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L126",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_126",
-      "target": "engine_loop_record_notes",
-      "confidence_score": 1.0
+      "target": "engine_loop_record_notes"
     },
     {
       "relation": "rationale_for",
@@ -33699,9 +33992,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L154",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_154",
-      "target": "engine_loop_ensure_plan",
-      "confidence_score": 1.0
+      "target": "engine_loop_ensure_plan"
     },
     {
       "relation": "rationale_for",
@@ -33739,9 +34032,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L179",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_179",
-      "target": "engine_loop_run_replay",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_replay"
     },
     {
       "relation": "rationale_for",
@@ -33790,9 +34083,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L243",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_243",
-      "target": "engine_loop_run_tick",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_tick"
     },
     {
       "relation": "rationale_for",
@@ -33830,9 +34123,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L282",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_282",
-      "target": "engine_loop_run_live",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_live"
     },
     {
       "relation": "rationale_for",
@@ -39702,156 +39995,6 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L1",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_md",
-      "target": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L5",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
-      "target": "docs_win_rate_pnl_improvements_where_the_system_stands",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L29",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
-      "target": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L105",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
-      "target": "docs_win_rate_pnl_improvements_weirdness_log_explicit_as_requested",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L114",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
-      "target": "docs_win_rate_pnl_improvements_suggested_order_of_attack",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L31",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_1_bug_fine_candle_window_lags_the_decision_bar_invalidation_races_and_loses_to_the_stop",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L48",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_2_bug_config_scalper_max_hold_bars_0_silently_disables_the_time_stop",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L53",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_3_make_the_observer_earn_its_3_217_calls_give_it_a_loss_cutting_mandate_and_deterministic_triggers",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L64",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_4_attack_the_fee_bleed_44_scratch_exits_and_2_8_margin_per_round_trip",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L73",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_5_don_t_short_into_a_4h_oversold_bounce_regime_gate_is_forcing_it",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L78",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_6_raise_scalper_min_rr_1_0_1_3",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L83",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_7_stop_the_plan_churn_1_640_plans_for_153_trades",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L88",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_8_lint_the_llm_s_rules_for_direction_coherence",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L93",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_9_ratchet_the_trail_after_a_big_mfe",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
-      "source_location": "L98",
-      "weight": 1.0,
-      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
-      "target": "docs_win_rate_pnl_improvements_10_trigger_entries_on_the_5m_bars_you_already_fetch",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
       "source_file": "docs/PIPELINE_STAGES.md",
       "source_location": "L1",
       "weight": 1.0,
@@ -40188,6 +40331,166 @@
       "confidence_score": 1.0,
       "source": "llm_strategies_setup_reference",
       "target": "llm_strategies_derivatives_flow_perp_specific_features"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L21",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "cli_commands_engine_rationale_21",
+      "target": "cli_commands_engine_parse_since"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_md",
+      "target": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L5",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
+      "target": "docs_win_rate_pnl_improvements_where_the_system_stands"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L29",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
+      "target": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L105",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
+      "target": "docs_win_rate_pnl_improvements_weirdness_log_explicit_as_requested"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L114",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_win_rate_pnl_improvement_report_btcusdt_replays",
+      "target": "docs_win_rate_pnl_improvements_suggested_order_of_attack"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L31",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_1_bug_fine_candle_window_lags_the_decision_bar_invalidation_races_and_loses_to_the_stop"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L48",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_2_bug_config_scalper_max_hold_bars_0_silently_disables_the_time_stop"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L53",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_3_make_the_observer_earn_its_3_217_calls_give_it_a_loss_cutting_mandate_and_deterministic_triggers"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L64",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_4_attack_the_fee_bleed_44_scratch_exits_and_2_8_margin_per_round_trip"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L73",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_5_don_t_short_into_a_4h_oversold_bounce_regime_gate_is_forcing_it"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L78",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_6_raise_scalper_min_rr_1_0_1_3"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L83",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_7_stop_the_plan_churn_1_640_plans_for_153_trades"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L88",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_8_lint_the_llm_s_rules_for_direction_coherence"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L93",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_9_ratchet_the_trail_after_a_big_mfe"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "docs/WIN_RATE_PNL_IMPROVEMENTS.md",
+      "source_location": "L98",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "docs_win_rate_pnl_improvements_improvements_ranked_by_estimated_impact_vs_effort",
+      "target": "docs_win_rate_pnl_improvements_10_trigger_entries_on_the_5m_bars_you_already_fetch"
     },
     {
       "relation": "contains",
@@ -40781,5 +41084,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "24276b35be7eb593cb8ba869a30d790966dbef37"
+  "built_at_commit": "0d0f2aba34380c8c9fae9b7e84a710de6c71bc27"
 }
