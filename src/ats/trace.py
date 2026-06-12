@@ -185,7 +185,7 @@ def observe(
         f"action={action}  parse_ok={parse_ok}{conf}"
     )
     _w(
-        f"  price={_num(price)}  unrealized_notional={unrealized_pct * 100:+.2f}%  "
+        f"  price={_num(price)}  unrealized_margin={unrealized_pct * 100:+.2f}%  "
         f"stop={_num(working_stop)}  remaining={_num(remaining_frac)}"
     )
     details: list[str] = []

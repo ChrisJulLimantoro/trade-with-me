@@ -20,11 +20,13 @@ from typing import Any
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ats import trace
 from ats.config import settings
 from ats.db.models import LlmCall, PaperTrade, Plan, Setup
 from ats.engine import state
 from ats.engine.invalidation import evaluate_invalidation
 from ats.engine.rule_engine import evaluate_setup
+from ats.engine.timeframes import timeframe_to_timedelta
 from ats.execution.executor import (
     close_paper_trade,
     open_paper_trade,
@@ -36,11 +38,10 @@ from ats.execution.reconcile import (
     PartialFill,
     TradeState,
     _pnl_pct,
+    breakeven_stop,
     net_of_costs,
     step_trade,
 )
-from ats.engine.timeframes import timeframe_to_timedelta
-from ats import trace
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.risk.manager import assess, regime_allows
@@ -83,6 +84,153 @@ class TickReport:
 
 def _f(v: Any) -> float:
     return float(v) if isinstance(v, Decimal) else float(v)
+
+
+def _parse_dt(value: Any) -> datetime | None:
+    if isinstance(value, datetime):
+        return value
+    if isinstance(value, str):
+        try:
+            return datetime.fromisoformat(value)
+        except ValueError:
+            return None
+    return None
+
+
+def _round_or_none(value: float | None, digits: int = 6) -> float | None:
+    return None if value is None else round(value, digits)
+
+
+def _trade_notional_margin(trade: PaperTrade) -> tuple[float, float]:
+    notional_usd = (
+        _f(trade.notional_usd)
+        if trade.notional_usd is not None
+        else settings.paper_equity_usd * _f(trade.size_pct)
+    )
+    if trade.margin_usd is not None:
+        margin_usd = _f(trade.margin_usd)
+    elif trade.leverage is not None and _f(trade.leverage) > 0:
+        margin_usd = notional_usd / _f(trade.leverage)
+    else:
+        margin_usd = notional_usd
+    return notional_usd, margin_usd
+
+
+def _margin_pnl_pct(trade: PaperTrade, notional_pnl_pct: float) -> float:
+    notional_usd, margin_usd = _trade_notional_margin(trade)
+    return (notional_usd * notional_pnl_pct) / margin_usd if margin_usd > 0 else 0.0
+
+
+def _hold_context(trade: PaperTrade, now: datetime) -> dict[str, Any]:
+    md = trade.trade_metadata or {}
+    entry_time = _parse_dt(trade.entry_time) or now
+    expires_at = _parse_dt(md.get("expires_at"))
+    window_s_raw = md.get("hold_window_seconds")
+    window_s = float(window_s_raw) if window_s_raw else None
+    held_s = max(0.0, (now - entry_time).total_seconds())
+    remaining_s = None if expires_at is None else (expires_at - now).total_seconds()
+    current_window_progress = None
+    if window_s and remaining_s is not None:
+        current_window_progress = max(0.0, (window_s - max(0.0, remaining_s)) / window_s)
+    held_bars_estimate = (
+        held_s / window_s * settings.max_hold_bars
+        if window_s and settings.max_hold_bars > 0
+        else None
+    )
+    return {
+        "held_seconds": round(held_s, 3),
+        "held_minutes": round(held_s / 60.0, 3),
+        "held_bars_estimate": _round_or_none(held_bars_estimate, 3),
+        "hold_window_seconds": window_s,
+        "hold_progress": _round_or_none(held_s / window_s if window_s else None),
+        "current_window_progress": _round_or_none(current_window_progress),
+        "expires_at": expires_at,
+        "seconds_to_time_stop": _round_or_none(remaining_s, 3),
+        "hold_extensions_used": int(md.get("hold_extensions", 0)),
+        "max_hold_extensions": settings.max_hold_extensions,
+    }
+
+
+@dataclass(frozen=True)
+class ExitPolicy:
+    """Concrete exit knobs carried by a trade after entry."""
+
+    regime_cell: str | None
+    exit_mode: str
+    scale_out_frac: float
+    trail_atr_mult: float
+    breakeven_requires_tp1: bool
+    trail_after_tp1_only: bool
+    early_stop_mode: str
+    early_trail_arm_atr: float
+    early_trail_atr_mult: float
+
+
+def _is_sideways(regime_cell: str | None) -> bool:
+    return bool(regime_cell and regime_cell.split("-", 1)[0].lower() == "side")
+
+
+def _exit_policy_for_regime(regime_cell: str | None) -> ExitPolicy:
+    if _is_sideways(regime_cell) and settings.sideways_exit_mode == "range":
+        return ExitPolicy(
+            regime_cell=regime_cell,
+            exit_mode="range",
+            scale_out_frac=settings.sideways_scale_out_frac,
+            trail_atr_mult=settings.sideways_trail_atr_mult,
+            breakeven_requires_tp1=settings.sideways_breakeven_requires_tp1,
+            trail_after_tp1_only=settings.sideways_trail_after_tp1_only,
+            early_stop_mode=settings.sideways_early_stop_mode,
+            early_trail_arm_atr=settings.sideways_early_trail_arm_atr,
+            early_trail_atr_mult=settings.sideways_early_trail_atr_mult,
+        )
+    return ExitPolicy(
+        regime_cell=regime_cell,
+        exit_mode="trend",
+        scale_out_frac=settings.scale_out_frac,
+        trail_atr_mult=settings.trail_atr_mult,
+        breakeven_requires_tp1=False,
+        trail_after_tp1_only=False,
+        early_stop_mode=settings.early_stop_mode,
+        early_trail_arm_atr=settings.early_trail_arm_atr,
+        early_trail_atr_mult=settings.early_trail_atr_mult,
+    )
+
+
+def _exit_policy_metadata(policy: ExitPolicy) -> dict[str, Any]:
+    return {
+        "regime_cell": policy.regime_cell,
+        "exit_mode": policy.exit_mode,
+        "exit_scale_out_frac": policy.scale_out_frac,
+        "exit_trail_atr_mult": policy.trail_atr_mult,
+        "exit_breakeven_requires_tp1": policy.breakeven_requires_tp1,
+        "exit_trail_after_tp1_only": policy.trail_after_tp1_only,
+        "exit_early_stop_mode": policy.early_stop_mode,
+        "exit_early_trail_arm_atr": policy.early_trail_arm_atr,
+        "exit_early_trail_atr_mult": policy.early_trail_atr_mult,
+    }
+
+
+def _exit_policy_from_metadata(md: dict[str, Any] | None) -> ExitPolicy:
+    md = md or {}
+    mode = md.get("exit_mode")
+    if mode in {"range", "trend"}:
+        return ExitPolicy(
+            regime_cell=md.get("regime_cell"),
+            exit_mode=str(mode),
+            scale_out_frac=float(md.get("exit_scale_out_frac", settings.scale_out_frac)),
+            trail_atr_mult=float(md.get("exit_trail_atr_mult", settings.trail_atr_mult)),
+            breakeven_requires_tp1=bool(md.get("exit_breakeven_requires_tp1", False)),
+            trail_after_tp1_only=bool(md.get("exit_trail_after_tp1_only", False)),
+            early_stop_mode=str(md.get("exit_early_stop_mode", settings.early_stop_mode)),
+            early_trail_arm_atr=float(
+                md.get("exit_early_trail_arm_atr", settings.early_trail_arm_atr)
+            ),
+            early_trail_atr_mult=float(
+                md.get("exit_early_trail_atr_mult", settings.early_trail_atr_mult)
+            ),
+        )
+    regime_cell = md.get("regime_cell")
+    return _exit_policy_for_regime(str(regime_cell) if regime_cell else None)
 
 
 def clamp_tightened_stop(direction: str, cur_stop: float, new_stop: float, price: float) -> float:
@@ -200,10 +348,12 @@ async def _advance_trade(
     expiry). Every ``observe_every_bars`` candles, consult the observation agent and apply
     its (code-clamped) adjustment. Stops on the first full close.
     """
+    md0 = trade.trade_metadata or {}
+    policy = _exit_policy_from_metadata(md0)
     if settings.max_hold_bars <= 0:
         expires_at: datetime | None = None  # time-stop disabled — trades run to SL/TP
     else:
-        raw_expiry = (trade.trade_metadata or {}).get("expires_at")
+        raw_expiry = md0.get("expires_at")
         last_ts = candles[-1]["open_time"] if candles else trade.entry_time
         expires_at = (
             datetime.fromisoformat(raw_expiry) if isinstance(raw_expiry, str) else last_ts
@@ -217,6 +367,14 @@ async def _advance_trade(
     state = TradeState.from_metadata(trade.trade_metadata)
     liq_price = _f(trade.liq_price) if trade.liq_price is not None else None
     cost_bps = settings.fee_bps + settings.slippage_bps
+    if policy.exit_mode == "range":
+        report.notes.append(
+            "exit_policy "
+            f"trade={str(trade.trade_id)[:8]} mode={policy.exit_mode} "
+            f"early={policy.early_stop_mode} "
+            f"be_after_tp1={policy.breakeven_requires_tp1} "
+            f"trail_atr={policy.trail_atr_mult:g} tp1_hit={state.tp_index > 0}"
+        )
     # Review-gate the time-stop only when the exit manager is actually available.
     can_review = (
         settings.expiry_review_enabled
@@ -224,7 +382,6 @@ async def _advance_trade(
         and settings.observe_enabled
         and feature_row is not None
     )
-    md0 = trade.trade_metadata or {}
     extensions = int(md0.get("hold_extensions", 0))
     window_s = float(md0.get("hold_window_seconds", 0.0))
     bars = 0
@@ -236,11 +393,16 @@ async def _advance_trade(
             candle,
             state,
             expires_at=expires_at,
-            scale_out_frac=settings.scale_out_frac,
-            trail_atr_mult=settings.trail_atr_mult,
+            scale_out_frac=policy.scale_out_frac,
+            trail_atr_mult=policy.trail_atr_mult,
             atr=atr,
+            early_stop_mode=policy.early_stop_mode,
+            early_trail_arm_atr=policy.early_trail_arm_atr,
+            early_trail_atr_mult=policy.early_trail_atr_mult,
             breakeven_arm_atr=settings.breakeven_arm_atr,
             breakeven_arm_cost_mult=settings.breakeven_arm_cost_mult,
+            breakeven_requires_tp1=policy.breakeven_requires_tp1,
+            trail_after_tp1_only=policy.trail_after_tp1_only,
             cost_bps=cost_bps,
             review_on_expiry=can_review,
             liq_price=liq_price,
@@ -252,7 +414,8 @@ async def _advance_trade(
             # Time-stop reached: review the thesis instead of a blind close. A clear reversal
             # closes via EXIT_NOW; otherwise grant one more full hold window, up to a backstop.
             if await _observe_and_adjust(
-                session, client, trade, trade_d, candle, state, report, feature_row=feature_row
+                session, client, trade, trade_d, candle, state, report,
+                feature_row=feature_row, policy=policy,
             ):
                 return  # exit manager closed it (EXIT_NOW)
             if extensions < settings.max_hold_extensions and window_s > 0:
@@ -287,6 +450,8 @@ async def _advance_trade(
             )
         elif step.state.working_stop != state.working_stop:
             await update_trade_state(session, trade.trade_id, step.state)
+        if step.notes:
+            report.notes.extend(step.notes)
         state = step.state
         bars += 1
 
@@ -298,7 +463,8 @@ async def _advance_trade(
             and bars % settings.observe_every_bars == 0
         ):
             closed = await _observe_and_adjust(
-                session, client, trade, trade_d, candle, state, report, feature_row=feature_row
+                session, client, trade, trade_d, candle, state, report,
+                feature_row=feature_row, policy=policy,
             )
             if closed:
                 return
@@ -333,6 +499,7 @@ async def _observe_and_adjust(
     report: TickReport,
     *,
     feature_row: dict[str, Any],
+    policy: ExitPolicy,
 ) -> bool:
     """Consult the observation agent for an open trade; apply a code-clamped adjustment.
 
@@ -349,7 +516,21 @@ async def _observe_and_adjust(
     def leg_pnl(px: float) -> float:
         return _pnl_pct(direction, entry, px)
 
-    unrealized = state.realized_pnl_pct + state.remaining_frac * leg_pnl(close)
+    unrealized_notional = state.realized_pnl_pct + state.remaining_frac * leg_pnl(close)
+    current_leg_notional = leg_pnl(close)
+    unrealized_margin = _margin_pnl_pct(trade, unrealized_notional)
+    current_leg_margin = _margin_pnl_pct(trade, current_leg_notional)
+    max_favorable_margin = _margin_pnl_pct(trade, state.max_favorable_pnl_pct)
+    max_adverse_margin = _margin_pnl_pct(trade, state.max_adverse_pnl_pct)
+    notional_usd, margin_usd = _trade_notional_margin(trade)
+    hold = _hold_context(trade, ts)
+    stale_candidate = (
+        (hold.get("current_window_progress") or hold.get("hold_progress") or 0.0)
+        >= settings.observe_stale_hold_progress
+        and abs(unrealized_margin) <= settings.observe_stale_unrealized_abs_pct
+        and max_favorable_margin <= settings.observe_stale_mfe_pct
+        and not state.breakeven
+    )
     env = {
         "now": ts,
         "symbol": trade.symbol,
@@ -357,11 +538,36 @@ async def _observe_and_adjust(
         "entry_price": entry,
         "entry_time": trade.entry_time,
         "current_price": close,
-        "unrealized_pct": round(unrealized, 6),
+        "unrealized_pct": round(unrealized_margin, 6),
+        "unrealized_margin_pct": round(unrealized_margin, 6),
+        "position_value": {
+            "margin_usd": round(margin_usd, 2),
+            "notional_usd": round(notional_usd, 2),
+            "leverage": (
+                round(notional_usd / margin_usd, 6)
+                if margin_usd > 0
+                else None
+            ),
+        },
         "working_stop": cur_ws,
         "take_profit": list(trade_d["take_profit"]),
         "remaining_frac": state.remaining_frac,
         "breakeven": state.breakeven,
+        "trail_armed": state.trail_armed,
+        "hold": hold,
+        "progress": {
+            "pnl_basis": "margin",
+            "current_leg_pnl_pct": round(current_leg_margin, 6),
+            "max_favorable_pnl_pct": round(max_favorable_margin, 6),
+            "max_adverse_pnl_pct": round(max_adverse_margin, 6),
+            "stale_candidate": stale_candidate,
+            "stale_thresholds": {
+                "hold_progress": settings.observe_stale_hold_progress,
+                "unrealized_abs_pct": settings.observe_stale_unrealized_abs_pct,
+                "max_favorable_pnl_pct": settings.observe_stale_mfe_pct,
+            },
+        },
+        "exit_policy": _exit_policy_metadata(policy),
         "observe_timeframe": settings.observe_timeframe,
         "features_now": feature_row,
     }
@@ -374,7 +580,7 @@ async def _observe_and_adjust(
         action=obs.action if llm.parse_ok and obs is not None else "PARSE_FAIL",
         parse_ok=llm.parse_ok,
         price=close,
-        unrealized_pct=unrealized,
+        unrealized_pct=unrealized_margin,
         working_stop=cur_ws,
         remaining_frac=state.remaining_frac,
         confidence=float(obs.confidence) if obs is not None else None,
@@ -431,7 +637,7 @@ async def _observe_and_adjust(
             leg = leg_pnl(close)
             state.realized_pnl_pct += net_of_costs(frac, leg, cost_bps)
             state.remaining_frac -= frac
-            state.working_stop = entry  # protect the runner at breakeven
+            state.working_stop = breakeven_stop(direction, entry, cost_bps)
             state.breakeven = True
             await record_partial_exit(
                 session, trade.trade_id,
@@ -484,12 +690,18 @@ async def _handle_invalidation(
             # close any open trade for this setup at the current close, banking partials
             for trade in await _open_trades_for(session, s.symbol):
                 if trade.setup_id == s.setup_id:
-                    price = feature_row["price"]
                     direction = trade.direction
                     entry = _f(trade.entry_price)
+                    st = TradeState.from_metadata(trade.trade_metadata)
+                    # A stopped-out trade can never fill worse than its (working) stop: if a
+                    # price-level invalidation resolves beyond the stop, reality would have
+                    # filled the stop first. Bound the exit so invalidation can't print a loss
+                    # larger than a stop-out at this level.
+                    ws = st.working_stop if st.working_stop is not None else _f(trade.stop_loss)
+                    price = feature_row["price"]
+                    price = max(price, ws) if direction == "long" else min(price, ws)
                     raw = (price - entry) / entry if entry else 0.0
                     leg = raw if direction == "long" else -raw
-                    st = TradeState.from_metadata(trade.trade_metadata)
                     cost_bps = settings.fee_bps + settings.slippage_bps
                     total = st.realized_pnl_pct + net_of_costs(
                         st.remaining_frac, leg, cost_bps
@@ -514,7 +726,10 @@ async def _handle_invalidation(
                     continue
                 st = TradeState.from_metadata(trade.trade_metadata)
                 if not st.breakeven:
-                    st.working_stop = _f(trade.entry_price)
+                    cost_bps = settings.fee_bps + settings.slippage_bps
+                    st.working_stop = breakeven_stop(
+                        trade.direction, _f(trade.entry_price), cost_bps
+                    )
                     st.breakeven = True
                     await update_trade_state(session, trade.trade_id, st)
                     report.notes.append(
@@ -554,6 +769,9 @@ async def _confirm_and_execute(
         "setup": {k: v for k, v in setup_d.items() if k not in ("expires_at",)},
         "rule_eval": {
             "price": ev.price,
+            "trigger_price": ev.trigger_price,
+            "close_price": ev.close_price,
+            "entry_trigger_mode": settings.entry_trigger_mode,
             "hard_ok": ev.hard_ok,
             "soft_score": ev.soft_score,
             "failed_hard": ev.failed_hard,
@@ -576,7 +794,10 @@ async def _confirm_and_execute(
             )
             confirm = ConfirmOutput(
                 action="REDUCE_SIZE",
-                reason="parse_fail_fallback: deterministic signal strong; executing at reduced size",
+                reason=(
+                    "parse_fail_fallback: deterministic signal strong; "
+                    "executing at reduced size"
+                ),
                 size_multiplier=0.75,
             )
         else:
@@ -667,6 +888,7 @@ async def _confirm_and_execute(
         report.notes.append(f"setup {setup.setup_id} risk-rejected: {decision.reasons}")
         return
 
+    policy = _exit_policy_for_regime(plan.regime_cell)
     trade_id = await open_paper_trade(
         session,
         {**setup_d, "trade_metadata": None},
@@ -684,13 +906,16 @@ async def _confirm_and_execute(
     # expiry: a trade that triggers late in a plan's life still gets a full hold budget,
     # so a healthy, still-running position is no longer cut short by the plan clock.
     trade = await session.get(PaperTrade, trade_id)
-    if trade is not None and settings.max_hold_bars > 0:
-        hold = timeframe_to_timedelta(tf) * settings.max_hold_bars
-        trade.trade_metadata = {
-            "expires_at": (now + hold).isoformat(),
-            # Window length each thesis-review extension grants (see _advance_trade).
-            "hold_window_seconds": hold.total_seconds(),
-        }
+    if trade is not None:
+        md = _exit_policy_metadata(policy)
+        if settings.max_hold_bars > 0:
+            hold = timeframe_to_timedelta(tf) * settings.max_hold_bars
+            md.update(
+                expires_at=(now + hold).isoformat(),
+                # Window length each thesis-review extension grants (see _advance_trade).
+                hold_window_seconds=hold.total_seconds(),
+            )
+        trade.trade_metadata = md
     setup.status = "realized"
     setup.detected_at = now
     open_positions.append(
@@ -705,6 +930,11 @@ async def _confirm_and_execute(
     )
     report.opened += 1
     trace.outcome(f"EXECUTED — {'; '.join(decision.reasons)}")
+    trace.outcome(
+        "EXIT POLICY "
+        f"mode={policy.exit_mode} be_after_tp1={policy.breakeven_requires_tp1} "
+        f"trail_atr={policy.trail_atr_mult:g}"
+    )
     await session.flush()
 
 
@@ -774,7 +1004,13 @@ async def evaluate_now(
             setup.status = "expired"
             continue
         setup_d = _setup_dict(setup)
-        ev = evaluate_setup(setup_d, feature_row, prev_row, soft_threshold=settings.soft_threshold)
+        ev = evaluate_setup(
+            setup_d,
+            feature_row,
+            prev_row,
+            soft_threshold=settings.soft_threshold,
+            entry_trigger_mode=settings.entry_trigger_mode,
+        )
         if not ev.detected:
             continue
         report.detections += 1
@@ -784,10 +1020,13 @@ async def evaluate_now(
                 f"setup {setup.setup_id} regime-filtered ({plan.regime_cell}/{setup.direction})"
             )
             continue
+        opened_before = report.opened
         await _confirm_and_execute(
             session, client, plan, setup, setup_d, ev, feature_row, now, open_positions, report,
             tf=tf,
         )
+        if report.opened > opened_before:
+            break
 
     await session.flush()
     return report

@@ -14,6 +14,7 @@ from __future__ import annotations
 
 from typing import Any
 
+from ats.config import settings
 from ats.llm.schemas import (
     ConfirmOutput,
     InvalidationRule,
@@ -136,13 +137,28 @@ def canned_observation(envelope: dict[str, Any]) -> ObservationOutput:
     Pure function of the envelope, so replays stay reproducible.
     """
     direction = envelope.get("direction", "long")
-    unrealized = float(envelope.get("unrealized_pct", 0.0))
+    unrealized = float(
+        envelope.get("unrealized_margin_pct", envelope.get("unrealized_pct", 0.0))
+    )
     price = float(envelope.get("current_price", 0.0))
     feats = envelope.get("features_now") or {}
     macd_hist = feats.get("macd_hist")
     mh = float(macd_hist) if macd_hist is not None else 0.0
     # Momentum "with the trade" is positive macd_hist for longs, negative for shorts.
     momentum_with = mh if direction == "long" else -mh
+    progress = envelope.get("progress") or {}
+    hold = envelope.get("hold") or {}
+    hold_progress = float(
+        hold.get("current_window_progress")
+        or hold.get("hold_progress")
+        or 0.0
+    )
+    max_favorable = float(progress.get("max_favorable_pnl_pct") or 0.0)
+    stale_candidate = bool(progress.get("stale_candidate")) or (
+        hold_progress >= settings.observe_stale_hold_progress
+        and abs(unrealized) <= settings.observe_stale_unrealized_abs_pct
+        and max_favorable <= settings.observe_stale_mfe_pct
+    )
 
     # Clear reversal against an at-risk position → exit.
     if unrealized <= 0.0 and momentum_with < 0:
@@ -150,6 +166,13 @@ def canned_observation(envelope: dict[str, Any]) -> ObservationOutput:
             action="EXIT_NOW",
             reason="Momentum flipped against the trade while not in profit.",
             confidence=0.8,
+        )
+    # Opportunity-cost exit: the trade used most of its hold budget and never moved.
+    if stale_candidate and momentum_with <= 0:
+        return ObservationOutput(
+            action="EXIT_NOW",
+            reason="Trade is stale: most of the hold window is spent without favorable progress.",
+            confidence=0.75,
         )
     # Healthy gain but momentum fading → lock in by tightening toward price.
     if unrealized >= 0.01 and momentum_with <= 0:

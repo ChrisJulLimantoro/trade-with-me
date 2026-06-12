@@ -120,6 +120,56 @@ def test_evaluate_setup_detection() -> None:
     }
     ev = evaluate_setup(setup, FEATURES, soft_threshold=0.5)
     assert ev.detected is True and ev.price_ok and ev.hard_ok and ev.soft_score == 1.0
+    assert ev.price == 100.0 and ev.trigger_price == 100.0 and ev.close_price == 100.0
+
+
+def test_close_inside_zone_triggers_in_both_entry_modes() -> None:
+    setup = {"direction": "long", "entry_zone_low": 95, "entry_zone_high": 105}
+    for mode in ("close", "wick_limit"):
+        ev = evaluate_setup(setup, FEATURES, soft_threshold=0.5, entry_trigger_mode=mode)
+        assert ev.detected is True
+        assert ev.price == 100.0
+
+
+def test_wick_touch_only_triggers_in_wick_limit_mode() -> None:
+    setup = {"direction": "long", "entry_zone_low": 101, "entry_zone_high": 105}
+    features = {**FEATURES, "price": 100.0, "close": 100.0, "low": 99.0, "high": 102.0}
+
+    close_ev = evaluate_setup(setup, features, soft_threshold=0.5, entry_trigger_mode="close")
+    wick_ev = evaluate_setup(setup, features, soft_threshold=0.5, entry_trigger_mode="wick_limit")
+
+    assert close_ev.detected is False
+    assert wick_ev.detected is True
+    assert wick_ev.close_price == 100.0
+
+
+def test_wick_limit_long_uses_zone_high_as_fill() -> None:
+    setup = {"direction": "long", "entry_zone_low": 101, "entry_zone_high": 105}
+    features = {**FEATURES, "price": 100.0, "close": 100.0, "low": 99.0, "high": 102.0}
+
+    ev = evaluate_setup(setup, features, soft_threshold=0.5, entry_trigger_mode="wick_limit")
+
+    assert ev.detected is True
+    assert ev.price == 105.0 and ev.trigger_price == 105.0
+
+
+def test_wick_limit_short_uses_zone_low_as_fill() -> None:
+    setup = {"direction": "short", "entry_zone_low": 95, "entry_zone_high": 99}
+    features = {**FEATURES, "price": 100.0, "close": 100.0, "low": 98.0, "high": 101.0}
+
+    ev = evaluate_setup(setup, features, soft_threshold=0.5, entry_trigger_mode="wick_limit")
+
+    assert ev.detected is True
+    assert ev.price == 95.0 and ev.trigger_price == 95.0
+
+
+def test_wick_limit_does_not_trigger_without_range_intersection() -> None:
+    setup = {"direction": "long", "entry_zone_low": 110, "entry_zone_high": 115}
+    features = {**FEATURES, "price": 100.0, "close": 100.0, "low": 99.0, "high": 105.0}
+
+    ev = evaluate_setup(setup, features, soft_threshold=0.5, entry_trigger_mode="wick_limit")
+
+    assert ev.detected is False and ev.price_ok is False
 
 
 def test_evaluate_setup_not_detected_when_hard_fails() -> None:

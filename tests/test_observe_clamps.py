@@ -75,6 +75,26 @@ def test_mock_exits_on_reversal_when_not_in_profit() -> None:
     assert obs.confidence >= 0.7  # clears the default exit floor
 
 
+def test_mock_prefers_explicit_margin_unrealized_alias() -> None:
+    env = _env("long", unrealized=0.02, macd_hist=-0.5)
+    env["unrealized_margin_pct"] = -0.002
+
+    obs = canned_observation(env)
+
+    assert obs.action == "EXIT_NOW"
+
+
+def test_mock_exits_stale_flat_trade_without_favorable_progress() -> None:
+    env = _env("long", unrealized=0.0005, macd_hist=0.0)
+    env["hold"] = {"current_window_progress": 0.8}
+    env["progress"] = {"max_favorable_pnl_pct": 0.001, "stale_candidate": True}
+
+    obs = canned_observation(env)
+
+    assert obs.action == "EXIT_NOW"
+    assert obs.confidence >= 0.7
+
+
 def test_mock_tightens_when_gain_and_momentum_fades() -> None:
     obs = canned_observation(_env("long", unrealized=0.02, macd_hist=-0.1))
     assert obs.action == "TIGHTEN_STOP"

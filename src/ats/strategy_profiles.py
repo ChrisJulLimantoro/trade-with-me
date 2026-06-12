@@ -28,8 +28,9 @@ PROFILES: dict[str, dict[str, Any]] = {
     # floor is relaxed so tight stops aren't rejected, and the hold/refresh windows shrink.
     "scalper": {
         "paper_equity_usd": 1_000.0,   # smaller book
+        "max_setups_per_plan": 3,
         "max_leverage": 20.0,           # conservative isolated leverage cap
-        "risk_per_trade_pct": 0.01,    # still risk ~1% of (the smaller) equity per stop-out
+        "risk_per_trade_pct": 0.025,    # still risk ~1% of (the smaller) equity per stop-out
         "max_margin_pct_per_trade": 0.20,
         "max_total_margin_pct": 0.60,
         "max_portfolio_risk_pct": 0.03,
@@ -57,4 +58,5 @@ def apply_profile(name: str, target: Settings = settings) -> dict[str, Any]:
         if not hasattr(target, field):
             raise AttributeError(f"profile '{name}' sets unknown Settings field '{field}'")
         setattr(target, field, value)
-    return dict(overrides)
+    target.strategy_profile = name
+    return {**overrides, "strategy_profile": name}

@@ -38,7 +38,10 @@ _PLAN_SCHEMA = """\
       "size_pct": <0..1 float>,
       "hard_rules": [{"left": str, "operator": str, "right": str|float}],
       "soft_rules": [{"left": str, "operator": str, "right": str|float, "weight": 0..1}],
-      "invalidation_rules": [{"severity": "warning"|"soft"|"hard", "left": str, "operator": str, "right": str|float, "on_close": bool}]
+      "invalidation_rules": [
+        {"severity": "warning"|"soft"|"hard", "left": str, "operator": str,
+         "right": str|float, "on_close": bool}
+      ]
     }
   ]
 }"""
@@ -49,6 +52,26 @@ _CONFIRM_SCHEMA = """\
   "reason": "<string>",
   "size_multiplier": <0..1 float, only meaningful for REDUCE_SIZE> (CAN'T BE NULL)
 }"""
+
+
+def _profile_strategy_addendum() -> str:
+    """Profile-specific strategy guidance appended to the shared strategist prompt."""
+    return f"""\
+- PROFILE GUIDANCE ({settings.strategy_profile}):
+  - Emit up to {settings.max_setups_per_plan} distinct allowed_setups when the market offers
+    genuinely different entries; avoid duplicate setups around the same trigger.
+  - In trending regimes, include a pullback/retest setup and, when valid, a separate
+    breakout/breakdown continuation setup.
+  - In sideways regimes, prefer range mean-reversion near support/resistance extremes and
+    consider both long and short setups when each has independent reward:risk. Prefer longs
+    near support/range lows and shorts near resistance/range highs; avoid entries near the
+    range midpoint unless take_profit[0] is very close. Set take_profit[0] near the range
+    midpoint, VWAP, EMA20/EMA50, or the nearest mean-reversion level. Use TP2 only for the
+    opposite range edge when reward:risk supports it, and avoid breakout-continuation
+    targets unless the regime is no longer sideways.
+  - Hard rules should be safety/invalidation-quality gates. Put trend flavor such as EMA/MACD
+    alignment in soft rules unless violating it should fully forbid the entry."""
+
 
 def plan_system_prompt() -> str:
     """Render the strategist system prompt with the live risk posture baked in.
@@ -124,10 +147,17 @@ Rules:
   higher-timeframe trend and avoid fighting it. All hard_rules, soft_rules, and
   invalidation_rules MUST reference base-timeframe features only (rsi_14, ema_50, atr_14,
   price, …) — NEVER higher-timeframe values.
+- INVALIDATION ≠ STOP: do NOT restate the stop_loss as an invalidation rule (e.g. a short
+  must not carry `[hard] price > stop_loss`, a long must not carry `[hard] price < stop_loss`).
+  The exit machine already enforces the protective stop. Reserve invalidation_rules for
+  thesis-level signals that mean the setup is wrong BEFORE price reaches the stop (e.g. a
+  momentum/structure feature flipping against the trade), not for the price level itself.
+
 
 You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.
 The object must exactly match this schema:
 {_PLAN_SCHEMA}"""
+# {_profile_strategy_addendum()}
 
 CONFIRM_SYSTEM_PROMPT = f"""\
 You are the tactical reviewer in a crypto perpetuals trading system. A deterministic
@@ -172,8 +202,12 @@ OBSERVE_SYSTEM_PROMPT = f"""\
 You are the tactical exit manager in a crypto perpetuals trading system. A position is
 already OPEN; deterministic code is trailing its stop and scaling at targets. You watch it
 on a FINER timeframe and may propose ONE adjustment this check. You are given the trade
-(direction, entry, current stop/targets, unrealized P&L, fraction remaining) and a fresh
-feature snapshot as JSON.
+(direction, entry, current stop/targets, unrealized P&L, committed margin, fraction
+remaining) and a fresh feature snapshot as JSON. P&L fields are return on committed margin
+(your actual money before margin/leverage), not raw notional price return. The envelope also
+includes hold/progress context: how long the position has been open, time-stop progress,
+max favorable/adverse margin excursion, and whether deterministic code flags it as a stale
+candidate.
 
 Choose one action:
 - "HOLD": let the deterministic plan run. This is the default — prefer it unless there is a
@@ -188,7 +222,17 @@ Choose one action:
   confidence; the engine ignores EXIT_NOW below its confidence floor.
 
 Bias toward protecting realized gains and letting clear winners run. Do NOT widen risk and
-do NOT chase — when unsure, HOLD. This is PAPER trading only.
+do NOT chase. Be impatient with dead money: use hold.held_minutes, hold.hold_progress,
+progress.max_favorable_pnl_pct, progress.current_leg_pnl_pct, and progress.stale_candidate
+to judge whether the trade has failed to travel.
+- If held_minutes is roughly 360+ (about 6 hours) and the trade is still near flat, never
+  made meaningful favorable progress, and fresh momentum is not clearly with the trade,
+  prefer EXIT_NOW with high confidence.
+- If held_minutes is roughly 480+ (about 8 hours), require a strong reason to keep holding;
+  a flat or slightly red trade should EXIT_NOW even if progress.stale_candidate is false.
+- HOLD stale/flat trades only when the current features show a credible, near-term catalyst
+  in the trade direction. Vague thesis survival is not enough.
+When unsure, HOLD only for young trades or protected winners. This is PAPER trading only.
 You MUST respond with ONLY a raw JSON object — no markdown, no code fences, no explanation.
 The object must exactly match this schema:
 {_OBSERVE_SCHEMA}"""

@@ -18,6 +18,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 from ats.config import settings
 from ats.engine import state
 from ats.engine.detector import ClosedTradeInfo, TickReport, evaluate_now
+from ats.engine.timeframes import timeframe_to_timedelta
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.planning.create_plan import create_plan
@@ -185,13 +186,18 @@ async def run_replay(
     bars_since_plan = settings.plan_refresh_bars  # force a plan on the first bar
     active_sticky: str | None = None
     observe_tf = settings.observe_timeframe
+    base_dt = timeframe_to_timedelta(tf)
+    obs_dt = timeframe_to_timedelta(observe_tf) if observe_tf != tf else base_dt
     for i, row in enumerate(rows):
         now = row["open_time"]
         prev = rows[i - 1] if i > 0 else None
 
-        # While a position is open, manage exits on the finer timeframe: fetch the
-        # observe-tf candles spanning the prior→current decision bar so reconciliation
-        # (and the observation agent) react within the 15m bar, not just at its close.
+        # While a position is open, manage exits on the finer timeframe. The feature row at
+        # open_time=now carries OHLC for the bar [now, now+base_dt); fetch the observe-tf
+        # candles that actually compose *this* bar so reconciliation (and the observation
+        # agent) react within it before invalidation/rules see the bar's close. candles_between
+        # is (start, end]: start=now-obs_dt includes the sub-candle at exactly `now`; end at
+        # now+base_dt-obs_dt includes the last sub-candle and excludes the next bar's open.
         open_before = bool(await state.open_positions(session, symbol=symbol))
         fine_candles = None
         if (
@@ -201,7 +207,7 @@ async def run_replay(
             and observe_tf != tf
         ):
             fine_candles = await state.candles_between(
-                session, symbol, observe_tf, prev["open_time"], now
+                session, symbol, observe_tf, now - obs_dt, now + base_dt - obs_dt
             )
 
         created, bars_since_plan = await _ensure_plan(

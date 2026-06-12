@@ -140,9 +140,12 @@ class TradeState:
     working_stop: float | None = None  # current stop; None → use the trade's stop_loss
     tp_index: int = 0  # index of the next take-profit to target
     breakeven: bool = False  # stop has been moved to (at least) entry
+    trail_armed: bool = False  # pre-TP1 ATR trailing has armed
+    max_favorable_pnl_pct: float = 0.0  # best signed return seen since entry
+    max_adverse_pnl_pct: float = 0.0  # worst signed return seen since entry
 
     @classmethod
-    def from_metadata(cls, md: dict[str, Any] | None) -> "TradeState":
+    def from_metadata(cls, md: dict[str, Any] | None) -> TradeState:
         md = md or {}
         ws = md.get("stop_working")
         return cls(
@@ -151,6 +154,9 @@ class TradeState:
             working_stop=float(ws) if ws is not None else None,
             tp_index=int(md.get("tp_index", 0)),
             breakeven=bool(md.get("breakeven", False)),
+            trail_armed=bool(md.get("trail_armed", False)),
+            max_favorable_pnl_pct=float(md.get("max_favorable_pnl_pct", 0.0)),
+            max_adverse_pnl_pct=float(md.get("max_adverse_pnl_pct", 0.0)),
         )
 
     def to_metadata(self) -> dict[str, Any]:
@@ -161,6 +167,9 @@ class TradeState:
             "stop_working": self.working_stop,
             "tp_index": self.tp_index,
             "breakeven": self.breakeven,
+            "trail_armed": self.trail_armed,
+            "max_favorable_pnl_pct": self.max_favorable_pnl_pct,
+            "max_adverse_pnl_pct": self.max_adverse_pnl_pct,
         }
 
 
@@ -195,8 +204,13 @@ def step_trade(
     scale_out_frac: float,
     trail_atr_mult: float = 0.0,
     atr: float | None = None,
+    early_stop_mode: str = "breakeven",
+    early_trail_arm_atr: float = 0.0,
+    early_trail_atr_mult: float = 0.0,
     breakeven_arm_atr: float = 0.0,
     breakeven_arm_cost_mult: float = 0.0,
+    breakeven_requires_tp1: bool = False,
+    trail_after_tp1_only: bool = False,
     cost_bps: float = 0.0,
     review_on_expiry: bool = False,
     hard_invalidation: bool = False,
@@ -205,14 +219,14 @@ def step_trade(
     """Advance one open trade by a single bar. Returns the resulting :class:`BarStep`.
 
     Exit priority per bar: hard-invalidation → working stop → liquidation → current
-    take-profit → early breakeven arm → expiry (skipped for breakeven-protected runners
-    and for in-profit trades) → trail update.
+    take-profit → early protection → expiry (skipped for protected runners and for
+    in-profit trades) → post-TP1 trail update.
 
-    ``breakeven_arm_atr`` (with ``atr``) moves the stop to breakeven once the favorable
-    excursion reaches that ATR multiple, without scaling out; ``breakeven_arm_cost_mult``
-    additionally requires that excursion to clear that many round-trip costs of profit so
-    the arm doesn't scratch trades at entry for a fee-only loss. ``cost_bps`` charges
-    round-trip trading costs at each leg-banking site (see :func:`net_of_costs`).
+    ``early_stop_mode="trail"`` arms a pre-TP1 ATR trail once favorable excursion reaches
+    ``early_trail_arm_atr``; ``early_stop_mode="breakeven"`` preserves the old direct
+    breakeven arm. ``cost_bps`` charges round-trip trading costs at each leg-banking site.
+    ``breakeven_requires_tp1`` disables that early arm until at least one target has filled;
+    ``trail_after_tp1_only`` similarly prevents a pre-TP1 trail from a manual breakeven state.
     ``review_on_expiry``: when the time-stop is reached, return ``expiry_due=True`` for the
     caller to run a thesis review instead of closing here.
 
@@ -238,6 +252,21 @@ def step_trade(
         new = replace(state, remaining_frac=0.0, realized_pnl_pct=total)
         return BarStep(state=new, exit_result=ExitResult(px, ts, reason, total))
 
+    def at_cost_breakeven(px: float) -> bool:
+        return abs(px - breakeven_stop(direction, entry, cost_bps)) < 1e-9
+
+    def beyond_cost_breakeven(px: float) -> bool:
+        be = breakeven_stop(direction, entry, cost_bps)
+        return px > be if direction == "long" else px < be
+
+    favorable_px = high if direction == "long" else low
+    adverse_px = low if direction == "long" else high
+    state = replace(
+        state,
+        max_favorable_pnl_pct=max(state.max_favorable_pnl_pct, pnl(favorable_px)),
+        max_adverse_pnl_pct=min(state.max_adverse_pnl_pct, pnl(adverse_px)),
+    )
+
     if hard_invalidation:
         return close_all(close, "invalidation")
 
@@ -248,9 +277,9 @@ def step_trade(
 
     # Conservative: a bar that straddles both the stop and the target stops out first.
     if sl_hit:
-        if state.breakeven and abs(working_stop - entry) < 1e-9:
+        if state.breakeven and at_cost_breakeven(working_stop):
             reason = "breakeven"
-        elif pnl(working_stop) > 0:
+        elif (state.trail_armed or pnl(working_stop) > 0) and beyond_cost_breakeven(working_stop):
             reason = "trail"
         else:
             reason = "sl"
@@ -265,7 +294,8 @@ def step_trade(
         # Partial scale-out: bank a fraction, move stop to breakeven, advance the target.
         close_frac = state.remaining_frac * scale_out_frac
         realized = state.realized_pnl_pct + net_of_costs(close_frac, pnl(target), cost_bps)
-        new = TradeState(
+        new = replace(
+            state,
             remaining_frac=state.remaining_frac - close_frac,
             realized_pnl_pct=realized,
             working_stop=breakeven_stop(direction, entry, cost_bps),  # breakeven, net of costs
@@ -278,20 +308,44 @@ def step_trade(
             notes=[f"scaled out {close_frac:.2f} at tp{tp_idx + 1}; stop→breakeven"],
         )
 
-    # Early breakeven arm: once the trade has run breakeven_arm_atr * ATR in our favor,
-    # move the stop to entry WITHOUT scaling out. This protects a green runner from the
-    # time-stop below and lets the trail engage before the first target is tagged.
+    # Early protection before TP1. In trail mode this arms an ATR trail without jumping
+    # straight to breakeven; breakeven mode preserves the legacy behavior for comparison.
     arm_notes: list[str] = []
-    if not state.breakeven and breakeven_arm_atr and atr:
+    if atr and state.tp_index == 0:
         favorable = (high - entry) if direction == "long" else (entry - low)
-        # Require both: the ATR excursion AND a profit cushion beyond round-trip costs, so a
-        # straight retrace to entry doesn't bank a fee-only loss.
-        profit_floor = entry * (2.0 * cost_bps / 10_000.0) * breakeven_arm_cost_mult
-        if favorable >= breakeven_arm_atr * atr and favorable >= profit_floor:
-            state = replace(
-                state, working_stop=breakeven_stop(direction, entry, cost_bps), breakeven=True
-            )
-            arm_notes = [f"armed breakeven early at {breakeven_arm_atr:g}x ATR"]
+        if (
+            early_stop_mode == "trail"
+            and not state.trail_armed
+            and early_trail_arm_atr
+            and favorable >= early_trail_arm_atr * atr
+        ):
+            state = replace(state, trail_armed=True)
+            arm_notes = [f"early_trail armed at {early_trail_arm_atr:g}x ATR"]
+        can_arm_breakeven = not (breakeven_requires_tp1 and state.tp_index == 0)
+        if (
+            early_stop_mode == "breakeven"
+            and not state.breakeven
+            and can_arm_breakeven
+            and breakeven_arm_atr
+        ):
+            profit_floor = entry * (2.0 * cost_bps / 10_000.0) * breakeven_arm_cost_mult
+            if favorable >= breakeven_arm_atr * atr and favorable >= profit_floor:
+                state = replace(
+                    state,
+                    working_stop=breakeven_stop(direction, entry, cost_bps),
+                    breakeven=True,
+                )
+                arm_notes = [f"armed breakeven early at {breakeven_arm_atr:g}x ATR"]
+
+    if state.trail_armed and state.tp_index == 0 and early_trail_atr_mult and atr:
+        cur_ws = state.working_stop if state.working_stop is not None else full_stop
+        if direction == "long":
+            ws = max(cur_ws, close - early_trail_atr_mult * atr)
+        else:
+            ws = min(cur_ws, close + early_trail_atr_mult * atr)
+        if ws != cur_ws or state.working_stop is None:
+            state = replace(state, working_stop=ws)
+            arm_notes.append(f"early_trail stop -> {ws:g} ({early_trail_atr_mult:g}x ATR)")
 
     # Time-stop: let breakeven-protected runners keep going, and never cut a trade that is
     # currently in profit; close only what is still flat/at risk and unprotected. When
@@ -305,7 +359,8 @@ def step_trade(
     # Trail the runner once it is protected. Base off the CURRENT working stop, which may
     # have just been set to entry by the early arm above.
     new_state = state
-    if state.breakeven and trail_atr_mult and atr:
+    can_trail = not (trail_after_tp1_only and state.tp_index == 0)
+    if state.breakeven and can_trail and trail_atr_mult and atr:
         cur_ws = state.working_stop if state.working_stop is not None else full_stop
         if direction == "long":
             ws = max(cur_ws, close - trail_atr_mult * atr)

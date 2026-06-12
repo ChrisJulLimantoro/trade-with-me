@@ -24,7 +24,7 @@ from ats.engine import state
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.llm.client import LlmClient
 from ats import trace
-from ats.llm.schemas import LlmResult, PlanOutput, SetupOutput
+from ats.llm.schemas import InvalidationRule, LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
 from ats.risk.manager import regime_allows, reward_risk
 
@@ -66,6 +66,50 @@ def _admissible_setups(setups: list[SetupOutput], *, min_rr: float) -> list[Setu
             continue
         admissible.append(s)
     return admissible
+
+
+# How close a hard price-invalidation literal must sit to the stop to count as a duplicate
+# of it (relative to the stop price).
+_STOP_DUP_TOL = 0.002
+
+
+def _stripped_invalidation_rules(s: SetupOutput) -> list[InvalidationRule]:
+    """Drop hard invalidation rules that merely restate the stop level.
+
+    The strategist routinely emits a ``[hard] price < stop`` (long) / ``price > stop`` (short)
+    rule. That duplicates the protective stop the exit machine already enforces — but
+    invalidation closes at the *bar close*, which on a fast bar prints past the stop and
+    produces a loss larger than a clean stop-out. Reconciliation already fills the stop on the
+    finer timeframe, and the invalidation exit is now stop-bounded, so these rules are at best
+    redundant and at worst harmful. Keep invalidation for genuine thesis-level signals.
+    """
+    stop = s.stop_loss
+    if stop <= 0:
+        return list(s.invalidation_rules)
+    kept: list[InvalidationRule] = []
+    for r in s.invalidation_rules:
+        is_price_literal = (
+            r.severity == "hard" and r.left == "price" and isinstance(r.right, (int, float))
+        )
+        redundant = False
+        if is_price_literal:
+            level = float(r.right)
+            if s.direction == "long" and r.operator in ("<", "<="):
+                # Fires once price falls to/through a level at-or-below (worse than) the stop.
+                redundant = level <= stop * (1 + _STOP_DUP_TOL)
+            elif s.direction == "short" and r.operator in (">", ">="):
+                redundant = level >= stop * (1 - _STOP_DUP_TOL)
+        if redundant:
+            log.info(
+                "invalidation_rule_dropped_stop_dup",
+                direction=s.direction,
+                operator=r.operator,
+                level=float(r.right),
+                stop_loss=stop,
+            )
+            continue
+        kept.append(r)
+    return kept
 
 
 @dataclass
@@ -263,7 +307,7 @@ async def _persist(
             size_pct=s.size_pct,
             hard_rules=[r.model_dump() for r in s.hard_rules],
             soft_rules=[r.model_dump() for r in s.soft_rules],
-            invalidation_rules=[r.model_dump() for r in s.invalidation_rules],
+            invalidation_rules=[r.model_dump() for r in _stripped_invalidation_rules(s)],
             expires_at=expires_at,
         )
         session.add(setup)

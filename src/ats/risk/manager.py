@@ -143,8 +143,8 @@ def _open_risk_usd(position: dict[str, Any]) -> float:
 def regime_allows(regime_cell: str | None, direction: str) -> bool:
     """Whether a setup's direction is aligned with the current regime.
 
-    The losing bucket in replay was counter-trend entries in chop. Rule of thumb:
-    - sideways regimes ("side-*"): take nothing (range chop stops out both ways),
+    Rule of thumb:
+    - sideways regimes ("side-*"): allow both directions for range/mean-reversion profiles,
     - bull regimes ("bull-*"): longs only,
     - bear regimes ("bear-*"): shorts only,
     - unknown / missing regime: allow (no information to gate on).
@@ -153,7 +153,7 @@ def regime_allows(regime_cell: str | None, direction: str) -> bool:
         return True
     head = regime_cell.split("-", 1)[0].lower()
     if head == "side":
-        return False
+        return direction in {"long", "short"}
     if head == "bull":
         return direction == "long"
     if head == "bear":
@@ -224,7 +224,10 @@ def assess(
         if stop_dist < min_dist:
             return RiskDecision(
                 False, 0.0,
-                [f"stop {stop_dist:.1f}pts < {min_stop_atr_mult}x ATR ({min_dist:.1f}pts) — noise-stop"],
+                [
+                    f"stop {stop_dist:.1f}pts < {min_stop_atr_mult}x ATR "
+                    f"({min_dist:.1f}pts) — noise-stop"
+                ],
             )
 
     # Fixed cap + scaling: the multiplier (<= 1) trims risk, never raises it past the cap.

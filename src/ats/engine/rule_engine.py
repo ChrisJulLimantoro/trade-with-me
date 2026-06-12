@@ -149,12 +149,40 @@ def in_entry_zone(price: float | None, low: float, high: float) -> bool:
     return price is not None and low <= price <= high
 
 
+def _entry_trigger(
+    setup: dict[str, Any],
+    features: dict[str, Any],
+    *,
+    entry_trigger_mode: str,
+) -> tuple[bool, float | None, float | None]:
+    """Return (triggered, fill_price, close_price) for the setup's entry zone."""
+    low, high = float(setup["entry_zone_low"]), float(setup["entry_zone_high"])
+    close = resolve_operand("price", features)
+    if in_entry_zone(close, low, high):
+        return True, close, close
+    if entry_trigger_mode != "wick_limit":
+        return False, close, close
+
+    candle_low = resolve_operand("low", features)
+    candle_high = resolve_operand("high", features)
+    if candle_low is None or candle_high is None:
+        return False, close, close
+    if candle_high < low or candle_low > high:
+        return False, close, close
+
+    direction = str(setup.get("direction") or "").lower()
+    fill = low if direction == "short" else high
+    return True, fill, close
+
+
 @dataclass
 class SetupEval:
     detected: bool
     price_ok: bool
     hard_ok: bool
     soft_score: float
+    trigger_price: float | None
+    close_price: float | None
     price: float | None
     failed_hard: list[str] = field(default_factory=list)
     # Feature references (in hard/soft rules) that didn't resolve this bar, as
@@ -168,15 +196,19 @@ def evaluate_setup(
     prev: dict[str, Any] | None = None,
     *,
     soft_threshold: float,
+    entry_trigger_mode: str = "close",
 ) -> SetupEval:
     """Combine entry-zone + hard rules + soft threshold into a detection decision.
 
     ``setup`` is a dict with keys ``entry_zone_low``, ``entry_zone_high``,
     ``hard_rules``, ``soft_rules``. ``features`` must include ``price`` (the close).
+    ``SetupEval.price`` is the simulated entry price, which can differ from the close
+    when ``entry_trigger_mode="wick_limit"`` and only the candle range touched the zone.
     """
     unresolved: list[str] = []
-    price = resolve_operand("price", features)
-    price_ok = in_entry_zone(price, float(setup["entry_zone_low"]), float(setup["entry_zone_high"]))
+    price_ok, trigger_price, close_price = _entry_trigger(
+        setup, features, entry_trigger_mode=entry_trigger_mode
+    )
     hard_ok, failed = eval_hard_rules(
         setup.get("hard_rules") or [], features, prev, unresolved=unresolved
     )
@@ -189,7 +221,9 @@ def evaluate_setup(
         price_ok=price_ok,
         hard_ok=hard_ok,
         soft_score=soft_score,
-        price=price,
+        trigger_price=trigger_price,
+        close_price=close_price,
+        price=trigger_price,
         failed_hard=failed,
         unresolved_operands=sorted(set(unresolved)),
     )

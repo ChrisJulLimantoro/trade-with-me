@@ -14,7 +14,12 @@ FAR = T0 + timedelta(days=10)
 
 # Two-target long: TP1=110, TP2=120, stop=95, entry=100.
 LONG = {"direction": "long", "entry_price": 100.0, "stop_loss": 95.0, "take_profit": [110.0, 120.0]}
-SHORT = {"direction": "short", "entry_price": 100.0, "stop_loss": 105.0, "take_profit": [90.0, 80.0]}
+SHORT = {
+    "direction": "short",
+    "entry_price": 100.0,
+    "stop_loss": 105.0,
+    "take_profit": [90.0, 80.0],
+}
 
 
 def _c(high: float, low: float, close: float, ts: datetime = T0) -> dict:
@@ -56,6 +61,15 @@ def test_partial_scale_out_at_tp1_moves_to_breakeven() -> None:
     assert step.state.tp_index == 1
     # banked leg pnl: 0.5 of position * +10%
     assert step.state.realized_pnl_pct == pytest.approx(0.5 * 0.10)
+
+
+def test_range_mode_banks_larger_fraction_at_tp1() -> None:
+    step = _step(LONG, _c(111, 99, 109), TradeState(), scale_out_frac=0.75)
+
+    assert step.partial is not None
+    assert step.partial.frac == pytest.approx(0.75)
+    assert step.state.remaining_frac == pytest.approx(0.25)
+    assert step.state.realized_pnl_pct == pytest.approx(0.75 * 0.10)
 
 
 def test_runner_closes_at_final_tp_with_summed_pnl() -> None:
@@ -106,7 +120,14 @@ def test_in_profit_trade_survives_expiry() -> None:
 
 def test_early_breakeven_arm_without_scale_out() -> None:
     # Fix B: favorable excursion of 7 pts >= 1x ATR(=5) arms breakeven without scaling out.
-    step = _step(LONG, _c(107, 100, 106), TradeState(), breakeven_arm_atr=1.0, atr=5.0)
+    step = _step(
+        LONG,
+        _c(107, 100, 106),
+        TradeState(),
+        early_stop_mode="breakeven",
+        breakeven_arm_atr=1.0,
+        atr=5.0,
+    )
     assert not step.closed
     assert step.partial is None
     assert step.state.breakeven is True
@@ -114,6 +135,89 @@ def test_early_breakeven_arm_without_scale_out() -> None:
     assert step.state.remaining_frac == pytest.approx(1.0)  # nothing banked
     assert step.state.realized_pnl_pct == pytest.approx(0.0)
     assert step.notes  # carries an "armed breakeven early" note
+
+
+def test_range_mode_does_not_early_arm_before_tp1() -> None:
+    step = _step(
+        LONG,
+        _c(107, 100, 106),
+        TradeState(),
+        early_stop_mode="breakeven",
+        breakeven_arm_atr=1.0,
+        atr=5.0,
+        breakeven_requires_tp1=True,
+    )
+
+    assert not step.closed
+    assert step.partial is None
+    assert step.state.breakeven is False
+    assert step.state.working_stop is None
+
+
+def test_early_trail_arms_without_breakeven() -> None:
+    step = _step(
+        LONG,
+        _c(107, 100, 106),
+        TradeState(),
+        early_stop_mode="trail",
+        early_trail_arm_atr=1.0,
+        early_trail_atr_mult=2.0,
+        atr=5.0,
+    )
+
+    assert not step.closed
+    assert step.state.trail_armed is True
+    assert step.state.breakeven is False
+    assert step.state.working_stop == pytest.approx(96.0)
+    assert any("early_trail armed" in note for note in step.notes)
+
+
+def test_early_stop_off_does_not_arm_protection() -> None:
+    step = _step(
+        LONG,
+        _c(107, 100, 106),
+        TradeState(),
+        early_stop_mode="off",
+        early_trail_arm_atr=1.0,
+        early_trail_atr_mult=2.0,
+        breakeven_arm_atr=1.0,
+        atr=5.0,
+    )
+
+    assert step.state.trail_armed is False
+    assert step.state.breakeven is False
+    assert step.state.working_stop is None
+
+
+def test_early_trail_never_loosens_original_stop() -> None:
+    step = _step(
+        LONG,
+        _c(107, 100, 106),
+        TradeState(),
+        early_stop_mode="trail",
+        early_trail_arm_atr=1.0,
+        early_trail_atr_mult=3.0,
+        atr=5.0,
+    )
+
+    assert step.state.trail_armed is True
+    assert step.state.working_stop == pytest.approx(95.0)
+
+
+def test_short_early_trail_formula() -> None:
+    step = _step(
+        SHORT,
+        _c(100, 93, 94),
+        TradeState(),
+        early_stop_mode="trail",
+        early_trail_arm_atr=1.0,
+        early_trail_atr_mult=2.0,
+        atr=5.0,
+    )
+
+    assert step.state.trail_armed is True
+    assert step.state.breakeven is False
+    assert step.state.working_stop == pytest.approx(104.0)
 
 
 def test_breakeven_stop_covers_costs() -> None:
@@ -130,7 +234,11 @@ def test_early_arm_blocked_by_profit_floor() -> None:
     # floor = entry * 2*cost_bps/1e4 * mult = 100 * 0.002 * 5 = 1.0 ; ATR thresh = 0.1*5 = 0.5
     step = _step(
         LONG, _c(100.6, 100, 100.4), TradeState(),
-        breakeven_arm_atr=0.1, atr=5.0, cost_bps=10.0, breakeven_arm_cost_mult=5.0,
+        early_stop_mode="breakeven",
+        breakeven_arm_atr=0.1,
+        atr=5.0,
+        cost_bps=10.0,
+        breakeven_arm_cost_mult=5.0,
     )
     assert step.state.breakeven is False  # excursion 0.6 < profit floor 1.0
 
@@ -174,6 +282,69 @@ def test_trailing_stop_locks_in_profit() -> None:
     assert out.exit_result.pnl_pct == pytest.approx(0.5 * 0.10 + 0.5 * 0.07)
 
 
+def test_range_mode_does_not_trail_before_tp1() -> None:
+    pre_tp1_be = TradeState(working_stop=100.0, breakeven=True, tp_index=0)
+
+    step = _step(
+        LONG,
+        _c(113, 108, 112),
+        pre_tp1_be,
+        trail_atr_mult=1.0,
+        atr=5.0,
+        trail_after_tp1_only=True,
+    )
+
+    assert not step.closed
+    assert step.state.working_stop == pytest.approx(100.0)
+
+
+def test_range_mode_trails_after_tp1() -> None:
+    after_tp1 = _step(LONG, _c(111, 99, 109), TradeState()).state
+
+    step = _step(
+        LONG,
+        _c(113, 108, 112),
+        after_tp1,
+        trail_atr_mult=1.0,
+        atr=5.0,
+        trail_after_tp1_only=True,
+    )
+
+    assert not step.closed
+    assert step.state.working_stop == pytest.approx(107.0)
+
+
+def test_cost_adjusted_breakeven_stop_reason_is_breakeven() -> None:
+    state = TradeState(
+        working_stop=breakeven_stop("long", 100.0, 10.0),
+        breakeven=True,
+    )
+
+    step = _step(LONG, _c(101, 100.1, 100.1), state, cost_bps=10.0)
+
+    assert step.closed
+    assert step.exit_result.exit_reason == "breakeven"
+    assert step.exit_result.pnl_pct == pytest.approx(0.0)
+
+
+def test_pre_tp1_trail_below_cost_breakeven_is_sl() -> None:
+    state = TradeState(working_stop=99.0, trail_armed=True)
+
+    step = _step(LONG, _c(100, 98.5, 98.8), state, cost_bps=10.0)
+
+    assert step.closed
+    assert step.exit_result.exit_reason == "sl"
+
+
+def test_pre_tp1_trail_beyond_cost_breakeven_is_trail() -> None:
+    state = TradeState(working_stop=103.0, trail_armed=True)
+
+    step = _step(LONG, _c(104, 102.5, 102.8), state, cost_bps=10.0)
+
+    assert step.closed
+    assert step.exit_result.exit_reason == "trail"
+
+
 def test_short_partial_scale_out() -> None:
     step = _step(SHORT, _c(101, 89, 91), TradeState())
     assert step.partial is not None and step.state.breakeven
@@ -183,7 +354,7 @@ def test_short_partial_scale_out() -> None:
 
 def test_metadata_roundtrip() -> None:
     st = TradeState(remaining_frac=0.5, realized_pnl_pct=0.05, working_stop=100.0,
-                    tp_index=1, breakeven=True)
+                    tp_index=1, breakeven=True, trail_armed=True)
     assert TradeState.from_metadata(st.to_metadata()) == st
 
 
@@ -192,6 +363,6 @@ def test_regime_gate() -> None:
     assert regime_allows("bull-low", "short") is False
     assert regime_allows("bear-low", "short") is True
     assert regime_allows("bear-low", "long") is False
-    assert regime_allows("side-low", "long") is False
-    assert regime_allows("side-low", "short") is False
+    assert regime_allows("side-low", "long") is True
+    assert regime_allows("side-high", "short") is True
     assert regime_allows(None, "long") is True

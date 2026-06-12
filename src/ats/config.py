@@ -24,12 +24,16 @@ class Settings(BaseSettings):
     llm_max_tokens: int = 2048
 
     # --- Engine / planning / risk knobs ---
+    strategy_profile: str = "baseline"
+    max_setups_per_plan: int = 2
+    entry_trigger_mode: Literal["close", "wick_limit"] = "close"
     plan_refresh_bars: int = 16  # replay: refresh the plan every N feature bars (~4h on 15m)
     soft_threshold: float = 0.6  # min weighted soft-rule score to "detect" a setup
-    min_rr: float = 1.5  # risk: min reward:risk (lowered from 2.0 — ATR-wide stops reduce TP distance)
+    # risk: min reward:risk (lowered from 2.0 — ATR-wide stops reduce TP distance)
+    min_rr: float = 1.5
     paper_equity_usd: float = 10_000.0
     # Risk-based sizing: size each trade so a stop-out loses at most this fraction of equity.
-    risk_per_trade_pct: float = 0.01
+    risk_per_trade_pct: float = 0.05
     # Cap on notional / equity. Leverage emerges from risk-based sizing up to this ceiling.
     max_leverage: float = 3.0
     # Isolated margin/risk heat caps. ``margin`` is the capital committed before leverage;
@@ -70,6 +74,21 @@ class Settings(BaseSettings):
     # Trailing-stop distance as a multiple of atr_14, applied to the runner once the
     # stop is at breakeven. 0 disables trailing.
     trail_atr_mult: float = 1.5
+    # Early protection before TP1. "trail" arms a real ATR trail instead of jumping the
+    # stop to breakeven; "breakeven" preserves the old early-arm behavior; "off" disables.
+    early_stop_mode: Literal["off", "breakeven", "trail"] = "trail"
+    early_trail_arm_atr: float = 1.0
+    early_trail_atr_mult: float = 2.0
+    # Sideways regimes use range-trading exits by default: bank more at TP1, then protect
+    # the remainder. Trend regimes keep the global exit knobs above.
+    sideways_exit_mode: Literal["trend", "range"] = "range"
+    sideways_scale_out_frac: float = 0.75
+    sideways_breakeven_requires_tp1: bool = True
+    sideways_trail_atr_mult: float = 2.0
+    sideways_trail_after_tp1_only: bool = True
+    sideways_early_stop_mode: Literal["off", "breakeven", "trail"] = "trail"
+    sideways_early_trail_arm_atr: float = 1.0
+    sideways_early_trail_atr_mult: float = 2.0
     # Round-trip trading costs charged at each leg-banking site (entry + exit), in basis
     # points. fee_bps = taker fee per side; slippage_bps = assumed adverse fill per side.
     fee_bps: float = 5.0
@@ -92,6 +111,12 @@ class Settings(BaseSettings):
     observe_every_bars: int = 1  # every 5m bar when observe_timeframe=5m (tightened from 3)
     # EXIT_NOW is only honoured when the observation confidence clears this floor.
     observe_exit_min_conf: float = 0.7
+    # Stagnation heuristic shown to the observation agent: once this fraction of the current
+    # hold window is spent, a trade that is still flat and never made meaningful favorable
+    # progress should be considered an opportunity-cost exit candidate.
+    observe_stale_hold_progress: float = 0.75
+    observe_stale_unrealized_abs_pct: float = 0.001
+    observe_stale_mfe_pct: float = 0.003
     llm_observe_model: str = "gpt-4o-mini"  # tactical exit manager — cheap/fast
 
     # --- Multi-timeframe context (higher-timeframe bias for create_plan) ---
