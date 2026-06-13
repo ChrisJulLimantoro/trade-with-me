@@ -152,7 +152,7 @@ async def latest_regime(
 
 
 async def open_positions(
-    session: AsyncSession, *, symbol: str | None = None
+    session: AsyncSession, *, symbol: str | None = None, run_id: str | None = None
 ) -> list[dict[str, Any]]:
     sql = (
         "SELECT trade_id, symbol, direction, size_pct, leverage, margin_usd, "
@@ -163,17 +163,22 @@ async def open_positions(
     if symbol:
         sql += " AND symbol = :symbol"
         params["symbol"] = symbol
+    if run_id is not None:
+        sql += " AND run_id = :run_id"
+        params["run_id"] = run_id
     rows = (await session.execute(text(sql), params)).mappings().all()
     return [{k: _coerce(v) for k, v in dict(r).items()} for r in rows]
 
 
-async def active_plan(session: AsyncSession, symbol: str) -> Plan | None:
+async def active_plan(session: AsyncSession, symbol: str, *, run_id: str | None = None) -> Plan | None:
     stmt = (
         select(Plan)
         .where(Plan.symbol == symbol, Plan.status == "active")
         .order_by(Plan.created_at.desc())
         .limit(1)
     )
+    if run_id is not None:
+        stmt = stmt.where(Plan.run_id == run_id)
     return (await session.execute(stmt)).scalar_one_or_none()
 
 
@@ -182,18 +187,17 @@ async def plan_setups(session: AsyncSession, plan_id: uuid.UUID) -> list[Setup]:
     return list((await session.execute(stmt)).scalars().all())
 
 
-async def supersede_active_plan(session: AsyncSession, symbol: str) -> int:
+async def supersede_active_plan(session: AsyncSession, symbol: str, *, run_id: str | None = None) -> int:
     """Mark the symbol's active plan superseded so the next bar builds a fresh one.
 
     Used after a trade closes: the thesis that motivated the closed trade is stale, so we
     discard it rather than acting on it again. Returns the number of plans superseded.
     """
-    result = await session.execute(
-        text(
-            "UPDATE plans SET status = 'superseded' "
-            "WHERE symbol = :symbol AND status = 'active'"
-        ),
-        {"symbol": symbol},
-    )
+    sql = "UPDATE plans SET status = 'superseded' WHERE symbol = :symbol AND status = 'active'"
+    params: dict[str, Any] = {"symbol": symbol}
+    if run_id is not None:
+        sql += " AND run_id = :run_id"
+        params["run_id"] = run_id
+    result = await session.execute(text(sql), params)
     await session.flush()
     return result.rowcount or 0

@@ -218,11 +218,12 @@ async def build_envelope(
     feature_row: dict[str, Any],
     *,
     as_of: datetime,
+    run_id: str | None = None,
 ) -> dict[str, Any]:
     """Assemble the JSON-only context passed to create_plan."""
     regime = await state.latest_regime(session, before_ts=as_of)
     candles = await state.recent_candles(session, symbol, tf, as_of, n=50)
-    positions = await state.open_positions(session)
+    positions = await state.open_positions(session, run_id=run_id)
 
     # Derive which directions the regime allows so the strategist doesn't propose setups
     # that will immediately be discarded by the runtime regime filter.
@@ -315,13 +316,13 @@ async def _persist(
     as_of: datetime,
     plan_out: PlanOutput,
     regime_cell: str | None,
+    run_id: str | None = None,
 ) -> tuple[Plan, list[Setup]]:
-    # Supersede any currently-active plan for this symbol (plan versioning).
-    await session.execute(
-        update(Plan)
-        .where(Plan.symbol == symbol, Plan.status == "active")
-        .values(status="superseded")
-    )
+    # Supersede only this run's active plans so concurrent replays don't clobber each other.
+    where = [Plan.symbol == symbol, Plan.status == "active"]
+    if run_id is not None:
+        where.append(Plan.run_id == run_id)
+    await session.execute(update(Plan).where(*where).values(status="superseded"))
 
     ttl = timeframe_to_timedelta(tf) * settings.plan_refresh_bars
     expires_at = as_of + ttl
@@ -334,6 +335,7 @@ async def _persist(
         status="active",
         regime_cell=regime_cell,
         rationale=plan_out.rationale,
+        run_id=run_id,
         plan_metadata={"timeframe": tf},
     )
     session.add(plan)
@@ -369,6 +371,7 @@ async def create_plan(
     symbol: str,
     tf: str,
     as_of: datetime | None = None,
+    run_id: str | None = None,
 ) -> PlanResult:
     """Run one create_plan cycle. Returns the persisted plan (or None on LLM failure)."""
     feature_row = await state.latest_feature_row(session, symbol, tf, as_of=as_of)
@@ -376,7 +379,7 @@ async def create_plan(
         raise ValueError(f"no features for {symbol} {tf} (run `ats process backfill` first)")
     effective_as_of = as_of or feature_row["open_time"]
 
-    envelope = await build_envelope(session, symbol, tf, feature_row, as_of=effective_as_of)
+    envelope = await build_envelope(session, symbol, tf, feature_row, as_of=effective_as_of, run_id=run_id)
     plan_out, llm = await client.create_plan(envelope, symbol=symbol)
 
     plan: Plan | None = None
@@ -392,6 +395,7 @@ async def create_plan(
             as_of=effective_as_of,
             plan_out=plan_out,
             regime_cell=regime_cell,
+            run_id=run_id,
         )
         trace.plan(plan, setups)
     else:

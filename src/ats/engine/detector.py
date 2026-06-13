@@ -455,8 +455,12 @@ def _setup_dict(s: Setup) -> dict[str, Any]:
     }
 
 
-async def _open_trades_for(session: AsyncSession, symbol: str) -> list[PaperTrade]:
+async def _open_trades_for(
+    session: AsyncSession, symbol: str, *, run_id: str | None = None
+) -> list[PaperTrade]:
     stmt = select(PaperTrade).where(PaperTrade.symbol == symbol, PaperTrade.status == "open")
+    if run_id is not None:
+        stmt = stmt.where(PaperTrade.run_id == run_id)
     return list((await session.execute(stmt)).scalars().all())
 
 
@@ -667,10 +671,11 @@ async def _reconcile_open_trades(
     client: LlmClient | None = None,
     fine_candles: list[dict[str, Any]] | None = None,
     feature_row: dict[str, Any] | None = None,
+    run_id: str | None = None,
 ) -> None:
     """Advance each open trade. Uses ``fine_candles`` (finer-tf) when given, else this bar."""
     candles = fine_candles if fine_candles else [candle]
-    for trade in await _open_trades_for(session, symbol):
+    for trade in await _open_trades_for(session, symbol, run_id=run_id):
         await _advance_trade(
             session, client, trade, candles, report, atr=atr, feature_row=feature_row
         )
@@ -873,6 +878,8 @@ async def _handle_invalidation(
     prev_row: dict[str, Any] | None,
     candle_closed: bool,
     report: TickReport,
+    *,
+    run_id: str | None = None,
 ) -> bool:
     """Evaluate invalidation across the plan's setups. Returns True if plan was killed."""
     paused = False
@@ -885,7 +892,7 @@ async def _handle_invalidation(
             hard = True
             s.status = "invalidated"
             # close any open trade for this setup at the current close, banking partials
-            for trade in await _open_trades_for(session, s.symbol):
+            for trade in await _open_trades_for(session, s.symbol, run_id=run_id):
                 if trade.setup_id == s.setup_id:
                     direction = trade.direction
                     entry = _f(trade.entry_price)
@@ -918,7 +925,7 @@ async def _handle_invalidation(
             # Thesis weakening: protect the open trade by moving its stop to breakeven
             # and pause new entries this bar.
             paused = True
-            for trade in await _open_trades_for(session, s.symbol):
+            for trade in await _open_trades_for(session, s.symbol, run_id=run_id):
                 if trade.setup_id != s.setup_id or trade.status != "open":
                     continue
                 st = TradeState.from_metadata(trade.trade_metadata)
@@ -1150,12 +1157,15 @@ async def evaluate_now(
     candle_closed: bool = True,
     now: datetime | None = None,
     fine_candles: list[dict[str, Any]] | None = None,
+    run_id: str | None = None,
 ) -> TickReport:
     """Run one full evaluation of the active plan against the current feature row.
 
     When ``fine_candles`` is supplied (a position is open and a finer timeframe is
     configured), open trades are reconciled bar-by-bar over those candles with the
     observation agent in the loop; otherwise the single decision-bar candle is used.
+    ``run_id`` isolates replay runs so concurrent same-symbol replays don't see each
+    other's plans or trades.
     """
     now = now or feature_row["open_time"]
     report = TickReport(now=now)
@@ -1171,9 +1181,10 @@ async def evaluate_now(
         session, symbol, candle, report,
         atr=_f(atr) if atr is not None else None,
         client=client, fine_candles=fine_candles, feature_row=feature_row,
+        run_id=run_id,
     )
 
-    plan = await state.active_plan(session, symbol)
+    plan = await state.active_plan(session, symbol, run_id=run_id)
     if plan is None:
         report.notes.append("no active plan")
         return report
@@ -1187,12 +1198,13 @@ async def evaluate_now(
 
     setups = await state.plan_setups(session, plan.plan_id)
     killed = await _handle_invalidation(
-        session, client, plan, setups, feature_row, prev_row, candle_closed, report
+        session, client, plan, setups, feature_row, prev_row, candle_closed, report,
+        run_id=run_id,
     )
     if killed or report.paused:
         return report
 
-    open_positions = await state.open_positions(session, symbol=symbol)
+    open_positions = await state.open_positions(session, symbol=symbol, run_id=run_id)
     if open_positions:
         # One position per symbol: no new entry is possible, so don't spend an LLM
         # confirm call this bar. Existing trades are still reconciled above.

@@ -298,7 +298,7 @@ def replay(
         for note in rep.notes:
             emit(f"  [dim]- {note}[/dim]")
         await _print_trade_summary(
-            symbol, from_dt, emit=emit, plans_created=rep.plans_created
+            symbol, from_dt, emit=emit, plans_created=rep.plans_created, run_id=run.run_id
         )
 
         if trace_console is not None:
@@ -418,6 +418,7 @@ async def _print_trade_summary(
     since: datetime | None = None,
     emit: Any = None,
     plans_created: int | None = None,
+    run_id: str | None = None,
 ) -> None:
     from sqlalchemy import text
 
@@ -429,6 +430,9 @@ async def _print_trade_summary(
     if since is not None:
         where += " AND entry_time >= :since"
         params["since"] = since
+    if run_id is not None:
+        where += " AND run_id = :run_id"
+        params["run_id"] = run_id
     async with SessionLocal() as session:
         rows = (
             await session.execute(

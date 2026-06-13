@@ -152,6 +152,7 @@ async def _ensure_plan(
     tf: str,
     now: datetime,
     bars_since_plan: int,
+    run_id: str | None = None,
 ) -> tuple[bool, int, int]:
     """Refresh the plan if there is none, it expired, or the refresh cadence elapsed.
 
@@ -161,12 +162,12 @@ async def _ensure_plan(
 
     Returns (created, bars_since_plan, setup_count).
     """
-    if await state.open_positions(session, symbol=symbol):
+    if await state.open_positions(session, symbol=symbol, run_id=run_id):
         return False, bars_since_plan, 0
-    plan = await state.active_plan(session, symbol)
+    plan = await state.active_plan(session, symbol, run_id=run_id)
     stale = plan is None or now >= plan.expires_at or bars_since_plan >= settings.plan_refresh_bars
     if stale:
-        result = await create_plan(session, client, symbol=symbol, tf=tf, as_of=now)
+        result = await create_plan(session, client, symbol=symbol, tf=tf, as_of=now, run_id=run_id)
         return True, 0, len(result.setups)
     return False, bars_since_plan + 1, 0
 
@@ -208,6 +209,8 @@ async def _walk_replay(
     rows: list,
     report: ReplayReport,
 ) -> ReplayReport:
+    run = current_run.get()
+    run_id = run.run_id if run else None
     bars_since_plan = settings.plan_refresh_bars  # force a plan on the first bar
     active_sticky: str | None = None
     observe_tf = settings.observe_timeframe
@@ -223,7 +226,7 @@ async def _walk_replay(
         # agent) react within it before invalidation/rules see the bar's close. candles_between
         # is (start, end]: start=now-obs_dt includes the sub-candle at exactly `now`; end at
         # now+base_dt-obs_dt includes the last sub-candle and excludes the next bar's open.
-        open_before = bool(await state.open_positions(session, symbol=symbol))
+        open_before = bool(await state.open_positions(session, symbol=symbol, run_id=run_id))
         fine_candles = None
         if (
             open_before
@@ -236,7 +239,8 @@ async def _walk_replay(
             )
 
         created, bars_since_plan, setup_count = await _ensure_plan(
-            session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=bars_since_plan
+            session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=bars_since_plan,
+            run_id=run_id,
         )
         if created:
             report.plans_created += 1
@@ -244,7 +248,7 @@ async def _walk_replay(
                 report.plans_with_setups += 1
         tick = await evaluate_now(
             session, client, symbol=symbol, tf=tf, feature_row=row, prev_row=prev,
-            candle_closed=True, now=now, fine_candles=fine_candles,
+            candle_closed=True, now=now, fine_candles=fine_candles, run_id=run_id,
         )
         _accumulate(report, tick)
         active_sticky = _record_notes(report, tick, active_sticky)
@@ -255,7 +259,7 @@ async def _walk_replay(
         if (
             settings.replan_on_close
             and tick.closed > 0
-            and await state.supersede_active_plan(session, symbol)
+            and await state.supersede_active_plan(session, symbol, run_id=run_id)
         ):
             bars_since_plan = settings.plan_refresh_bars
 

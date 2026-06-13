@@ -50,7 +50,7 @@ def _patch_state(monkeypatch: pytest.MonkeyPatch) -> None:
     async def fake_latest_regime(session, *, before_ts=None):  # noqa: ANN001
         return {"regime_cell": "trend_up", "trend": "up"}
 
-    async def fake_open_positions(session, *, symbol=None):  # noqa: ANN001
+    async def fake_open_positions(session, *, symbol=None, run_id=None):  # noqa: ANN001
         return []
 
     monkeypatch.setattr(state, "latest_feature_row", fake_latest_feature_row)

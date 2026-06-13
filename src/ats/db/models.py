@@ -210,6 +210,7 @@ class Plan(Base):
     )  # active|expired|invalidated|superseded
     regime_cell: Mapped[str | None] = mapped_column(String, nullable=True)
     rationale: Mapped[str | None] = mapped_column(Text, nullable=True)
+    run_id: Mapped[str | None] = mapped_column(String, nullable=True)
     plan_metadata: Mapped[dict[str, object]] = mapped_column(
         "metadata", JSONB, nullable=False, default=dict
     )

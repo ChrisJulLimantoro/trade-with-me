@@ -104,13 +104,15 @@ async def _patch_detector(
     )
     opened_entries: list[float] = []
 
-    async def active_plan(_session: Any, _symbol: str) -> Any:
+    async def active_plan(_session: Any, _symbol: str, *, run_id: str | None = None) -> Any:
         return plan
 
     async def plan_setups(_session: Any, _plan_id: uuid.UUID) -> list[Any]:
         return setups
 
-    async def open_positions(_session: Any, *, symbol: str | None = None) -> list[dict[str, Any]]:
+    async def open_positions(
+        _session: Any, *, symbol: str | None = None, run_id: str | None = None
+    ) -> list[dict[str, Any]]:
         return []
 
     async def reconcile(*_args: Any, **_kwargs: Any) -> None:
