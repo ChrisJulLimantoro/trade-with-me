@@ -28,6 +28,28 @@ from ats.logging import get_logger
 
 log = get_logger(__name__)
 
+
+def _validate_json(schema: type, content: str) -> Any:
+    """Validate ``content`` against ``schema``, repairing malformed JSON if needed.
+
+    The strict path (``model_validate_json``) handles well-formed output. When a model
+    garnishes the object — code fences, leading prose, trailing commas, smart quotes —
+    that raises, and we fall back to ``json_repair`` to salvage the embedded object
+    before validating the repaired dict. Repair is only attempted on the failure path,
+    so clean responses pay no extra cost. A genuinely empty/non-JSON body re-raises the
+    original error and the caller degrades to deterministic behaviour.
+    """
+    try:
+        return schema.model_validate_json(content)
+    except Exception:
+        from json_repair import repair_json
+
+        repaired = repair_json(content, return_objects=True)
+        if not isinstance(repaired, (dict, list)) or repaired == "":
+            raise
+        log.info("llm_json_repaired", schema=getattr(schema, "__name__", str(schema)))
+        return schema.model_validate(repaired)
+
 # USD per 1M tokens (input, output). Rough public list prices; only used for the audit
 # row. Unknown models cost 0 — the number is informational, not a billing source.
 _PRICING: dict[str, tuple[float, float]] = {
@@ -129,11 +151,12 @@ class OpenAIClient:
                 ],
                 response_format={"type": "json_object"},
                 max_tokens=settings.llm_max_tokens,
+                reasoning_effort="low",
                 # opencode zen / OpenRouter convention: disable the reasoning trace so
                 # the token budget goes to the JSON answer, not hidden chain-of-thought.
                 temperature=0.0,
                 extra_body={
-                    # "reasoning": {"enabled": False},
+                    "reasoning": {"enabled": False},
                     "thinking": {"type": "disabled"}
                 },
             )
@@ -146,7 +169,7 @@ class OpenAIClient:
                     f"model returned no content (finish_reason={finish}, "
                     f"reasoning_len={len(reasoning or '')})"
                 )
-            parsed = schema.model_validate_json(content)
+            parsed = _validate_json(schema, content)
             usage = getattr(resp, "usage", None)
             tin = int(getattr(usage, "prompt_tokens", 0) or 0)
             tout = int(getattr(usage, "completion_tokens", 0) or 0)

@@ -232,9 +232,18 @@ def replay(
             f"\n[bold cyan]Replay {symbol} {timeframe}[/bold cyan] "
             f"{str(from_dt)[:19]} → {str(to_dt)[:19]}"
         )
+        # Fraction of plans-with-setups that produced an opened trade.
+        plan_confirm_rate = (
+            f"{rep.opened / rep.plans_with_setups * 100:.0f}%"
+            if rep.plans_with_setups
+            else "n/a"
+        )
         emit(
-            f"  bars={rep.bars}  plans={rep.plans_created}  detections={rep.detections}  "
+            f"  bars={rep.bars}  plans={rep.plans_created}"
+            f"  plans_with_setups={rep.plans_with_setups}"
+            f"  detections={rep.detections}  "
             f"opened={rep.opened}  closed={rep.closed}  invalidations={rep.invalidations}  "
+            f"plan_confirm_rate={plan_confirm_rate}  "
             f"confirm_calls={rep.confirm_calls}  observe_calls={rep.observe_calls}  "
             f"risk_rejected={rep.risk_rejected}"
         )
@@ -288,7 +297,9 @@ def replay(
             emit(t)
         for note in rep.notes:
             emit(f"  [dim]- {note}[/dim]")
-        await _print_trade_summary(symbol, from_dt, emit=emit)
+        await _print_trade_summary(
+            symbol, from_dt, emit=emit, plans_created=rep.plans_created
+        )
 
         if trace_console is not None:
             trace.block(trace_buf.getvalue())
@@ -406,6 +417,7 @@ async def _print_trade_summary(
     symbol: str,
     since: datetime | None = None,
     emit: Any = None,
+    plans_created: int | None = None,
 ) -> None:
     from sqlalchemy import text
 
@@ -432,11 +444,19 @@ async def _print_trade_summary(
             )
         ).mappings().first()
     closed = rows["closed"] or 0
+    opened = closed + (rows["open"] or 0)
     wins = rows["wins"] or 0
     win_rate = (wins / closed * 100) if closed else 0.0
     scope = f" (since {str(since)[:19]})" if since is not None else ""
+    # plan_confirm_rate = trades opened / plans made. Only shown when the caller
+    # supplies the plan count (it lives on the replay report, not in paper_trades).
+    pcr = ""
+    if plans_created:
+        pcr = f" plan_confirm_rate={opened / plans_created * 100:.0f}%"
+    elif plans_created == 0:
+        pcr = " plan_confirm_rate=n/a"
     emit(
         f"  trades{scope}: closed={closed} open={rows['open'] or 0} "
         f"win_rate={win_rate:.0f}% avg_margin_pnl={rows['avg_pnl'] or 0} "
-        f"pnl_usd=${rows['pnl_usd'] or 0}"
+        f"pnl_usd=${rows['pnl_usd'] or 0}{pcr}"
     )

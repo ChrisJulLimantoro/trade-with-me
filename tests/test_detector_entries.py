@@ -262,6 +262,8 @@ async def test_sideways_trade_persists_range_exit_metadata(monkeypatch) -> None:
     assert md["exit_early_stop_mode"] == "trail"
     assert md["exit_early_trail_arm_atr"] == pytest.approx(1.0)
     assert md["exit_early_trail_atr_mult"] == pytest.approx(2.0)
+    assert md["entry_zone_low"] == pytest.approx(95.0)
+    assert md["entry_zone_high"] == pytest.approx(105.0)
 
 
 async def test_trending_trade_persists_trend_exit_metadata(monkeypatch) -> None:
@@ -302,6 +304,8 @@ async def test_trending_trade_persists_trend_exit_metadata(monkeypatch) -> None:
     assert md["exit_early_stop_mode"] == "trail"
     assert md["exit_early_trail_arm_atr"] == pytest.approx(1.0)
     assert md["exit_early_trail_atr_mult"] == pytest.approx(2.0)
+    assert md["entry_zone_low"] == pytest.approx(95.0)
+    assert md["entry_zone_high"] == pytest.approx(105.0)
 
 
 async def test_sideways_exit_policy_passes_range_knobs_to_step_trade(monkeypatch) -> None:
@@ -422,6 +426,8 @@ async def test_observer_envelope_includes_hold_and_stagnation_context(monkeypatc
         notional_usd=300.0,
         trade_metadata={
             **detector._exit_policy_metadata(policy),
+            "entry_zone_low": 95.0,
+            "entry_zone_high": 105.0,
             "expires_at": (entry_time + timedelta(hours=2)).isoformat(),
             "hold_window_seconds": 7200.0,
         },
@@ -436,7 +442,13 @@ async def test_observer_envelope_includes_hold_and_stagnation_context(monkeypatc
         {"open_time": now, "high": 100.2, "low": 99.8, "close": 100.05},
         state,
         detector.TickReport(),
-        feature_row={"atr_14": 2.0, "macd_hist": 0.0},
+        feature_row={
+            "atr_14": 2.0,
+            "close": 100.05,
+            "macd_hist": 0.0,
+            "cvd_slope_10": 0.0,
+            "vol_zscore_20": 0.5,
+        },
         policy=policy,
     )
 
@@ -458,3 +470,76 @@ async def test_observer_envelope_includes_hold_and_stagnation_context(monkeypatc
     assert progress["max_favorable_pnl_pct"] == pytest.approx(0.003)
     assert progress["max_adverse_pnl_pct"] == pytest.approx(-0.006)
     assert progress["stale_candidate"] is False
+    observer_context = client.envelope["observer_context"]
+    assert observer_context["entry_quality"]["entry_vs_zone"] == "mid_zone"
+    assert observer_context["entry_quality"]["entry_to_zone_low_atr"] == pytest.approx(2.5)
+    assert observer_context["entry_quality"]["entry_to_zone_high_atr"] == pytest.approx(2.5)
+    assert observer_context["excursion"]["current_r"] == pytest.approx(0.01)
+    assert observer_context["excursion"]["mfe_r"] == pytest.approx(0.02)
+    assert observer_context["excursion"]["mae_r"] == pytest.approx(-0.04)
+    assert observer_context["thesis_health"]["status"] == "healthy"
+    assert observer_context["recommended_pressure"] == "hold"
+
+
+async def test_observer_context_marks_failed_short_as_broken(monkeypatch) -> None:
+    monkeypatch.setattr(settings, "max_hold_bars", 48)
+    entry_time = datetime(2026, 1, 1, 0, 0)
+    now = entry_time + timedelta(minutes=30)
+    policy = detector._exit_policy_for_regime("bear-low")
+    client = ObserveClient()
+    trade = SimpleNamespace(
+        trade_id=uuid.uuid4(),
+        plan_id=uuid.uuid4(),
+        setup_id=uuid.uuid4(),
+        symbol="BTCUSDT",
+        direction="short",
+        entry_time=entry_time,
+        entry_price=100.0,
+        stop_loss=105.0,
+        take_profit=[95.0, 90.0],
+        size_pct=0.1,
+        leverage=3.0,
+        margin_usd=100.0,
+        notional_usd=300.0,
+        trade_metadata={
+            **detector._exit_policy_metadata(policy),
+            "entry_zone_low": 99.0,
+            "entry_zone_high": 101.0,
+            "expires_at": (entry_time + timedelta(hours=2)).isoformat(),
+            "hold_window_seconds": 7200.0,
+        },
+    )
+    state = TradeState(max_favorable_pnl_pct=0.005, max_adverse_pnl_pct=-0.04)
+
+    closed = await detector._observe_and_adjust(
+        FakeSession(),
+        client,
+        trade,
+        {"direction": "short", "entry_price": 100.0, "stop_loss": 105.0, "take_profit": [95.0]},
+        {"open_time": now, "high": 103.0, "low": 99.5, "close": 102.5},
+        state,
+        detector.TickReport(),
+        feature_row={
+            "atr_14": 2.0,
+            "close": 102.5,
+            "macd_hist": 1.0,
+            "cvd_slope_10": 1.0,
+            "vol_zscore_20": -0.5,
+            "rsi_14": 30.0,
+            "ema_20": 103.0,
+            "ema_50": 104.0,
+        },
+        policy=policy,
+    )
+
+    assert closed is False
+    assert client.envelope is not None
+    observer_context = client.envelope["observer_context"]
+    assert observer_context["excursion"]["current_r"] == pytest.approx(-0.5)
+    assert observer_context["excursion"]["mfe_r"] == pytest.approx(0.1)
+    assert observer_context["excursion"]["mae_r"] == pytest.approx(-0.8)
+    assert observer_context["thesis_health"]["status"] == "broken"
+    assert observer_context["thesis_health"]["directional_momentum"] == "against"
+    assert observer_context["thesis_health"]["cvd_agreement"] == "against"
+    assert observer_context["thesis_health"]["squeeze_risk"] == "against_trade"
+    assert observer_context["recommended_pressure"] == "exit"

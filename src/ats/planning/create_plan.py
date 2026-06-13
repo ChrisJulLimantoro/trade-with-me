@@ -113,6 +113,39 @@ def _stripped_invalidation_rules(s: SetupOutput) -> list[InvalidationRule]:
     return kept
 
 
+def _stripped_hard_rules(s: SetupOutput) -> list[dict[str, Any]]:
+    """Drop hard ENTRY rules that merely restate the entry_zone as a bare price literal.
+
+    The strategist routinely re-encodes the entry band as hard rules (``price >= zone_low``,
+    ``price <= zone_high``) — but the ``entry_zone`` already IS the executable price gate
+    (``in_entry_zone`` / the wick-limit trigger). When the literal drifts from the zone edge
+    it doesn't just duplicate the gate, it CONTRADICTS it: a ``price >= 61850`` hard rule on a
+    setup whose zone fills at 61500 can never trigger, so the setup is permanently undetectable
+    even when price sits squarely in the zone. (Measured: bare price-vs-literal rules were the
+    single largest cause of in-zone setups that never filled.) Strip every hard rule that is
+    ``price`` compared to a numeric literal; keep ``price`` vs a feature (e.g. ``price < ema_50``
+    is a genuine trend gate, not a zone restatement) and all non-price rules.
+    """
+    kept: list[dict[str, Any]] = []
+    for r in s.hard_rules:
+        is_price_literal = (
+            (r.left == "price" and isinstance(r.right, (int, float)))
+            or (r.right == "price" and isinstance(r.left, (int, float)))
+        )
+        if is_price_literal:
+            log.info(
+                "hard_rule_dropped_zone_dup",
+                direction=s.direction,
+                left=r.left,
+                operator=r.operator,
+                right=r.right,
+                entry_zone=s.entry_zone,
+            )
+            continue
+        kept.append(r.model_dump())
+    return kept
+
+
 @dataclass
 class PlanResult:
     plan: Plan | None
@@ -318,7 +351,7 @@ async def _persist(
             take_profit=list(s.take_profit),
             stop_loss=s.stop_loss,
             size_pct=s.size_pct,
-            hard_rules=[r.model_dump() for r in s.hard_rules],
+            hard_rules=_stripped_hard_rules(s),
             soft_rules=[r.model_dump() for r in s.soft_rules],
             invalidation_rules=[r.model_dump() for r in _stripped_invalidation_rules(s)],
             expires_at=expires_at,

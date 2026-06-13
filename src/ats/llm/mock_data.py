@@ -147,6 +147,10 @@ def canned_observation(envelope: dict[str, Any]) -> ObservationOutput:
     # Momentum "with the trade" is positive macd_hist for longs, negative for shorts.
     momentum_with = mh if direction == "long" else -mh
     progress = envelope.get("progress") or {}
+    observer_context = envelope.get("observer_context") or {}
+    thesis_health = observer_context.get("thesis_health") or {}
+    excursion = observer_context.get("excursion") or {}
+    pressure = str(observer_context.get("recommended_pressure") or "hold")
     hold = envelope.get("hold") or {}
     hold_progress = float(
         hold.get("current_window_progress")
@@ -159,6 +163,27 @@ def canned_observation(envelope: dict[str, Any]) -> ObservationOutput:
         and abs(unrealized) <= settings.observe_stale_unrealized_abs_pct
         and max_favorable <= settings.observe_stale_mfe_pct
     )
+    current_r = excursion.get("current_r")
+    mfe_r = excursion.get("mfe_r")
+    failed_to_travel = (
+        current_r is not None
+        and mfe_r is not None
+        and float(current_r) <= -0.5
+        and float(mfe_r) < 0.25
+    )
+
+    if pressure == "exit" or thesis_health.get("status") == "broken":
+        return ObservationOutput(
+            action="EXIT_NOW",
+            reason="Observer context marks thesis broken or exit pressure.",
+            confidence=0.85,
+        )
+    if pressure == "cut_or_tighten" and (unrealized <= 0.0 or failed_to_travel):
+        return ObservationOutput(
+            action="EXIT_NOW",
+            reason="Trade is red or failed to travel under cut-or-tighten pressure.",
+            confidence=0.78,
+        )
 
     # Clear reversal against an at-risk position → exit.
     if unrealized <= 0.0 and momentum_with < 0:

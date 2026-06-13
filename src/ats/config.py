@@ -26,7 +26,12 @@ class Settings(BaseSettings):
     # --- Engine / planning / risk knobs ---
     strategy_profile: str = "baseline"
     max_setups_per_plan: int = 2
-    entry_trigger_mode: Literal["close", "wick_limit"] = "close"
+    # Setups are resting limit orders at a narrow entry_zone; a limit fills when price
+    # TOUCHES the zone, not only when a bar CLOSES inside it. "close" mode requires a 15m
+    # bar to close inside a ~0.1%-wide band, which almost never happens and starves the
+    # detector of fills (measured ~40% of setups ever close-in-zone vs ~68% that touch it).
+    # "wick_limit" fills at the zone edge on a touch — realistic and far higher hit rate.
+    entry_trigger_mode: Literal["close", "wick_limit"] = "wick_limit"
     plan_refresh_bars: int = 16  # replay: refresh the plan every N feature bars (~4h on 15m)
     soft_threshold: float = 0.6  # min weighted soft-rule score to "detect" a setup
     # risk: min reward:risk (lowered from 2.0 — ATR-wide stops reduce TP distance)

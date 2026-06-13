@@ -51,6 +51,7 @@ class ReplayReport:
     timeframe: str
     bars: int = 0
     plans_created: int = 0
+    plans_with_setups: int = 0
     detections: int = 0
     opened: int = 0
     closed: int = 0
@@ -151,21 +152,23 @@ async def _ensure_plan(
     tf: str,
     now: datetime,
     bars_since_plan: int,
-) -> tuple[bool, int]:
+) -> tuple[bool, int, int]:
     """Refresh the plan if there is none, it expired, or the refresh cadence elapsed.
 
     Never refreshes while a position is open: re-thinking the thesis mid-trade is the
     exit manager's / invalidation rules' job, not the strategist's, and a plan built
     while holding would be discarded unused (entries are blocked) — wasting an LLM call.
+
+    Returns (created, bars_since_plan, setup_count).
     """
     if await state.open_positions(session, symbol=symbol):
-        return False, bars_since_plan
+        return False, bars_since_plan, 0
     plan = await state.active_plan(session, symbol)
     stale = plan is None or now >= plan.expires_at or bars_since_plan >= settings.plan_refresh_bars
     if stale:
-        await create_plan(session, client, symbol=symbol, tf=tf, as_of=now)
-        return True, 0
-    return False, bars_since_plan + 1
+        result = await create_plan(session, client, symbol=symbol, tf=tf, as_of=now)
+        return True, 0, len(result.setups)
+    return False, bars_since_plan + 1, 0
 
 
 async def run_replay(
@@ -232,11 +235,13 @@ async def _walk_replay(
                 session, symbol, observe_tf, now - obs_dt, now + base_dt - obs_dt
             )
 
-        created, bars_since_plan = await _ensure_plan(
+        created, bars_since_plan, setup_count = await _ensure_plan(
             session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=bars_since_plan
         )
         if created:
             report.plans_created += 1
+            if setup_count > 0:
+                report.plans_with_setups += 1
         tick = await evaluate_now(
             session, client, symbol=symbol, tf=tf, feature_row=row, prev_row=prev,
             candle_closed=True, now=now, fine_candles=fine_candles,

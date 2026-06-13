@@ -459,7 +459,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L27",
       "id": "tests_test_llm_schemas_test_valid_plan_parses",
-      "community": 43,
+      "community": 38,
       "norm_label": "test_valid_plan_parses()"
     },
     {
@@ -504,7 +504,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L55",
       "id": "tests_test_llm_schemas_test_reject_bad_operator",
-      "community": 43,
+      "community": 38,
       "norm_label": "test_reject_bad_operator()"
     },
     {
@@ -531,7 +531,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L70",
       "id": "tests_test_llm_schemas_test_mock_create_plan_is_schema_valid",
-      "community": 57,
+      "community": 43,
       "norm_label": "test_mock_create_plan_is_schema_valid()"
     },
     {
@@ -540,7 +540,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L86",
       "id": "tests_test_llm_schemas_test_mock_neutral_regime_has_no_setups",
-      "community": 57,
+      "community": 43,
       "norm_label": "test_mock_neutral_regime_has_no_setups()"
     },
     {
@@ -558,7 +558,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L107",
       "id": "tests_test_llm_schemas_test_observation_scale_frac_zero_coerced_to_none",
-      "community": 70,
+      "community": 43,
       "norm_label": "test_observation_scale_frac_zero_coerced_to_none()"
     },
     {
@@ -567,7 +567,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L117",
       "id": "tests_test_llm_schemas_test_observation_confidence_out_of_range_clamped",
-      "community": 70,
+      "community": 57,
       "norm_label": "test_observation_confidence_out_of_range_clamped()"
     },
     {
@@ -603,7 +603,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L146",
       "id": "tests_test_llm_schemas_test_mock_confirm_thresholds",
-      "community": 57,
+      "community": 43,
       "norm_label": "test_mock_confirm_thresholds()"
     },
     {
@@ -630,7 +630,7 @@
       "source_file": "tests/test_llm_schemas.py",
       "source_location": "L108",
       "id": "tests_test_llm_schemas_rationale_108",
-      "community": 70,
+      "community": 43,
       "norm_label": "models emit scale_frac:0 on non-scale_out actions; a bare gt=0 field would rejec"
     },
     {
@@ -684,7 +684,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L36",
       "id": "tests_test_episodic_memory_test_fingerprint_handles_missing_features",
-      "community": 139,
+      "community": 156,
       "norm_label": "test_fingerprint_handles_missing_features()"
     },
     {
@@ -702,7 +702,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L49",
       "id": "tests_test_episodic_memory_test_vector_literal_format",
-      "community": 139,
+      "community": 153,
       "norm_label": "test_vector_literal_format()"
     },
     {
@@ -882,7 +882,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L1",
       "id": "tests_test_planner_context_py",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_planner_context.py"
     },
     {
@@ -891,7 +891,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L18",
       "id": "tests_test_planner_context_candle",
-      "community": 42,
+      "community": 154,
       "norm_label": "_candle()"
     },
     {
@@ -900,7 +900,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L30",
       "id": "tests_test_planner_context_test_structure_context_finds_range_pivots_and_atr_distances",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_structure_context_finds_range_pivots_and_atr_distances()"
     },
     {
@@ -909,7 +909,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L54",
       "id": "tests_test_planner_context_test_exhaustion_context_marks_oversold_bear_squeeze_risk",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_exhaustion_context_marks_oversold_bear_squeeze_risk()"
     },
     {
@@ -918,7 +918,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L71",
       "id": "tests_test_planner_context_test_exhaustion_context_marks_overbought_long_squeeze_risk",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_exhaustion_context_marks_overbought_long_squeeze_risk()"
     },
     {
@@ -927,7 +927,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L88",
       "id": "tests_test_planner_context_test_exhaustion_context_neutral_when_not_extended",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_exhaustion_context_neutral_when_not_extended()"
     },
     {
@@ -936,7 +936,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L107",
       "id": "tests_test_planner_context_test_volume_context_uses_relative_volume_taker_ratio_and_cvd_agreement",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_volume_context_uses_relative_volume_taker_ratio_and_cvd_agreement()"
     },
     {
@@ -945,7 +945,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L122",
       "id": "tests_test_planner_context_test_volume_context_handles_missing_taker_buy_vol",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_volume_context_handles_missing_taker_buy_vol()"
     },
     {
@@ -954,7 +954,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L132",
       "id": "tests_test_planner_context_rows",
-      "community": 42,
+      "community": 154,
       "norm_label": "_rows"
     },
     {
@@ -963,7 +963,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L133",
       "id": "tests_test_planner_context_rows_init",
-      "community": 42,
+      "community": 154,
       "norm_label": ".__init__()"
     },
     {
@@ -972,7 +972,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L136",
       "id": "tests_test_planner_context_rows_mappings",
-      "community": 42,
+      "community": 154,
       "norm_label": ".mappings()"
     },
     {
@@ -981,7 +981,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L139",
       "id": "tests_test_planner_context_rows_all",
-      "community": 42,
+      "community": 156,
       "norm_label": ".all()"
     },
     {
@@ -990,7 +990,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L143",
       "id": "tests_test_planner_context_session",
-      "community": 42,
+      "community": 154,
       "norm_label": "_session"
     },
     {
@@ -999,7 +999,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L144",
       "id": "tests_test_planner_context_session_init",
-      "community": 42,
+      "community": 154,
       "norm_label": ".__init__()"
     },
     {
@@ -1008,7 +1008,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L147",
       "id": "tests_test_planner_context_session_execute",
-      "community": 42,
+      "community": 154,
       "norm_label": ".execute()"
     },
     {
@@ -1017,7 +1017,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L151",
       "id": "tests_test_planner_context_learning",
-      "community": 42,
+      "community": 154,
       "norm_label": "_learning()"
     },
     {
@@ -1026,7 +1026,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L168",
       "id": "tests_test_planner_context_test_memory_summary_aggregates_similar_learning_rows",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_memory_summary_aggregates_similar_learning_rows()"
     },
     {
@@ -1035,7 +1035,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L198",
       "id": "tests_test_planner_context_test_memory_summary_low_confidence_when_sample_is_sparse",
-      "community": 42,
+      "community": 154,
       "norm_label": "test_memory_summary_low_confidence_when_sample_is_sparse()"
     },
     {
@@ -1044,7 +1044,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L211",
       "id": "tests_test_planner_context_envelope_state",
-      "community": 42,
+      "community": 154,
       "norm_label": "_envelope_state()"
     },
     {
@@ -1053,7 +1053,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L246",
       "id": "tests_test_planner_context_test_build_envelope_includes_planner_context_and_prior_lessons",
-      "community": 4,
+      "community": 70,
       "norm_label": "test_build_envelope_includes_planner_context_and_prior_lessons()"
     },
     {
@@ -1377,7 +1377,7 @@
       "source_file": "tests/test_dead_features.py",
       "source_location": "L118",
       "id": "tests_test_dead_features_test_prune_missing_drops_none_and_nan",
-      "community": 4,
+      "community": 70,
       "norm_label": "test_prune_missing_drops_none_and_nan()"
     },
     {
@@ -2061,7 +2061,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L54",
       "id": "tests_test_detector_entries_observeclient_observe_trade",
-      "community": 70,
+      "community": 57,
       "norm_label": ".observe_trade()"
     },
     {
@@ -2122,7 +2122,7 @@
       "label": "test_trending_trade_persists_trend_exit_metadata()",
       "file_type": "code",
       "source_file": "tests/test_detector_entries.py",
-      "source_location": "L267",
+      "source_location": "L269",
       "id": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
       "community": 48,
       "norm_label": "test_trending_trade_persists_trend_exit_metadata()"
@@ -2131,7 +2131,7 @@
       "label": "test_sideways_exit_policy_passes_range_knobs_to_step_trade()",
       "file_type": "code",
       "source_file": "tests/test_detector_entries.py",
-      "source_location": "L307",
+      "source_location": "L311",
       "id": "tests_test_detector_entries_test_sideways_exit_policy_passes_range_knobs_to_step_trade",
       "community": 48,
       "norm_label": "test_sideways_exit_policy_passes_range_knobs_to_step_trade()"
@@ -2140,7 +2140,7 @@
       "label": "test_trend_exit_policy_passes_global_knobs_to_step_trade()",
       "file_type": "code",
       "source_file": "tests/test_detector_entries.py",
-      "source_location": "L355",
+      "source_location": "L359",
       "id": "tests_test_detector_entries_test_trend_exit_policy_passes_global_knobs_to_step_trade",
       "community": 48,
       "norm_label": "test_trend_exit_policy_passes_global_knobs_to_step_trade()"
@@ -2149,10 +2149,19 @@
       "label": "test_observer_envelope_includes_hold_and_stagnation_context()",
       "file_type": "code",
       "source_file": "tests/test_detector_entries.py",
-      "source_location": "L400",
+      "source_location": "L404",
       "id": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
       "community": 48,
       "norm_label": "test_observer_envelope_includes_hold_and_stagnation_context()"
+    },
+    {
+      "label": "test_observer_context_marks_failed_short_as_broken()",
+      "file_type": "code",
+      "source_file": "tests/test_detector_entries.py",
+      "source_location": "L484",
+      "id": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
+      "community": 48,
+      "norm_label": "test_observer_context_marks_failed_short_as_broken()"
     },
     {
       "label": "Detector entry-loop tests.",
@@ -2378,6 +2387,60 @@
       "id": "tests_test_llm_prompts_rationale_1",
       "community": 65,
       "norm_label": "guards for the strategist system-prompt assembly (strategy-catalog injection)."
+    },
+    {
+      "label": "test_create_plan_hard_rules.py",
+      "file_type": "code",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L1",
+      "id": "tests_test_create_plan_hard_rules_py",
+      "community": 157,
+      "norm_label": "test_create_plan_hard_rules.py"
+    },
+    {
+      "label": "_setup()",
+      "file_type": "code",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L14",
+      "id": "tests_test_create_plan_hard_rules_setup",
+      "community": 157,
+      "norm_label": "_setup()"
+    },
+    {
+      "label": "test_strips_price_vs_literal_hard_rules()",
+      "file_type": "code",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L25",
+      "id": "tests_test_create_plan_hard_rules_test_strips_price_vs_literal_hard_rules",
+      "community": 157,
+      "norm_label": "test_strips_price_vs_literal_hard_rules()"
+    },
+    {
+      "label": "test_keeps_price_vs_feature_and_non_price_rules()",
+      "file_type": "code",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L35",
+      "id": "tests_test_create_plan_hard_rules_test_keeps_price_vs_feature_and_non_price_rules",
+      "community": 157,
+      "norm_label": "test_keeps_price_vs_feature_and_non_price_rules()"
+    },
+    {
+      "label": "test_empty_hard_rules_stay_empty()",
+      "file_type": "code",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L50",
+      "id": "tests_test_create_plan_hard_rules_test_empty_hard_rules_stay_empty",
+      "community": 157,
+      "norm_label": "test_empty_hard_rules_stay_empty()"
+    },
+    {
+      "label": "Tests for the hard-rule sanitizer in create_plan.  The entry_zone is the executa",
+      "file_type": "rationale",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L1",
+      "id": "tests_test_create_plan_hard_rules_rationale_1",
+      "community": 157,
+      "norm_label": "tests for the hard-rule sanitizer in create_plan.  the entry_zone is the executa"
     },
     {
       "label": "test_backfill_idempotency.py",
@@ -3222,7 +3285,7 @@
       "source_file": "tests/test_step_trade.py",
       "source_location": "L361",
       "id": "tests_test_step_trade_test_regime_gate",
-      "community": 4,
+      "community": 70,
       "norm_label": "test_regime_gate()"
     },
     {
@@ -5035,10 +5098,19 @@
       "norm_label": "client.py"
     },
     {
+      "label": "_validate_json()",
+      "file_type": "code",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L32",
+      "id": "llm_client_validate_json",
+      "community": 45,
+      "norm_label": "_validate_json()"
+    },
+    {
       "label": "_cost_usd()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L41",
+      "source_location": "L63",
       "id": "llm_client_cost_usd",
       "community": 45,
       "norm_label": "_cost_usd()"
@@ -5047,7 +5119,7 @@
       "label": "LlmClient",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L46",
+      "source_location": "L68",
       "id": "llm_client_llmclient",
       "community": 66,
       "norm_label": "llmclient"
@@ -5065,7 +5137,7 @@
       "label": ".create_plan()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L47",
+      "source_location": "L69",
       "id": "llm_client_llmclient_create_plan",
       "community": 66,
       "norm_label": ".create_plan()"
@@ -5074,7 +5146,7 @@
       "label": ".confirm_setup()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L51",
+      "source_location": "L73",
       "id": "llm_client_llmclient_confirm_setup",
       "community": 66,
       "norm_label": ".confirm_setup()"
@@ -5083,7 +5155,7 @@
       "label": ".observe_trade()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L55",
+      "source_location": "L77",
       "id": "llm_client_llmclient_observe_trade",
       "community": 66,
       "norm_label": ".observe_trade()"
@@ -5092,7 +5164,7 @@
       "label": ".reflect_trade()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L59",
+      "source_location": "L81",
       "id": "llm_client_llmclient_reflect_trade",
       "community": 66,
       "norm_label": ".reflect_trade()"
@@ -5101,7 +5173,7 @@
       "label": "MockClient",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L64",
+      "source_location": "L86",
       "id": "llm_client_mockclient",
       "community": 57,
       "norm_label": "mockclient"
@@ -5110,7 +5182,7 @@
       "label": ".create_plan()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L69",
+      "source_location": "L91",
       "id": "llm_client_mockclient_create_plan",
       "community": 57,
       "norm_label": ".create_plan()"
@@ -5119,7 +5191,7 @@
       "label": ".confirm_setup()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L78",
+      "source_location": "L100",
       "id": "llm_client_mockclient_confirm_setup",
       "community": 57,
       "norm_label": ".confirm_setup()"
@@ -5128,7 +5200,7 @@
       "label": ".observe_trade()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L87",
+      "source_location": "L109",
       "id": "llm_client_mockclient_observe_trade",
       "community": 57,
       "norm_label": ".observe_trade()"
@@ -5137,7 +5209,7 @@
       "label": ".reflect_trade()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L96",
+      "source_location": "L118",
       "id": "llm_client_mockclient_reflect_trade",
       "community": 57,
       "norm_label": ".reflect_trade()"
@@ -5146,7 +5218,7 @@
       "label": "OpenAIClient",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L106",
+      "source_location": "L128",
       "id": "llm_client_openaiclient",
       "community": 45,
       "norm_label": "openaiclient"
@@ -5155,7 +5227,7 @@
       "label": ".__init__()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L111",
+      "source_location": "L133",
       "id": "llm_client_openaiclient_init",
       "community": 45,
       "norm_label": ".__init__()"
@@ -5164,7 +5236,7 @@
       "label": "._parse()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L119",
+      "source_location": "L141",
       "id": "llm_client_openaiclient_parse",
       "community": 45,
       "norm_label": "._parse()"
@@ -5173,7 +5245,7 @@
       "label": ".create_plan()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L172",
+      "source_location": "L195",
       "id": "llm_client_openaiclient_create_plan",
       "community": 45,
       "norm_label": ".create_plan()"
@@ -5182,7 +5254,7 @@
       "label": ".confirm_setup()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L182",
+      "source_location": "L205",
       "id": "llm_client_openaiclient_confirm_setup",
       "community": 45,
       "norm_label": ".confirm_setup()"
@@ -5191,7 +5263,7 @@
       "label": ".observe_trade()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L202",
+      "source_location": "L225",
       "id": "llm_client_openaiclient_observe_trade",
       "community": 45,
       "norm_label": ".observe_trade()"
@@ -5200,7 +5272,7 @@
       "label": ".reflect_trade()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L221",
+      "source_location": "L244",
       "id": "llm_client_openaiclient_reflect_trade",
       "community": 45,
       "norm_label": ".reflect_trade()"
@@ -5209,7 +5281,7 @@
       "label": "get_client()",
       "file_type": "code",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L232",
+      "source_location": "L255",
       "id": "llm_client_get_client",
       "community": 152,
       "norm_label": "get_client()"
@@ -5224,11 +5296,20 @@
       "norm_label": "llm client abstraction: a deterministic mock and a real openai implementation."
     },
     {
+      "label": "Validate ``content`` against ``schema``, repairing malformed JSON if needed.",
+      "file_type": "rationale",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L33",
+      "id": "llm_client_rationale_33",
+      "community": 45,
+      "norm_label": "validate ``content`` against ``schema``, repairing malformed json if needed."
+    },
+    {
       "label": "Deterministic, offline. Pure function of the envelope.",
       "file_type": "rationale",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L65",
-      "id": "llm_client_rationale_65",
+      "source_location": "L87",
+      "id": "llm_client_rationale_87",
       "community": 57,
       "norm_label": "deterministic, offline. pure function of the envelope."
     },
@@ -5236,8 +5317,8 @@
       "label": "Real OpenAI implementation using the Responses API structured-output parser.",
       "file_type": "rationale",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L107",
-      "id": "llm_client_rationale_107",
+      "source_location": "L129",
+      "id": "llm_client_rationale_129",
       "community": 45,
       "norm_label": "real openai implementation using the responses api structured-output parser."
     },
@@ -5245,8 +5326,8 @@
       "label": "Return the mock unless real OpenAI calls are explicitly enabled with a key.",
       "file_type": "rationale",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L233",
-      "id": "llm_client_rationale_233",
+      "source_location": "L256",
+      "id": "llm_client_rationale_256",
       "community": 152,
       "norm_label": "return the mock unless real openai calls are explicitly enabled with a key."
     },
@@ -5326,7 +5407,7 @@
       "label": "canned_reflection()",
       "file_type": "code",
       "source_file": "src/ats/llm/mock_data.py",
-      "source_location": "L201",
+      "source_location": "L226",
       "id": "llm_mock_data_canned_reflection",
       "community": 139,
       "norm_label": "canned_reflection()"
@@ -5380,8 +5461,8 @@
       "label": "Deterministic post-mortem from the closed trade's exit_reason + pnl.      Accept",
       "file_type": "rationale",
       "source_file": "src/ats/llm/mock_data.py",
-      "source_location": "L202",
-      "id": "llm_mock_data_rationale_202",
+      "source_location": "L227",
+      "id": "llm_mock_data_rationale_227",
       "community": 139,
       "norm_label": "deterministic post-mortem from the closed trade's exit_reason + pnl.      accept"
     },
@@ -5425,7 +5506,7 @@
       "label": "user_message()",
       "file_type": "code",
       "source_file": "src/ats/llm/prompts.py",
-      "source_location": "L308",
+      "source_location": "L361",
       "id": "llm_prompts_user_message",
       "community": 65,
       "norm_label": "user_message()"
@@ -5470,8 +5551,8 @@
       "label": "Render the per-call envelope as a compact JSON user message.",
       "file_type": "rationale",
       "source_file": "src/ats/llm/prompts.py",
-      "source_location": "L309",
-      "id": "llm_prompts_rationale_309",
+      "source_location": "L362",
+      "id": "llm_prompts_rationale_362",
       "community": 65,
       "norm_label": "render the per-call envelope as a compact json user message."
     },
@@ -5526,7 +5607,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L92",
       "id": "llm_schemas_rule",
-      "community": 43,
+      "community": 38,
       "norm_label": "rule"
     },
     {
@@ -5625,7 +5706,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L183",
       "id": "llm_schemas_observationoutput",
-      "community": 70,
+      "community": 57,
       "norm_label": "observationoutput"
     },
     {
@@ -5742,7 +5823,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L93",
       "id": "llm_schemas_rationale_93",
-      "community": 43,
+      "community": 38,
       "norm_label": "a single comparison the rule engine can evaluate.      ``left``/``right`` resolv"
     },
     {
@@ -5805,7 +5886,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L184",
       "id": "llm_schemas_rationale_184",
-      "community": 70,
+      "community": 57,
       "norm_label": "the observe_trade result \u2014 a tactical adjustment for an open trade.      all fie"
     },
     {
@@ -6525,7 +6606,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L1",
       "id": "src_ats_learning_post_mortem_py",
-      "community": 139,
+      "community": 153,
       "norm_label": "post_mortem.py"
     },
     {
@@ -6534,7 +6615,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L26",
       "id": "learning_post_mortem_outcome",
-      "community": 139,
+      "community": 153,
       "norm_label": "_outcome()"
     },
     {
@@ -6543,7 +6624,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L30",
       "id": "learning_post_mortem_reflect_and_store",
-      "community": 139,
+      "community": 153,
       "norm_label": "reflect_and_store()"
     },
     {
@@ -6552,7 +6633,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L1",
       "id": "learning_post_mortem_rationale_1",
-      "community": 139,
+      "community": 153,
       "norm_label": "post-mortem: on a closed trade, write one structured ``learning`` row.  called f"
     },
     {
@@ -6561,7 +6642,7 @@
       "source_file": "src/ats/learning/post_mortem.py",
       "source_location": "L36",
       "id": "learning_post_mortem_rationale_36",
-      "community": 139,
+      "community": 153,
       "norm_label": "run the post-mortem for ``trade`` and persist a learning + audit row."
     },
     {
@@ -6570,7 +6651,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L1",
       "id": "src_ats_learning_fingerprint_py",
-      "community": 139,
+      "community": 156,
       "norm_label": "fingerprint.py"
     },
     {
@@ -6579,7 +6660,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L30",
       "id": "learning_fingerprint_clamp01",
-      "community": 139,
+      "community": 156,
       "norm_label": "_clamp01()"
     },
     {
@@ -6588,7 +6669,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L34",
       "id": "learning_fingerprint_get",
-      "community": 139,
+      "community": 156,
       "norm_label": "_get()"
     },
     {
@@ -6597,7 +6678,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L42",
       "id": "learning_fingerprint_squash",
-      "community": 139,
+      "community": 156,
       "norm_label": "_squash()"
     },
     {
@@ -6606,7 +6687,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L53",
       "id": "learning_fingerprint_build_fingerprint",
-      "community": 139,
+      "community": 156,
       "norm_label": "build_fingerprint()"
     },
     {
@@ -6615,7 +6696,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L66",
       "id": "learning_fingerprint_to_vector_literal",
-      "community": 139,
+      "community": 153,
       "norm_label": "to_vector_literal()"
     },
     {
@@ -6624,7 +6705,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L1",
       "id": "learning_fingerprint_rationale_1",
-      "community": 139,
+      "community": 156,
       "norm_label": "numeric setup fingerprint \u2014 the vector episodic memory is retrieved by.  a fixed"
     },
     {
@@ -6633,7 +6714,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L43",
       "id": "learning_fingerprint_rationale_43",
-      "community": 139,
+      "community": 156,
       "norm_label": "map an unbounded z-score-like value into [0, 1] via tanh (0.5 = neutral/missing)"
     },
     {
@@ -6642,7 +6723,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L56",
       "id": "learning_fingerprint_rationale_56",
-      "community": 139,
+      "community": 156,
       "norm_label": "build the fixed-length setup fingerprint. ``regime`` is accepted for future use."
     },
     {
@@ -6651,7 +6732,7 @@
       "source_file": "src/ats/learning/fingerprint.py",
       "source_location": "L67",
       "id": "learning_fingerprint_rationale_67",
-      "community": 139,
+      "community": 153,
       "norm_label": "render a fingerprint as a pgvector text literal, e.g. ``[0.1,0.2,...]``."
     },
     {
@@ -6678,7 +6759,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L1",
       "id": "src_ats_learning_retrieval_py",
-      "community": 42,
+      "community": 153,
       "norm_label": "retrieval.py"
     },
     {
@@ -6687,7 +6768,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L13",
       "id": "learning_retrieval_avg",
-      "community": 42,
+      "community": 153,
       "norm_label": "_avg()"
     },
     {
@@ -6696,7 +6777,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L17",
       "id": "learning_retrieval_retrieve_relevant_learnings",
-      "community": 42,
+      "community": 153,
       "norm_label": "retrieve_relevant_learnings()"
     },
     {
@@ -6705,7 +6786,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L74",
       "id": "learning_retrieval_retrieve_memory_summary",
-      "community": 42,
+      "community": 153,
       "norm_label": "retrieve_memory_summary()"
     },
     {
@@ -6714,7 +6795,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L1",
       "id": "learning_retrieval_rationale_1",
-      "community": 42,
+      "community": 153,
       "norm_label": "retrieve the most-similar prior learnings for a setup (cosine over the fingerpri"
     },
     {
@@ -6723,7 +6804,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L25",
       "id": "learning_retrieval_rationale_25",
-      "community": 42,
+      "community": 153,
       "norm_label": "top-k learnings nearest to ``fingerprint`` by cosine distance.      ``direction`"
     },
     {
@@ -6732,7 +6813,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L81",
       "id": "learning_retrieval_rationale_81",
-      "community": 42,
+      "community": 153,
       "norm_label": "aggregate nearby learning rows into a compact planner-facing memory signal."
     },
     {
@@ -7153,7 +7234,7 @@
       "label": "tick()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L300",
+      "source_location": "L307",
       "id": "cli_commands_engine_tick",
       "community": 147,
       "norm_label": "tick()"
@@ -7162,7 +7243,7 @@
       "label": "invalidate_check()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L324",
+      "source_location": "L331",
       "id": "cli_commands_engine_invalidate_check",
       "community": 141,
       "norm_label": "invalidate_check()"
@@ -7171,7 +7252,7 @@
       "label": "run()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L361",
+      "source_location": "L368",
       "id": "cli_commands_engine_run",
       "community": 151,
       "norm_label": "run()"
@@ -7180,7 +7261,7 @@
       "label": "_print_trade_summary()",
       "file_type": "code",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L405",
+      "source_location": "L412",
       "id": "cli_commands_engine_print_trade_summary",
       "community": 36,
       "norm_label": "_print_trade_summary()"
@@ -7225,8 +7306,8 @@
       "label": "Single evaluation against the latest computed features.",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L304",
-      "id": "cli_commands_engine_rationale_304",
+      "source_location": "L311",
+      "id": "cli_commands_engine_rationale_311",
       "community": 147,
       "norm_label": "single evaluation against the latest computed features."
     },
@@ -7234,8 +7315,8 @@
       "label": "Evaluate the active plan's invalidation rules against the latest closed bar.",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L328",
-      "id": "cli_commands_engine_rationale_328",
+      "source_location": "L335",
+      "id": "cli_commands_engine_rationale_335",
       "community": 141,
       "norm_label": "evaluate the active plan's invalidation rules against the latest closed bar."
     },
@@ -7243,8 +7324,8 @@
       "label": "Live poll loop: (optionally refresh data,) then tick, repeating every --interval",
       "file_type": "rationale",
       "source_file": "src/ats/cli_commands/engine.py",
-      "source_location": "L370",
-      "id": "cli_commands_engine_rationale_370",
+      "source_location": "L377",
+      "id": "cli_commands_engine_rationale_377",
       "community": 151,
       "norm_label": "live poll loop: (optionally refresh data,) then tick, repeating every --interval"
     },
@@ -7924,10 +8005,19 @@
       "norm_label": "_stripped_invalidation_rules()"
     },
     {
+      "label": "_stripped_hard_rules()",
+      "file_type": "code",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L116",
+      "id": "planning_create_plan_stripped_hard_rules",
+      "community": 157,
+      "norm_label": "_stripped_hard_rules()"
+    },
+    {
       "label": "PlanResult",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L117",
+      "source_location": "L150",
       "id": "planning_create_plan_planresult",
       "community": 17,
       "norm_label": "planresult"
@@ -7936,7 +8026,7 @@
       "label": "_json_safe()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L123",
+      "source_location": "L156",
       "id": "planning_create_plan_json_safe",
       "community": 4,
       "norm_label": "_json_safe()"
@@ -7945,16 +8035,16 @@
       "label": "_prune_missing()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L127",
+      "source_location": "L160",
       "id": "planning_create_plan_prune_missing",
-      "community": 4,
+      "community": 70,
       "norm_label": "_prune_missing()"
     },
     {
       "label": "_rule_operands()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L146",
+      "source_location": "L179",
       "id": "planning_create_plan_rule_operands",
       "community": 4,
       "norm_label": "_rule_operands()"
@@ -7963,7 +8053,7 @@
       "label": "_warn_unknown_features()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L158",
+      "source_location": "L191",
       "id": "planning_create_plan_warn_unknown_features",
       "community": 4,
       "norm_label": "_warn_unknown_features()"
@@ -7972,16 +8062,16 @@
       "label": "build_envelope()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L181",
+      "source_location": "L214",
       "id": "planning_create_plan_build_envelope",
-      "community": 4,
+      "community": 70,
       "norm_label": "build_envelope()"
     },
     {
       "label": "_persist()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L277",
+      "source_location": "L310",
       "id": "planning_create_plan_persist",
       "community": 4,
       "norm_label": "_persist()"
@@ -7990,7 +8080,7 @@
       "label": "create_plan()",
       "file_type": "code",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L332",
+      "source_location": "L365",
       "id": "planning_create_plan_create_plan",
       "community": 4,
       "norm_label": "create_plan()"
@@ -8032,20 +8122,29 @@
       "norm_label": "drop hard invalidation rules that merely restate the stop level.      the strate"
     },
     {
+      "label": "Drop hard ENTRY rules that merely restate the entry_zone as a bare price literal",
+      "file_type": "rationale",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L117",
+      "id": "planning_create_plan_rationale_117",
+      "community": 157,
+      "norm_label": "drop hard entry rules that merely restate the entry_zone as a bare price literal"
+    },
+    {
       "label": "Drop feature keys whose value is None or NaN before sending to the strategist.",
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L128",
-      "id": "planning_create_plan_rationale_128",
-      "community": 4,
+      "source_location": "L161",
+      "id": "planning_create_plan_rationale_161",
+      "community": 70,
       "norm_label": "drop feature keys whose value is none or nan before sending to the strategist."
     },
     {
       "label": "Feature names referenced by a rule list (string operands, excluding ``price``).",
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L147",
-      "id": "planning_create_plan_rationale_147",
+      "source_location": "L180",
+      "id": "planning_create_plan_rationale_180",
       "community": 4,
       "norm_label": "feature names referenced by a rule list (string operands, excluding ``price``)."
     },
@@ -8053,8 +8152,8 @@
       "label": "Log (once per plan) any setup rule that references a feature absent from the env",
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L159",
-      "id": "planning_create_plan_rationale_159",
+      "source_location": "L192",
+      "id": "planning_create_plan_rationale_192",
       "community": 4,
       "norm_label": "log (once per plan) any setup rule that references a feature absent from the env"
     },
@@ -8062,17 +8161,17 @@
       "label": "Assemble the JSON-only context passed to create_plan.",
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L189",
-      "id": "planning_create_plan_rationale_189",
-      "community": 4,
+      "source_location": "L222",
+      "id": "planning_create_plan_rationale_222",
+      "community": 70,
       "norm_label": "assemble the json-only context passed to create_plan."
     },
     {
       "label": "Run one create_plan cycle. Returns the persisted plan (or None on LLM failure).",
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L340",
-      "id": "planning_create_plan_rationale_340",
+      "source_location": "L373",
+      "id": "planning_create_plan_rationale_373",
       "community": 4,
       "norm_label": "run one create_plan cycle. returns the persisted plan (or none on llm failure)."
     },
@@ -8343,7 +8442,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L32",
       "id": "execution_reconcile_net_of_costs",
-      "community": 13,
+      "community": 155,
       "norm_label": "net_of_costs()"
     },
     {
@@ -8460,7 +8559,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L33",
       "id": "execution_reconcile_rationale_33",
-      "community": 13,
+      "community": 155,
       "norm_label": "position-weighted pnl for a leg of size ``frac`` after round-trip trading costs."
     },
     {
@@ -8811,7 +8910,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L253",
       "id": "db_models_papertrade",
-      "community": 66,
+      "community": 17,
       "norm_label": "papertrade"
     },
     {
@@ -8847,7 +8946,7 @@
       "source_file": "src/ats/db/models.py",
       "source_location": "L254",
       "id": "db_models_rationale_254",
-      "community": 66,
+      "community": 17,
       "norm_label": "executor output \u2014 paper only, never a live order."
     },
     {
@@ -8910,7 +9009,7 @@
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L70",
       "id": "engine_detector_tickreport",
-      "community": 66,
+      "community": 17,
       "norm_label": "tickreport"
     },
     {
@@ -8968,10 +9067,55 @@
       "norm_label": "_hold_context()"
     },
     {
+      "label": "_directional_feature_state()",
+      "file_type": "code",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L154",
+      "id": "engine_detector_directional_feature_state",
+      "community": 52,
+      "norm_label": "_directional_feature_state()"
+    },
+    {
+      "label": "_entry_zone_location()",
+      "file_type": "code",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L166",
+      "id": "engine_detector_entry_zone_location",
+      "community": 52,
+      "norm_label": "_entry_zone_location()"
+    },
+    {
+      "label": "_atr_distance()",
+      "file_type": "code",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L177",
+      "id": "engine_detector_atr_distance",
+      "community": 52,
+      "norm_label": "_atr_distance()"
+    },
+    {
+      "label": "_observer_thesis_health()",
+      "file_type": "code",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L183",
+      "id": "engine_detector_observer_thesis_health",
+      "community": 52,
+      "norm_label": "_observer_thesis_health()"
+    },
+    {
+      "label": "_observer_context()",
+      "file_type": "code",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L233",
+      "id": "engine_detector_observer_context",
+      "community": 52,
+      "norm_label": "_observer_context()"
+    },
+    {
       "label": "ExitPolicy",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L155",
+      "source_location": "L342",
       "id": "engine_detector_exitpolicy",
       "community": 52,
       "norm_label": "exitpolicy"
@@ -8980,7 +9124,7 @@
       "label": "_is_sideways()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L169",
+      "source_location": "L356",
       "id": "engine_detector_is_sideways",
       "community": 52,
       "norm_label": "_is_sideways()"
@@ -8989,7 +9133,7 @@
       "label": "_exit_policy_for_regime()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L173",
+      "source_location": "L360",
       "id": "engine_detector_exit_policy_for_regime",
       "community": 52,
       "norm_label": "_exit_policy_for_regime()"
@@ -8998,16 +9142,16 @@
       "label": "_exit_policy_metadata()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L199",
+      "source_location": "L386",
       "id": "engine_detector_exit_policy_metadata",
-      "community": 52,
+      "community": 23,
       "norm_label": "_exit_policy_metadata()"
     },
     {
       "label": "_exit_policy_from_metadata()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L213",
+      "source_location": "L400",
       "id": "engine_detector_exit_policy_from_metadata",
       "community": 52,
       "norm_label": "_exit_policy_from_metadata()"
@@ -9016,7 +9160,7 @@
       "label": "clamp_tightened_stop()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L236",
+      "source_location": "L423",
       "id": "engine_detector_clamp_tightened_stop",
       "community": 20,
       "norm_label": "clamp_tightened_stop()"
@@ -9025,7 +9169,7 @@
       "label": "clamp_extended_tp()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L247",
+      "source_location": "L434",
       "id": "engine_detector_clamp_extended_tp",
       "community": 20,
       "norm_label": "clamp_extended_tp()"
@@ -9034,7 +9178,7 @@
       "label": "_setup_dict()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L252",
+      "source_location": "L439",
       "id": "engine_detector_setup_dict",
       "community": 23,
       "norm_label": "_setup_dict()"
@@ -9043,16 +9187,16 @@
       "label": "_open_trades_for()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L271",
+      "source_location": "L458",
       "id": "engine_detector_open_trades_for",
-      "community": 23,
+      "community": 52,
       "norm_label": "_open_trades_for()"
     },
     {
       "label": "_close_trade()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L276",
+      "source_location": "L463",
       "id": "engine_detector_close_trade",
       "community": 89,
       "norm_label": "_close_trade()"
@@ -9061,7 +9205,7 @@
       "label": "_advance_trade()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L335",
+      "source_location": "L522",
       "id": "engine_detector_advance_trade",
       "community": 89,
       "norm_label": "_advance_trade()"
@@ -9070,16 +9214,16 @@
       "label": "_reconcile_open_trades()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L473",
+      "source_location": "L660",
       "id": "engine_detector_reconcile_open_trades",
-      "community": 23,
+      "community": 52,
       "norm_label": "_reconcile_open_trades()"
     },
     {
       "label": "_observe_and_adjust()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L492",
+      "source_location": "L679",
       "id": "engine_detector_observe_and_adjust",
       "community": 13,
       "norm_label": "_observe_and_adjust()"
@@ -9088,25 +9232,25 @@
       "label": "_handle_invalidation()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L670",
+      "source_location": "L867",
       "id": "engine_detector_handle_invalidation",
-      "community": 23,
+      "community": 155,
       "norm_label": "_handle_invalidation()"
     },
     {
       "label": "_confirm_and_execute()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L750",
+      "source_location": "L947",
       "id": "engine_detector_confirm_and_execute",
-      "community": 52,
+      "community": 23,
       "norm_label": "_confirm_and_execute()"
     },
     {
       "label": "evaluate_now()",
       "file_type": "code",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L941",
+      "source_location": "L1142",
       "id": "engine_detector_evaluate_now",
       "community": 23,
       "norm_label": "evaluate_now()"
@@ -9133,8 +9277,8 @@
       "label": "Concrete exit knobs carried by a trade after entry.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L156",
-      "id": "engine_detector_rationale_156",
+      "source_location": "L343",
+      "id": "engine_detector_rationale_343",
       "community": 52,
       "norm_label": "concrete exit knobs carried by a trade after entry."
     },
@@ -9142,8 +9286,8 @@
       "label": "Clamp an observation's proposed stop so it can only tighten, never widen risk.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L237",
-      "id": "engine_detector_rationale_237",
+      "source_location": "L424",
+      "id": "engine_detector_rationale_424",
       "community": 20,
       "norm_label": "clamp an observation's proposed stop so it can only tighten, never widen risk."
     },
@@ -9151,8 +9295,8 @@
       "label": "Clamp a proposed take-profit so the final target can only extend outward.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L248",
-      "id": "engine_detector_rationale_248",
+      "source_location": "L435",
+      "id": "engine_detector_rationale_435",
       "community": 20,
       "norm_label": "clamp a proposed take-profit so the final target can only extend outward."
     },
@@ -9160,8 +9304,8 @@
       "label": "Single close path: record the close, then run the episodic post-mortem.      Cen",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L285",
-      "id": "engine_detector_rationale_285",
+      "source_location": "L472",
+      "id": "engine_detector_rationale_472",
       "community": 89,
       "norm_label": "single close path: record the close, then run the episodic post-mortem.      cen"
     },
@@ -9169,8 +9313,8 @@
       "label": "Walk one open trade across a sequence of candles (finer-tf bars or a single bar)",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L345",
-      "id": "engine_detector_rationale_345",
+      "source_location": "L532",
+      "id": "engine_detector_rationale_532",
       "community": 89,
       "norm_label": "walk one open trade across a sequence of candles (finer-tf bars or a single bar)"
     },
@@ -9178,17 +9322,17 @@
       "label": "Advance each open trade. Uses ``fine_candles`` (finer-tf) when given, else this",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L484",
-      "id": "engine_detector_rationale_484",
-      "community": 23,
+      "source_location": "L671",
+      "id": "engine_detector_rationale_671",
+      "community": 52,
       "norm_label": "advance each open trade. uses ``fine_candles`` (finer-tf) when given, else this"
     },
     {
       "label": "Consult the observation agent for an open trade; apply a code-clamped adjustment",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L504",
-      "id": "engine_detector_rationale_504",
+      "source_location": "L691",
+      "id": "engine_detector_rationale_691",
       "community": 13,
       "norm_label": "consult the observation agent for an open trade; apply a code-clamped adjustment"
     },
@@ -9196,17 +9340,17 @@
       "label": "Evaluate invalidation across the plan's setups. Returns True if plan was killed.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L680",
-      "id": "engine_detector_rationale_680",
-      "community": 23,
+      "source_location": "L877",
+      "id": "engine_detector_rationale_877",
+      "community": 155,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed."
     },
     {
       "label": "Run one full evaluation of the active plan against the current feature row.",
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L953",
-      "id": "engine_detector_rationale_953",
+      "source_location": "L1154",
+      "id": "engine_detector_rationale_1154",
       "community": 23,
       "norm_label": "run one full evaluation of the active plan against the current feature row."
     },
@@ -9855,7 +9999,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L143",
       "id": "risk_manager_regime_allows",
-      "community": 4,
+      "community": 70,
       "norm_label": "regime_allows()"
     },
     {
@@ -9909,7 +10053,7 @@
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L144",
       "id": "risk_manager_rationale_144",
-      "community": 4,
+      "community": 70,
       "norm_label": "whether a setup's direction is aligned with the current regime.      rule of thu"
     },
     {
@@ -15331,22 +15475,31 @@
       "norm_label": "derivatives / flow (perp-specific features)"
     },
     {
-      "label": "test_observer_context_marks_failed_short_as_broken()",
-      "file_type": "code",
-      "source_file": "tests/test_detector_entries.py",
-      "source_location": "L484",
-      "community": 48,
-      "norm_label": "test_observer_context_marks_failed_short_as_broken()",
-      "id": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken"
+      "label": "Deterministic, offline. Pure function of the envelope.",
+      "file_type": "rationale",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L65",
+      "community": 57,
+      "norm_label": "deterministic, offline. pure function of the envelope.",
+      "id": "llm_client_rationale_65"
     },
     {
-      "label": "Deterministic post-mortem from the closed trade's exit_reason + pnl.      Accept",
+      "label": "Real OpenAI implementation using the Responses API structured-output parser.",
       "file_type": "rationale",
-      "source_file": "src/ats/llm/mock_data.py",
-      "source_location": "L227",
-      "community": 139,
-      "norm_label": "deterministic post-mortem from the closed trade's exit_reason + pnl.      accept",
-      "id": "llm_mock_data_rationale_227"
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L107",
+      "community": 45,
+      "norm_label": "real openai implementation using the responses api structured-output parser.",
+      "id": "llm_client_rationale_107"
+    },
+    {
+      "label": "Return the mock unless real OpenAI calls are explicitly enabled with a key.",
+      "file_type": "rationale",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L233",
+      "community": 152,
+      "norm_label": "return the mock unless real openai calls are explicitly enabled with a key.",
+      "id": "llm_client_rationale_233"
     },
     {
       "label": "Render the per-call envelope as a compact JSON user message.",
@@ -15358,49 +15511,175 @@
       "id": "llm_prompts_rationale_343"
     },
     {
-      "label": "_directional_feature_state()",
-      "file_type": "code",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L154",
-      "community": 52,
-      "norm_label": "_directional_feature_state()",
-      "id": "engine_detector_directional_feature_state"
+      "label": "Single evaluation against the latest computed features.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L304",
+      "community": 147,
+      "norm_label": "single evaluation against the latest computed features.",
+      "id": "cli_commands_engine_rationale_304"
     },
     {
-      "label": "_entry_zone_location()",
-      "file_type": "code",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L166",
-      "community": 52,
-      "norm_label": "_entry_zone_location()",
-      "id": "engine_detector_entry_zone_location"
+      "label": "Evaluate the active plan's invalidation rules against the latest closed bar.",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L328",
+      "community": 141,
+      "norm_label": "evaluate the active plan's invalidation rules against the latest closed bar.",
+      "id": "cli_commands_engine_rationale_328"
     },
     {
-      "label": "_atr_distance()",
-      "file_type": "code",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L177",
-      "community": 52,
-      "norm_label": "_atr_distance()",
-      "id": "engine_detector_atr_distance"
+      "label": "Live poll loop: (optionally refresh data,) then tick, repeating every --interval",
+      "file_type": "rationale",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L370",
+      "community": 151,
+      "norm_label": "live poll loop: (optionally refresh data,) then tick, repeating every --interval",
+      "id": "cli_commands_engine_rationale_370"
     },
     {
-      "label": "_observer_thesis_health()",
-      "file_type": "code",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L183",
-      "community": 52,
-      "norm_label": "_observer_thesis_health()",
-      "id": "engine_detector_observer_thesis_health"
+      "label": "Drop feature keys whose value is None or NaN before sending to the strategist.",
+      "file_type": "rationale",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L128",
+      "community": 70,
+      "norm_label": "drop feature keys whose value is none or nan before sending to the strategist.",
+      "id": "planning_create_plan_rationale_128"
     },
     {
-      "label": "_observer_context()",
-      "file_type": "code",
+      "label": "Feature names referenced by a rule list (string operands, excluding ``price``).",
+      "file_type": "rationale",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L147",
+      "community": 4,
+      "norm_label": "feature names referenced by a rule list (string operands, excluding ``price``).",
+      "id": "planning_create_plan_rationale_147"
+    },
+    {
+      "label": "Log (once per plan) any setup rule that references a feature absent from the env",
+      "file_type": "rationale",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L159",
+      "community": 4,
+      "norm_label": "log (once per plan) any setup rule that references a feature absent from the env",
+      "id": "planning_create_plan_rationale_159"
+    },
+    {
+      "label": "Assemble the JSON-only context passed to create_plan.",
+      "file_type": "rationale",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L189",
+      "community": 70,
+      "norm_label": "assemble the json-only context passed to create_plan.",
+      "id": "planning_create_plan_rationale_189"
+    },
+    {
+      "label": "Run one create_plan cycle. Returns the persisted plan (or None on LLM failure).",
+      "file_type": "rationale",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L340",
+      "community": 4,
+      "norm_label": "run one create_plan cycle. returns the persisted plan (or none on llm failure).",
+      "id": "planning_create_plan_rationale_340"
+    },
+    {
+      "label": "Deterministic post-mortem from the closed trade's exit_reason + pnl.      Accept",
+      "file_type": "rationale",
+      "source_file": "src/ats/llm/mock_data.py",
+      "source_location": "L202",
+      "community": 139,
+      "norm_label": "deterministic post-mortem from the closed trade's exit_reason + pnl.      accept",
+      "id": "llm_mock_data_rationale_202"
+    },
+    {
+      "label": "Render the per-call envelope as a compact JSON user message.",
+      "file_type": "rationale",
+      "source_file": "src/ats/llm/prompts.py",
+      "source_location": "L309",
+      "community": 65,
+      "norm_label": "render the per-call envelope as a compact json user message.",
+      "id": "llm_prompts_rationale_309"
+    },
+    {
+      "label": "Concrete exit knobs carried by a trade after entry.",
+      "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L235",
+      "source_location": "L156",
       "community": 52,
-      "norm_label": "_observer_context()",
-      "id": "engine_detector_observer_context"
+      "norm_label": "concrete exit knobs carried by a trade after entry.",
+      "id": "engine_detector_rationale_156"
+    },
+    {
+      "label": "Clamp an observation's proposed stop so it can only tighten, never widen risk.",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L237",
+      "community": 20,
+      "norm_label": "clamp an observation's proposed stop so it can only tighten, never widen risk.",
+      "id": "engine_detector_rationale_237"
+    },
+    {
+      "label": "Clamp a proposed take-profit so the final target can only extend outward.",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L248",
+      "community": 20,
+      "norm_label": "clamp a proposed take-profit so the final target can only extend outward.",
+      "id": "engine_detector_rationale_248"
+    },
+    {
+      "label": "Single close path: record the close, then run the episodic post-mortem.      Cen",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L285",
+      "community": 89,
+      "norm_label": "single close path: record the close, then run the episodic post-mortem.      cen",
+      "id": "engine_detector_rationale_285"
+    },
+    {
+      "label": "Walk one open trade across a sequence of candles (finer-tf bars or a single bar)",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L345",
+      "community": 89,
+      "norm_label": "walk one open trade across a sequence of candles (finer-tf bars or a single bar)",
+      "id": "engine_detector_rationale_345"
+    },
+    {
+      "label": "Advance each open trade. Uses ``fine_candles`` (finer-tf) when given, else this",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L484",
+      "community": 52,
+      "norm_label": "advance each open trade. uses ``fine_candles`` (finer-tf) when given, else this",
+      "id": "engine_detector_rationale_484"
+    },
+    {
+      "label": "Consult the observation agent for an open trade; apply a code-clamped adjustment",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L504",
+      "community": 13,
+      "norm_label": "consult the observation agent for an open trade; apply a code-clamped adjustment",
+      "id": "engine_detector_rationale_504"
+    },
+    {
+      "label": "Evaluate invalidation across the plan's setups. Returns True if plan was killed.",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L680",
+      "community": 155,
+      "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
+      "id": "engine_detector_rationale_680"
+    },
+    {
+      "label": "Run one full evaluation of the active plan against the current feature row.",
+      "file_type": "rationale",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L953",
+      "community": 23,
+      "norm_label": "run one full evaluation of the active plan against the current feature row.",
+      "id": "engine_detector_rationale_953"
     },
     {
       "label": "Concrete exit knobs carried by a trade after entry.",
@@ -15452,7 +15731,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L674",
-      "community": 23,
+      "community": 52,
       "norm_label": "advance each open trade. uses ``fine_candles`` (finer-tf) when given, else this",
       "id": "engine_detector_rationale_674"
     },
@@ -15470,7 +15749,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L880",
-      "community": 23,
+      "community": 155,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
       "id": "engine_detector_rationale_880"
     },
@@ -15524,7 +15803,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L21",
-      "community": 42,
+      "community": 153,
       "norm_label": "top-k learnings nearest to ``fingerprint`` by cosine distance.      ``direction`",
       "id": "learning_retrieval_rationale_21"
     },
@@ -15605,7 +15884,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L127",
-      "community": 4,
+      "community": 70,
       "norm_label": "drop feature keys whose value is none or nan before sending to the strategist.",
       "id": "planning_create_plan_rationale_127"
     },
@@ -15632,7 +15911,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L188",
-      "community": 4,
+      "community": 70,
       "norm_label": "assemble the json-only context passed to create_plan.",
       "id": "planning_create_plan_rationale_188"
     },
@@ -16055,7 +16334,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L83",
-      "community": 4,
+      "community": 70,
       "norm_label": "drop feature keys whose value is none or nan before sending to the strategist.",
       "id": "planning_create_plan_rationale_83"
     },
@@ -16082,7 +16361,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L144",
-      "community": 4,
+      "community": 70,
       "norm_label": "assemble the json-only context passed to create_plan.",
       "id": "planning_create_plan_rationale_144"
     },
@@ -16163,7 +16442,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L318",
-      "community": 23,
+      "community": 52,
       "norm_label": "advance each open trade. uses ``fine_candles`` (finer-tf) when given, else this",
       "id": "engine_detector_rationale_318"
     },
@@ -16181,7 +16460,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L474",
-      "community": 23,
+      "community": 155,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
       "id": "engine_detector_rationale_474"
     },
@@ -16901,7 +17180,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L458",
-      "community": 23,
+      "community": 155,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
       "id": "engine_detector_rationale_458"
     },
@@ -17081,7 +17360,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L303",
-      "community": 23,
+      "community": 52,
       "norm_label": "advance each open trade. uses ``fine_candles`` (finer-tf) when given, else this",
       "id": "engine_detector_rationale_303"
     },
@@ -17099,7 +17378,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L443",
-      "community": 23,
+      "community": 155,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
       "id": "engine_detector_rationale_443"
     },
@@ -17189,7 +17468,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/risk/manager.py",
       "source_location": "L86",
-      "community": 4,
+      "community": 70,
       "norm_label": "whether a setup's direction is aligned with the current regime.      the losing",
       "id": "risk_manager_rationale_86"
     },
@@ -17279,7 +17558,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L297",
-      "community": 23,
+      "community": 52,
       "norm_label": "advance each open trade. uses ``fine_candles`` (finer-tf) when given, else this",
       "id": "engine_detector_rationale_297"
     },
@@ -17297,7 +17576,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/detector.py",
       "source_location": "L437",
-      "community": 23,
+      "community": 155,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed.",
       "id": "engine_detector_rationale_437"
     },
@@ -21476,16 +21755,6 @@
       "target": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context"
     },
     {
-      "relation": "rationale_for",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_detector_entries.py",
-      "source_location": "L1",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_detector_entries_rationale_1",
-      "target": "tests_test_detector_entries_py"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_detector_entries.py",
@@ -21494,6 +21763,16 @@
       "confidence_score": 1.0,
       "source": "tests_test_detector_entries_py",
       "target": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_detector_entries.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_detector_entries_rationale_1",
+      "target": "tests_test_detector_entries_py"
     },
     {
       "relation": "method",
@@ -21624,6 +21903,17 @@
       "target": "tests_test_detector_entries_fakesession"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_detector_entries.py",
+      "source_location": "L515",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
+      "target": "tests_test_detector_entries_fakesession"
+    },
+    {
       "relation": "uses",
       "confidence": "INFERRED",
       "source_file": "tests/test_detector_entries.py",
@@ -21682,17 +21972,6 @@
       "confidence_score": 0.5,
       "source": "tests_test_detector_entries_fakesession",
       "target": "risk_manager_riskdecision"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_detector_entries.py",
-      "source_location": "L515",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
-      "target": "tests_test_detector_entries_fakesession"
     },
     {
       "relation": "method",
@@ -21883,6 +22162,17 @@
       "target": "tests_test_detector_entries_observeclient"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_detector_entries.py",
+      "source_location": "L489",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
+      "target": "tests_test_detector_entries_observeclient"
+    },
+    {
       "relation": "uses",
       "confidence": "INFERRED",
       "source_file": "tests/test_detector_entries.py",
@@ -21941,17 +22231,6 @@
       "confidence_score": 0.5,
       "source": "tests_test_detector_entries_observeclient",
       "target": "risk_manager_riskdecision"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_detector_entries.py",
-      "source_location": "L489",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
-      "target": "tests_test_detector_entries_observeclient"
     },
     {
       "relation": "calls",
@@ -22094,6 +22373,17 @@
       "source_location": "L429",
       "weight": 1.0,
       "source": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
+      "target": "execution_reconcile_tradestate"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_detector_entries.py",
+      "source_location": "L512",
+      "weight": 1.0,
+      "source": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
       "target": "execution_reconcile_tradestate"
     },
     {
@@ -22502,6 +22792,155 @@
       "weight": 1.0,
       "source": "tests_test_llm_prompts_test_plan_prompt_injects_catalog_before_schema",
       "target": "llm_prompts_plan_system_prompt"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L14",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_py",
+      "target": "tests_test_create_plan_hard_rules_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L25",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_py",
+      "target": "tests_test_create_plan_hard_rules_test_strips_price_vs_literal_hard_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L35",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_py",
+      "target": "tests_test_create_plan_hard_rules_test_keeps_price_vs_feature_and_non_price_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L50",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_py",
+      "target": "tests_test_create_plan_hard_rules_test_empty_hard_rules_stay_empty",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_rationale_1",
+      "target": "tests_test_create_plan_hard_rules_py",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L26",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_strips_price_vs_literal_hard_rules",
+      "target": "tests_test_create_plan_hard_rules_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L36",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_keeps_price_vs_feature_and_non_price_rules",
+      "target": "tests_test_create_plan_hard_rules_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_empty_hard_rules_stay_empty",
+      "target": "tests_test_create_plan_hard_rules_setup",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L15",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_setup",
+      "target": "llm_schemas_setupoutput"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L28",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_strips_price_vs_literal_hard_rules",
+      "target": "llm_schemas_rule"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_strips_price_vs_literal_hard_rules",
+      "target": "planning_create_plan_stripped_hard_rules"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L38",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_keeps_price_vs_feature_and_non_price_rules",
+      "target": "llm_schemas_rule"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L43",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_keeps_price_vs_feature_and_non_price_rules",
+      "target": "planning_create_plan_stripped_hard_rules"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_create_plan_hard_rules.py",
+      "source_location": "L51",
+      "weight": 1.0,
+      "source": "tests_test_create_plan_hard_rules_test_empty_hard_rules_stay_empty",
+      "target": "planning_create_plan_stripped_hard_rules"
     },
     {
       "relation": "contains",
@@ -27488,6 +27927,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/client.py",
+      "source_location": "L32",
+      "weight": 1.0,
+      "source": "src_ats_llm_client_py",
+      "target": "llm_client_validate_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/client.py",
       "source_location": "L41",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -27543,6 +27992,27 @@
       "confidence_score": 1.0,
       "source": "llm_client_rationale_1",
       "target": "src_ats_llm_client_py"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L172",
+      "weight": 1.0,
+      "source": "llm_client_openaiclient_parse",
+      "target": "llm_client_validate_json",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L33",
+      "weight": 1.0,
+      "source": "llm_client_rationale_33",
+      "target": "llm_client_validate_json",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -27770,11 +28240,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L65",
+      "source_location": "L87",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "llm_client_rationale_65",
-      "target": "llm_client_mockclient"
+      "source": "llm_client_rationale_87",
+      "target": "llm_client_mockclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "uses",
@@ -27825,6 +28295,16 @@
       "confidence_score": 0.5,
       "source": "llm_client_mockclient",
       "target": "llm_schemas_reflectionoutput"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L65",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "llm_client_rationale_65",
+      "target": "llm_client_mockclient"
     },
     {
       "relation": "calls",
@@ -27945,11 +28425,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L107",
+      "source_location": "L129",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "llm_client_rationale_107",
-      "target": "llm_client_openaiclient"
+      "source": "llm_client_rationale_129",
+      "target": "llm_client_openaiclient",
+      "confidence_score": 1.0
     },
     {
       "relation": "uses",
@@ -28000,6 +28480,16 @@
       "confidence_score": 0.5,
       "source": "llm_client_openaiclient",
       "target": "llm_schemas_reflectionoutput"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L107",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "llm_client_rationale_107",
+      "target": "llm_client_openaiclient"
     },
     {
       "relation": "calls",
@@ -28060,11 +28550,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/client.py",
-      "source_location": "L233",
+      "source_location": "L256",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "llm_client_rationale_233",
-      "target": "llm_client_get_client"
+      "source": "llm_client_rationale_256",
+      "target": "llm_client_get_client",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -28108,6 +28598,16 @@
       "source_location": "L254",
       "weight": 1.0,
       "source": "cli_commands_engine_run",
+      "target": "llm_client_get_client"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/client.py",
+      "source_location": "L233",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "llm_client_rationale_233",
       "target": "llm_client_get_client"
     },
     {
@@ -28372,10 +28872,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/mock_data.py",
-      "source_location": "L202",
+      "source_location": "L227",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "llm_mock_data_rationale_202",
+      "source": "llm_mock_data_rationale_227",
       "target": "llm_mock_data_canned_reflection"
     },
     {
@@ -28393,10 +28893,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/mock_data.py",
-      "source_location": "L227",
+      "source_location": "L202",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "llm_mock_data_rationale_227",
+      "source": "llm_mock_data_rationale_202",
       "target": "llm_mock_data_canned_reflection"
     },
     {
@@ -28535,11 +29035,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/llm/prompts.py",
-      "source_location": "L309",
+      "source_location": "L362",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "llm_prompts_rationale_309",
-      "target": "llm_prompts_user_message"
+      "source": "llm_prompts_rationale_362",
+      "target": "llm_prompts_user_message",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -28549,6 +29049,16 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "llm_prompts_rationale_343",
+      "target": "llm_prompts_user_message"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/llm/prompts.py",
+      "source_location": "L309",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "llm_prompts_rationale_309",
       "target": "llm_prompts_user_message"
     },
     {
@@ -31257,6 +31767,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L311",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_311",
+      "target": "cli_commands_engine_tick",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
       "source_location": "L304",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -31318,6 +31838,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L335",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_335",
+      "target": "cli_commands_engine_invalidate_check",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
       "source_location": "L328",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -31363,6 +31893,16 @@
       "confidence_score": 1.0,
       "source": "cli_commands_engine_rationale_206",
       "target": "cli_commands_engine_invalidate_check"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/cli_commands/engine.py",
+      "source_location": "L377",
+      "weight": 1.0,
+      "source": "cli_commands_engine_rationale_377",
+      "target": "cli_commands_engine_run",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -32369,6 +32909,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L116",
+      "weight": 1.0,
+      "source": "src_ats_planning_create_plan_py",
+      "target": "planning_create_plan_stripped_hard_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L72",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -32564,6 +33114,27 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L354",
+      "weight": 1.0,
+      "source": "planning_create_plan_persist",
+      "target": "planning_create_plan_stripped_hard_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L117",
+      "weight": 1.0,
+      "source": "planning_create_plan_rationale_117",
+      "target": "planning_create_plan_stripped_hard_rules",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L325",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -32626,6 +33197,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L161",
+      "weight": 1.0,
+      "source": "planning_create_plan_rationale_161",
+      "target": "planning_create_plan_prune_missing",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L128",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -32662,6 +33243,16 @@
       "confidence_score": 1.0,
       "source": "planning_create_plan_warn_unknown_features",
       "target": "planning_create_plan_rule_operands"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L180",
+      "weight": 1.0,
+      "source": "planning_create_plan_rationale_180",
+      "target": "planning_create_plan_rule_operands",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -32708,6 +33299,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L192",
+      "weight": 1.0,
+      "source": "planning_create_plan_rationale_192",
+      "target": "planning_create_plan_warn_unknown_features",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L159",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -32749,11 +33350,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L189",
+      "source_location": "L222",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "planning_create_plan_rationale_189",
-      "target": "planning_create_plan_build_envelope"
+      "source": "planning_create_plan_rationale_222",
+      "target": "planning_create_plan_build_envelope",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -32787,6 +33388,16 @@
       "weight": 1.0,
       "source": "planning_create_plan_build_envelope",
       "target": "planning_context_build_planner_context"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L189",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "planning_create_plan_rationale_189",
+      "target": "planning_create_plan_build_envelope"
     },
     {
       "relation": "rationale_for",
@@ -32845,11 +33456,11 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/planning/create_plan.py",
-      "source_location": "L340",
+      "source_location": "L373",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "planning_create_plan_rationale_340",
-      "target": "planning_create_plan_create_plan"
+      "source": "planning_create_plan_rationale_373",
+      "target": "planning_create_plan_create_plan",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -32861,6 +33472,16 @@
       "weight": 1.0,
       "source": "planning_create_plan_create_plan",
       "target": "db_models_llmcall"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/planning/create_plan.py",
+      "source_location": "L340",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "planning_create_plan_rationale_340",
+      "target": "planning_create_plan_create_plan"
     },
     {
       "relation": "rationale_for",
@@ -33671,9 +34292,9 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L253",
+      "source_location": "L255",
       "weight": 1.0,
-      "source": "engine_detector_advance_trade",
+      "source": "engine_detector_observer_context",
       "target": "execution_reconcile_pnl_pct"
     },
     {
@@ -33682,9 +34303,9 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L255",
+      "source_location": "L253",
       "weight": 1.0,
-      "source": "engine_detector_observer_context",
+      "source": "engine_detector_advance_trade",
       "target": "execution_reconcile_pnl_pct"
     },
     {
@@ -33895,17 +34516,6 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "engine_detector_exitpolicy",
-      "target": "execution_reconcile_tradestate"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "tests/test_detector_entries.py",
-      "source_location": "L512",
-      "weight": 1.0,
-      "source": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
       "target": "execution_reconcile_tradestate"
     },
     {
@@ -35099,6 +35709,56 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L154",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ats_engine_detector_py",
+      "target": "engine_detector_directional_feature_state"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L166",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ats_engine_detector_py",
+      "target": "engine_detector_entry_zone_location"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L177",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ats_engine_detector_py",
+      "target": "engine_detector_atr_distance"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L183",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ats_engine_detector_py",
+      "target": "engine_detector_observer_thesis_health"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L235",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "src_ats_engine_detector_py",
+      "target": "engine_detector_observer_context"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L155",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -35266,56 +35926,6 @@
       "target": "src_ats_engine_detector_py"
     },
     {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L154",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_directional_feature_state"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L166",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_entry_zone_location"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L177",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_atr_distance"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L183",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_observer_thesis_health"
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L235",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "src_ats_engine_detector_py",
-      "target": "engine_detector_observer_context"
-    },
-    {
       "relation": "calls",
       "context": "call",
       "confidence": "EXTRACTED",
@@ -35468,10 +36078,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L687",
+      "source_location": "L1112",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "engine_detector_evaluate_now",
+      "source": "engine_detector_confirm_and_execute",
       "target": "engine_detector_f"
     },
     {
@@ -35479,10 +36089,10 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L1112",
+      "source_location": "L687",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "engine_detector_confirm_and_execute",
+      "source": "engine_detector_evaluate_now",
       "target": "engine_detector_f"
     },
     {
@@ -35556,6 +36166,61 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L273",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_observer_context",
+      "target": "engine_detector_directional_feature_state"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L320",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_observer_context",
+      "target": "engine_detector_entry_zone_location"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L321",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_observer_context",
+      "target": "engine_detector_atr_distance"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L306",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_observer_context",
+      "target": "engine_detector_observer_thesis_health"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L724",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_observe_and_adjust",
+      "target": "engine_detector_observer_context"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L175",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -35571,6 +36236,16 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "engine_detector_exit_policy_from_metadata",
+      "target": "engine_detector_exitpolicy"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L343",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_343",
       "target": "engine_detector_exitpolicy"
     },
     {
@@ -35674,6 +36349,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L424",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_424",
+      "target": "engine_detector_clamp_tightened_stop"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L237",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -35729,6 +36414,16 @@
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "engine_detector_observe_and_adjust",
+      "target": "engine_detector_clamp_extended_tp"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L435",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_435",
       "target": "engine_detector_clamp_extended_tp"
     },
     {
@@ -35851,6 +36546,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L472",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_472",
+      "target": "engine_detector_close_trade"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L285",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -35923,6 +36628,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L532",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_532",
+      "target": "engine_detector_advance_trade"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L345",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -35984,6 +36699,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L671",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_671",
+      "target": "engine_detector_reconcile_open_trades"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L484",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -36034,22 +36759,21 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
+      "source_location": "L691",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_691",
+      "target": "engine_detector_observe_and_adjust"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
       "source_location": "L504",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "engine_detector_rationale_504",
       "target": "engine_detector_observe_and_adjust"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L724",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "engine_detector_observe_and_adjust",
-      "target": "engine_detector_observer_context"
     },
     {
       "relation": "rationale_for",
@@ -36106,10 +36830,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L680",
+      "source_location": "L877",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "engine_detector_rationale_680",
+      "source": "engine_detector_rationale_877",
       "target": "engine_detector_handle_invalidation"
     },
     {
@@ -36122,6 +36846,16 @@
       "weight": 1.0,
       "source": "engine_detector_handle_invalidation",
       "target": "engine_invalidation_evaluate_invalidation"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L680",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_680",
+      "target": "engine_detector_handle_invalidation"
     },
     {
       "relation": "rationale_for",
@@ -36210,10 +36944,10 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/engine/detector.py",
-      "source_location": "L953",
+      "source_location": "L1154",
       "weight": 1.0,
       "confidence_score": 1.0,
-      "source": "engine_detector_rationale_953",
+      "source": "engine_detector_rationale_1154",
       "target": "engine_detector_evaluate_now"
     },
     {
@@ -36258,6 +36992,16 @@
       "source_location": "L248",
       "weight": 1.0,
       "source": "engine_loop_run_tick",
+      "target": "engine_detector_evaluate_now"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/engine/detector.py",
+      "source_location": "L953",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "engine_detector_rationale_953",
       "target": "engine_detector_evaluate_now"
     },
     {
@@ -43656,50 +44400,6 @@
       "target": "llm_strategies_derivatives_flow_perp_specific_features"
     },
     {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L273",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "engine_detector_observer_context",
-      "target": "engine_detector_directional_feature_state"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L320",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "engine_detector_observer_context",
-      "target": "engine_detector_entry_zone_location"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L321",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "engine_detector_observer_context",
-      "target": "engine_detector_atr_distance"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "src/ats/engine/detector.py",
-      "source_location": "L306",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "engine_detector_observer_context",
-      "target": "engine_detector_observer_thesis_health"
-    },
-    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/cli_commands/engine.py",
@@ -44451,5 +45151,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "a40dd5c85441b801c6edb7714754883e7856fdca"
+  "built_at_commit": "85377b289f805869d87dae629ee20832f18d194b"
 }

@@ -24,6 +24,7 @@ dependencies = [
     "pandas-ta>=0.4.71b0",
     # POC LLM-plan trading layer (LLM_BASED_ARCHITECTURE.md). Mock mode needs no key.
     "openai>=1.40",
+    "json-repair>=0.30",
 ]
 
 [project.optional-dependencies]

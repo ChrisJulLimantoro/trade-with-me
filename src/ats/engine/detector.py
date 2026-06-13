@@ -151,6 +151,193 @@ def _hold_context(trade: PaperTrade, now: datetime) -> dict[str, Any]:
     }
 
 
+def _directional_feature_state(direction: str, value: Any) -> str:
+    if value is None:
+        return "unknown"
+    raw = float(value)
+    with_trade = raw if direction == "long" else -raw
+    if with_trade > 0:
+        return "with"
+    if with_trade < 0:
+        return "against"
+    return "flat"
+
+
+def _entry_zone_location(entry: float, zone_low: float | None, zone_high: float | None) -> str:
+    if zone_low is None or zone_high is None or zone_high <= zone_low:
+        return "unknown"
+    pos = (entry - zone_low) / (zone_high - zone_low)
+    if pos <= 0.33:
+        return "lower_zone"
+    if pos >= 0.67:
+        return "upper_zone"
+    return "mid_zone"
+
+
+def _atr_distance(a: float | None, b: float | None, atr: float | None) -> float | None:
+    if a is None or b is None or atr is None or atr <= 0:
+        return None
+    return round(abs(a - b) / atr, 4)
+
+
+def _observer_thesis_health(
+    *,
+    current_r: float | None,
+    max_favorable_r: float | None,
+    max_adverse_r: float | None,
+    momentum_state: str,
+    cvd_state: str,
+    volume_followthrough: str,
+    squeeze_risk: str,
+) -> tuple[str, list[str], str]:
+    reasons: list[str] = []
+
+    if current_r is not None and current_r <= -0.5:
+        reasons.append("current_loss_beyond_half_r")
+    if max_favorable_r is not None and max_favorable_r < 0.25:
+        reasons.append("poor_favorable_excursion")
+    if max_adverse_r is not None and max_adverse_r <= -0.75:
+        reasons.append("large_adverse_excursion")
+    if momentum_state == "against":
+        reasons.append("momentum_against_trade")
+    if cvd_state == "against":
+        reasons.append("cvd_against_trade")
+    if volume_followthrough == "weak":
+        reasons.append("weak_volume_followthrough")
+    if squeeze_risk == "against_trade":
+        reasons.append("squeeze_risk_against_trade")
+
+    broken = (
+        current_r is not None
+        and current_r <= -0.5
+        and max_favorable_r is not None
+        and max_favorable_r < 0.25
+        and (momentum_state == "against" or squeeze_risk == "against_trade")
+    )
+    decaying = len(reasons) >= 2 or (
+        max_adverse_r is not None
+        and max_favorable_r is not None
+        and abs(max_adverse_r) > max(0.25, max_favorable_r * 2)
+    )
+    if broken:
+        return "broken", reasons, "exit"
+    if decaying:
+        if current_r is not None and current_r > 0:
+            return "decaying", reasons, "tighten_or_scale"
+        return "decaying", reasons, "cut_or_tighten"
+    if current_r is not None and current_r > 1.0 and momentum_state == "with":
+        return "healthy", reasons, "let_winner_work"
+    return "healthy", reasons, "hold"
+
+
+def _observer_context(
+    *,
+    trade: PaperTrade,
+    trade_d: dict[str, Any],
+    feature_row: dict[str, Any],
+    hold: dict[str, Any],
+    current_leg_notional: float,
+    max_favorable_notional: float,
+    max_adverse_notional: float,
+) -> dict[str, Any]:
+    direction = trade.direction
+    entry = float(trade_d["entry_price"])
+    stop = float(trade_d["stop_loss"])
+    md = trade.trade_metadata or {}
+    atr = feature_row.get("atr_14")
+    atr_f = float(atr) if atr is not None else None
+    zone_low_raw = md.get("entry_zone_low")
+    zone_high_raw = md.get("entry_zone_high")
+    zone_low = float(zone_low_raw) if zone_low_raw is not None else None
+    zone_high = float(zone_high_raw) if zone_high_raw is not None else None
+    risk_per_unit = abs(_pnl_pct(direction, entry, stop))
+
+    def to_r(value: float) -> float | None:
+        if risk_per_unit <= 0:
+            return None
+        return round(value / risk_per_unit, 4)
+
+    current_r = to_r(current_leg_notional)
+    max_favorable_r = to_r(max_favorable_notional)
+    max_adverse_r = to_r(max_adverse_notional)
+    bars_est = hold.get("held_bars_estimate")
+    bars_since_entry = int(round(float(bars_est))) if bars_est is not None else None
+    bars_without_positive_mfe = (
+        bars_since_entry
+        if bars_since_entry is not None and (max_favorable_r is None or max_favorable_r < 0.1)
+        else 0
+    )
+
+    momentum_state = _directional_feature_state(direction, feature_row.get("macd_hist"))
+    cvd_state = _directional_feature_state(direction, feature_row.get("cvd_slope_10"))
+    vol_z = feature_row.get("vol_zscore_20")
+    volume_followthrough = "unknown"
+    if vol_z is not None:
+        volume_followthrough = "strong" if float(vol_z) >= 0 else "weak"
+
+    rsi = feature_row.get("rsi_14")
+    ema_20 = feature_row.get("ema_20")
+    ema_50 = feature_row.get("ema_50")
+    price = feature_row.get("close") or feature_row.get("price")
+    squeeze_risk = "neutral"
+    if rsi is not None and price is not None:
+        rsi_f = float(rsi)
+        price_f = float(price)
+        below_emas = (
+            (ema_20 is None or price_f < float(ema_20))
+            and (ema_50 is None or price_f < float(ema_50))
+        )
+        above_emas = (
+            (ema_20 is None or price_f > float(ema_20))
+            and (ema_50 is None or price_f > float(ema_50))
+        )
+        if (
+            direction == "short"
+            and rsi_f <= 35
+            and below_emas
+            or direction == "long"
+            and rsi_f >= 65
+            and above_emas
+        ):
+            squeeze_risk = "against_trade"
+
+    status, reasons, pressure = _observer_thesis_health(
+        current_r=current_r,
+        max_favorable_r=max_favorable_r,
+        max_adverse_r=max_adverse_r,
+        momentum_state=momentum_state,
+        cvd_state=cvd_state,
+        volume_followthrough=volume_followthrough,
+        squeeze_risk=squeeze_risk,
+    )
+    return {
+        "entry_quality": {
+            "entry_zone_low": zone_low,
+            "entry_zone_high": zone_high,
+            "entry_vs_zone": _entry_zone_location(entry, zone_low, zone_high),
+            "entry_to_zone_low_atr": _atr_distance(entry, zone_low, atr_f),
+            "entry_to_zone_high_atr": _atr_distance(entry, zone_high, atr_f),
+        },
+        "excursion": {
+            "risk_per_unit_pct": round(risk_per_unit, 6),
+            "current_r": current_r,
+            "mfe_r": max_favorable_r,
+            "mae_r": max_adverse_r,
+            "bars_since_entry": bars_since_entry,
+            "bars_without_positive_mfe": bars_without_positive_mfe,
+        },
+        "thesis_health": {
+            "status": status,
+            "reasons": reasons,
+            "directional_momentum": momentum_state,
+            "cvd_agreement": cvd_state,
+            "volume_followthrough": volume_followthrough,
+            "squeeze_risk": squeeze_risk,
+        },
+        "recommended_pressure": pressure,
+    }
+
+
 @dataclass(frozen=True)
 class ExitPolicy:
     """Concrete exit knobs carried by a trade after entry."""
@@ -531,6 +718,15 @@ async def _observe_and_adjust(
         and max_favorable_margin <= settings.observe_stale_mfe_pct
         and not state.breakeven
     )
+    observer_context = _observer_context(
+        trade=trade,
+        trade_d=trade_d,
+        feature_row=feature_row,
+        hold=hold,
+        current_leg_notional=current_leg_notional,
+        max_favorable_notional=state.max_favorable_pnl_pct,
+        max_adverse_notional=state.max_adverse_pnl_pct,
+    )
     env = {
         "now": ts,
         "symbol": trade.symbol,
@@ -567,6 +763,7 @@ async def _observe_and_adjust(
                 "max_favorable_pnl_pct": settings.observe_stale_mfe_pct,
             },
         },
+        "observer_context": observer_context,
         "exit_policy": _exit_policy_metadata(policy),
         "observe_timeframe": settings.observe_timeframe,
         "features_now": feature_row,
@@ -908,6 +1105,10 @@ async def _confirm_and_execute(
     trade = await session.get(PaperTrade, trade_id)
     if trade is not None:
         md = _exit_policy_metadata(policy)
+        md.update(
+            entry_zone_low=_f(setup.entry_zone_low),
+            entry_zone_high=_f(setup.entry_zone_high),
+        )
         if settings.max_hold_bars > 0:
             hold = timeframe_to_timedelta(tf) * settings.max_hold_bars
             md.update(
