@@ -42,6 +42,30 @@ PROFILES: dict[str, dict[str, Any]] = {
         "scale_out_frac": 0.5,         # bank half at the first target, ride the rest
         "observe_every_bars": 1,       # check the open trade every finer-tf bar
     },
+    # Scalper v2: the scalper posture with the deterministic-work levers turned on for A/B
+    # against `scalper` (#1 entry confirmation, #4 preferred-direction hint, #5 event-driven
+    # observer, #6 regime-change replan). Use the run-tagging harness to compare side by side.
+    "scalper_v2": {
+        "paper_equity_usd": 1_000.0,
+        "max_setups_per_plan": 3,
+        "max_leverage": 20.0,
+        "risk_per_trade_pct": 0.025,
+        "max_margin_pct_per_trade": 0.20,
+        "max_total_margin_pct": 0.60,
+        "max_portfolio_risk_pct": 0.03,
+        "min_rr": 1.0,
+        "min_stop_atr_mult": 0.5,
+        "max_hold_bars": 0,
+        "plan_refresh_bars": 8,
+        "trail_atr_mult": 1.0,
+        "scale_out_frac": 0.5,
+        "observe_every_bars": 1,
+        # The four deterministic-work levers under test.
+        "entry_confirmation_enabled": True,
+        "deterministic_direction_hint": True,
+        "observe_only_on_health": True,
+        "replan_on_regime_change": True,
+    },
 }
 
 

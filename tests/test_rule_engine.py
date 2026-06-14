@@ -7,6 +7,7 @@ import math
 import pytest
 
 from ats.engine.rule_engine import (
+    entry_confirmed,
     eval_hard_rules,
     eval_rule,
     evaluate_setup,
@@ -187,3 +188,46 @@ def test_evaluate_setup_not_detected_out_of_zone() -> None:
     setup = {"entry_zone_low": 200, "entry_zone_high": 300, "hard_rules": [], "soft_rules": []}
     ev = evaluate_setup(setup, FEATURES, soft_threshold=0.5)
     assert ev.detected is False and ev.price_ok is False
+
+
+# --- entry_confirmed (#1) -------------------------------------------------------------
+
+
+def test_entry_confirmed_short_red_bar_with_flow() -> None:
+    prev = {"price": 101.0}
+    feat = {"price": 100.0, "cvd_slope_10": -1.0, "macd_hist": -0.2}
+    ok, reason = entry_confirmed("short", feat, prev)
+    assert ok is True
+    assert "cvd_slope_10" in reason
+
+
+def test_entry_confirmed_short_rejects_green_bounce() -> None:
+    # Price closed UP and flow is bullish — a short is not confirmed (bounce-fill guard).
+    prev = {"price": 100.0}
+    feat = {"price": 101.0, "cvd_slope_10": 1.0, "macd_hist": 0.3}
+    ok, reason = entry_confirmed("short", feat, prev)
+    assert ok is False
+    assert "close with trade" not in reason  # close moved against the short
+
+
+def test_entry_confirmed_long_close_up_but_no_flow() -> None:
+    # Close moved with the long, but neither flow signal agrees → not confirmed.
+    prev = {"price": 100.0}
+    feat = {"price": 101.0, "cvd_slope_10": -1.0, "macd_hist": -0.2}
+    ok, reason = entry_confirmed("long", feat, prev)
+    assert ok is False
+    assert "no flow signal" in reason
+
+
+def test_entry_confirmed_long_with_macd_only() -> None:
+    prev = {"price": 100.0}
+    feat = {"price": 101.0, "cvd_slope_10": None, "macd_hist": 0.4}
+    ok, reason = entry_confirmed("long", feat, prev)
+    assert ok is True
+    assert "macd_hist" in reason
+
+
+def test_entry_confirmed_needs_prev_row() -> None:
+    ok, reason = entry_confirmed("long", {"price": 101.0, "macd_hist": 0.4}, None)
+    assert ok is False
+    assert "prev_close" in reason

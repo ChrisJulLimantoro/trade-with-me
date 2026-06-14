@@ -53,9 +53,21 @@ def _bias(envelope: dict[str, Any]) -> str:
     return "neutral"
 
 
+def _preferred_bias(envelope: dict[str, Any]) -> str | None:
+    """Map the deterministic preferred_direction hint (#4) onto a mock bias, if present."""
+    pref = (envelope.get("risk_limits") or {}).get("preferred_direction")
+    if pref == "long":
+        return "bullish"
+    if pref == "short":
+        return "bearish"
+    return None
+
+
 def canned_plan(envelope: dict[str, Any]) -> PlanOutput:
     """Build a deterministic plan from the market snapshot."""
-    bias = _bias(envelope)
+    # Honor the deterministic preferred-direction hint when present; otherwise fall back to the
+    # regime/EMA bias. Flag OFF → no hint in the envelope → unchanged baseline behavior.
+    bias = _preferred_bias(envelope) or _bias(envelope)
     price = _price(envelope)
     # Nominal only — the risk manager sizes by risk/leverage and ignores this.
     nominal_size = 0.05

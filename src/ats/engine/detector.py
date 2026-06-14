@@ -25,7 +25,7 @@ from ats.config import settings
 from ats.db.models import LlmCall, PaperTrade, Plan, Setup
 from ats.engine import state
 from ats.engine.invalidation import evaluate_invalidation
-from ats.engine.rule_engine import evaluate_setup
+from ats.engine.rule_engine import entry_confirmed, evaluate_setup
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.execution.executor import (
     close_paper_trade,
@@ -228,6 +228,19 @@ def _observer_thesis_health(
     if current_r is not None and current_r > 1.0 and momentum_state == "with":
         return "healthy", reasons, "let_winner_work"
     return "healthy", reasons, "hold"
+
+
+def _observer_call_due(status: str | None, *, stale_candidate: bool, bars: int) -> bool:
+    """Event-driven observer gate (#5): is an LLM observation worth spending this bar?
+
+    Consult the observer when the deterministic thesis is decaying/broken, the trade is a
+    stale candidate, or the periodic health fallback cadence has elapsed. A healthy, still-
+    traveling trade is left to deterministic management (step_trade) and skips the LLM call.
+    """
+    if status in {"decaying", "broken"} or stale_candidate:
+        return True
+    fb = settings.observe_health_fallback_bars
+    return fb > 0 and bars % fb == 0
 
 
 def _observer_context(
@@ -655,7 +668,7 @@ async def _advance_trade(
         ):
             closed = await _observe_and_adjust(
                 session, client, trade, trade_d, candle, state, report,
-                feature_row=feature_row, policy=policy,
+                feature_row=feature_row, policy=policy, bars=bars, cadence_call=True,
             )
             if closed:
                 return
@@ -692,6 +705,8 @@ async def _observe_and_adjust(
     *,
     feature_row: dict[str, Any],
     policy: ExitPolicy,
+    bars: int = 0,
+    cadence_call: bool = False,
 ) -> bool:
     """Consult the observation agent for an open trade; apply a code-clamped adjustment.
 
@@ -732,6 +747,14 @@ async def _observe_and_adjust(
         max_favorable_notional=state.max_favorable_pnl_pct,
         max_adverse_notional=state.max_adverse_pnl_pct,
     )
+    # Event-driven gate (#5): on the per-bar cadence call, only spend an LLM observation when
+    # the deterministic thesis health says it matters. Deterministic exit management already
+    # ran this bar in step_trade; a healthy, traveling trade needs no LLM "hold". The
+    # expiry-review call (cadence_call=False) is never gated — that IS the event.
+    if cadence_call and settings.observe_only_on_health:
+        status = (observer_context.get("thesis_health") or {}).get("status")
+        if not _observer_call_due(status, stale_candidate=stale_candidate, bars=bars):
+            return False
     env = {
         "now": ts,
         "symbol": trade.symbol,
@@ -1227,12 +1250,29 @@ async def evaluate_now(
         if not ev.detected:
             continue
         report.detections += 1
-        if settings.regime_filter and not regime_allows(plan.regime_cell, setup.direction):
+        # Enforce the direction gate the strategist was given. The planner persists the
+        # exact allowed_directions it planned under (including any HTF-exhaustion counter-
+        # trend relief) onto the plan, so honor that; fall back to the strict trend-only
+        # gate for plans that predate the persisted field.
+        allowed = (getattr(plan, "plan_metadata", None) or {}).get("allowed_directions")
+        if allowed is not None:
+            direction_ok = setup.direction in allowed
+        else:
+            direction_ok = regime_allows(plan.regime_cell, setup.direction)
+        if settings.regime_filter and not direction_ok:
             trace.outcome(f"SKIPPED: regime {plan.regime_cell} disallows {setup.direction}")
             report.notes.append(
                 f"setup {setup.setup_id} regime-filtered ({plan.regime_cell}/{setup.direction})"
             )
             continue
+        if settings.entry_confirmation_enabled:
+            confirmed, reason = entry_confirmed(setup.direction, feature_row, prev_row)
+            if not confirmed:
+                trace.outcome(f"AWAITING confirmation: {reason}")
+                report.notes.append(
+                    f"setup {setup.setup_id} awaiting confirmation ({reason})"
+                )
+                continue
         opened_before = report.opened
         await _confirm_and_execute(
             session, client, plan, setup, setup_d, ev, feature_row, now, open_positions, report,

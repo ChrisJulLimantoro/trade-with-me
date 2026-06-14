@@ -149,6 +149,46 @@ def in_entry_zone(price: float | None, low: float, high: float) -> bool:
     return price is not None and low <= price <= high
 
 
+def _with_trade(direction: str, value: float | None) -> str:
+    """Classify a signed value relative to a trade direction: with / against / flat."""
+    if value is None:
+        return "unknown"
+    signed = value if direction == "long" else -value
+    if signed > 0:
+        return "with"
+    if signed < 0:
+        return "against"
+    return "flat"
+
+
+def entry_confirmed(
+    direction: str,
+    features: dict[str, Any],
+    prev: dict[str, Any] | None,
+) -> tuple[bool, str]:
+    """Deterministic entry confirmation (#1): require the decision bar to confirm the turn.
+
+    A detected setup is only worth filling when, on the decision bar's close, price is
+    actually moving in the trade's direction AND at least one order-flow signal agrees.
+    This kills "bounce fills" where ``wick_limit`` touches a level that price immediately
+    rejects. Returns ``(confirmed, reason)``; the reason names the failing leg so the caller
+    can surface why a setup was skipped.
+    """
+    direction = (direction or "").lower()
+    close = resolve_operand("price", features)
+    prev_close = resolve_operand("price", prev) if prev is not None else None
+    if close is None or prev_close is None:
+        return False, "no close/prev_close to confirm bar direction"
+    close_state = _with_trade(direction, close - prev_close)
+    if close_state != "with":
+        return False, f"decision bar close {close_state} trade ({direction})"
+    cvd = _with_trade(direction, resolve_operand("cvd_slope_10", features))
+    macd = _with_trade(direction, resolve_operand("macd_hist", features))
+    if cvd == "with" or macd == "with":
+        return True, f"close+{'cvd_slope_10' if cvd == 'with' else 'macd_hist'} with trade"
+    return False, "no flow signal (cvd_slope_10/macd_hist) with trade"
+
+
 def _entry_trigger(
     setup: dict[str, Any],
     features: dict[str, Any],

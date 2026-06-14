@@ -166,6 +166,13 @@ async def _ensure_plan(
         return False, bars_since_plan, 0
     plan = await state.active_plan(session, symbol, run_id=run_id)
     stale = plan is None or now >= plan.expires_at or bars_since_plan >= settings.plan_refresh_bars
+    if not stale and settings.replan_on_regime_change and plan is not None:
+        # Re-plan when the world changes (#6): the regime cell that anchored this plan flipped,
+        # so its thesis is stale even though the refresh timer hasn't elapsed.
+        regime = await state.latest_regime(session, before_ts=now)
+        current_cell = (regime or {}).get("regime_cell")
+        if current_cell is not None and current_cell != plan.regime_cell:
+            stale = True
     if stale:
         result = await create_plan(session, client, symbol=symbol, tf=tf, as_of=now, run_id=run_id)
         return True, 0, len(result.setups)

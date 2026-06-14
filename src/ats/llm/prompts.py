@@ -100,6 +100,17 @@ def plan_system_prompt() -> str:
     m = settings.min_stop_atr_mult
     m_hi = round(m * 1.5, 2)
     rr_target = round(settings.min_rr + 0.3, 2)
+    pref_hint = (
+        """
+- PREFERRED DIRECTION: when risk_limits.preferred_direction is present and non-null, a
+  deterministic analysis of regime, higher-timeframe exhaustion, and price structure already
+  favors that side. Design your allowed_setups in that direction, or return an EMPTY
+  allowed_setups if there is no clean entry. You MAY instead propose the OTHER allowed
+  direction, but ONLY if you state a strong, specific contrarian reason in the rationale. When
+  preferred_direction is null or absent, use risk_limits.allowed_directions normally."""
+        if settings.deterministic_direction_hint
+        else ""
+    )
     return f"""\
 You are the strategist in a crypto perpetuals trading system. You decide WHAT to
 trade; deterministic code decides WHEN. You are given a structured market snapshot
@@ -124,7 +135,11 @@ Rules:
 - REGIME GATE: if risk_limits.allowed_directions is present, ONLY emit setups whose
   direction appears in that list. An empty list means no setups can execute this bar;
   return market_bias with an EMPTY allowed_setups. Never propose a direction that the
-  regime filter will immediately discard — it wastes the plan.
+  regime filter will immediately discard — it wastes the plan. When the list contains a
+  direction AGAINST the regime trend (e.g. "long" in a bear regime), a higher timeframe is
+  RSI-exhausted and that direction is a COUNTER-TREND mean-reversion play: enter on signs of
+  reversal (reclaim of a level / RSI turning up off oversold), target the nearest mean
+  (EMA / range mid), and keep stops tight — do not treat it as trend continuation.{pref_hint}
 - reward:risk is judged by the engine as `(tp1 - entry) / (entry - stop)` for longs
   and `(entry - tp1) / (stop - entry)` for shorts, where `tp1` is the FIRST element of
   take_profit and `entry` is the ACTUAL fill price. The engine may fill anywhere inside

@@ -26,7 +26,11 @@ from ats.engine.timeframes import timeframe_to_timedelta
 from ats.llm.client import LlmClient
 from ats.llm.schemas import InvalidationRule, LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
-from ats.planning.context import build_planner_context
+from ats.planning.context import (
+    _htf_rsi_state,
+    build_planner_context,
+    preferred_direction,
+)
 from ats.risk.manager import regime_allows, reward_risk
 
 log = get_logger(__name__)
@@ -224,14 +228,7 @@ async def build_envelope(
     regime = await state.latest_regime(session, before_ts=as_of)
     candles = await state.recent_candles(session, symbol, tf, as_of, n=50)
     positions = await state.open_positions(session, run_id=run_id)
-
-    # Derive which directions the regime allows so the strategist doesn't propose setups
-    # that will immediately be discarded by the runtime regime filter.
     regime_cell: str | None = (regime or {}).get("regime_cell")
-    allowed_directions: list[str] = []
-    for d in ("long", "short"):
-        if regime_allows(regime_cell, d):
-            allowed_directions.append(d)
 
     # Higher-timeframe context: a read-only snapshot of slower charts for bias/direction
     # only (executable rules stay on the base tf). Look-ahead guard: an htf bar with
@@ -254,6 +251,19 @@ async def build_envelope(
                 session, symbol, htf, htf_as_of, n=20
             ),
         }
+
+    # Derive which directions the regime allows so the strategist doesn't propose setups
+    # that will immediately be discarded by the runtime regime filter. When enabled, a
+    # higher-timeframe RSI extreme also opens the counter-trend (mean-reversion) direction.
+    htf_rsi_state = (
+        _htf_rsi_state(higher_timeframes)
+        if settings.counter_trend_on_htf_exhaustion
+        else None
+    )
+    allowed_directions: list[str] = [
+        d for d in ("long", "short")
+        if regime_allows(regime_cell, d, htf_rsi_state=htf_rsi_state)
+    ]
 
     # Episodic memory: surface the most-similar prior post-mortems as non-binding context.
     prior_lessons: list[dict[str, Any]] = []
@@ -280,6 +290,32 @@ async def build_envelope(
         higher_timeframes=higher_timeframes,
     )
 
+    # Deterministic soft directional steer (#4). Kept inside the hard allowed_directions gate
+    # so the hint can never point at a direction the runtime filter would discard.
+    preferred = None
+    if settings.deterministic_direction_hint:
+        preferred = preferred_direction(
+            regime_cell,
+            planner_context["exhaustion"],
+            planner_context["structure"],
+        )
+        if preferred is not None and preferred not in allowed_directions:
+            preferred = None
+
+    risk_limits: dict[str, Any] = {
+        "risk_per_trade_pct": settings.risk_per_trade_pct,
+        "max_leverage": settings.max_leverage,
+        "max_margin_pct_per_trade": settings.max_margin_pct_per_trade,
+        "max_total_margin_pct": settings.max_total_margin_pct,
+        "max_portfolio_risk_pct": settings.max_portfolio_risk_pct,
+        "min_rr": settings.min_rr,
+        "one_position_per_symbol": True,
+        # Directions the runtime regime filter will allow. Propose ONLY these.
+        "allowed_directions": allowed_directions,
+    }
+    if settings.deterministic_direction_hint:
+        risk_limits["preferred_direction"] = preferred
+
     return {
         "as_of": as_of,
         "symbol": symbol,
@@ -292,17 +328,7 @@ async def build_envelope(
             "equity_usd": settings.paper_equity_usd,
             "open_positions": positions,
         },
-        "risk_limits": {
-            "risk_per_trade_pct": settings.risk_per_trade_pct,
-            "max_leverage": settings.max_leverage,
-            "max_margin_pct_per_trade": settings.max_margin_pct_per_trade,
-            "max_total_margin_pct": settings.max_total_margin_pct,
-            "max_portfolio_risk_pct": settings.max_portfolio_risk_pct,
-            "min_rr": settings.min_rr,
-            "one_position_per_symbol": True,
-            # Directions the runtime regime filter will allow. Propose ONLY these.
-            "allowed_directions": allowed_directions,
-        },
+        "risk_limits": risk_limits,
         "prior_lessons": prior_lessons,
         "planner_context": planner_context,
     }
@@ -316,6 +342,8 @@ async def _persist(
     as_of: datetime,
     plan_out: PlanOutput,
     regime_cell: str | None,
+    allowed_directions: list[str] | None = None,
+    preferred_dir: str | None = None,
     run_id: str | None = None,
 ) -> tuple[Plan, list[Setup]]:
     # Supersede only this run's active plans so concurrent replays don't clobber each other.
@@ -336,7 +364,11 @@ async def _persist(
         regime_cell=regime_cell,
         rationale=plan_out.rationale,
         run_id=run_id,
-        plan_metadata={"timeframe": tf},
+        plan_metadata={
+            "timeframe": tf,
+            "allowed_directions": allowed_directions,
+            "preferred_direction": preferred_dir,
+        },
     )
     session.add(plan)
 
@@ -388,6 +420,8 @@ async def create_plan(
         available = set((envelope.get("features") or {}).keys()) | {"price"}
         _warn_unknown_features(plan_out, available, symbol=symbol)
         regime_cell = (envelope.get("regime") or {}).get("regime_cell")
+        allowed_directions = (envelope.get("risk_limits") or {}).get("allowed_directions")
+        preferred_dir = (envelope.get("risk_limits") or {}).get("preferred_direction")
         plan, setups = await _persist(
             session,
             symbol=symbol,
@@ -395,6 +429,8 @@ async def create_plan(
             as_of=effective_as_of,
             plan_out=plan_out,
             regime_cell=regime_cell,
+            allowed_directions=allowed_directions,
+            preferred_dir=preferred_dir,
             run_id=run_id,
         )
         trace.plan(plan, setups)

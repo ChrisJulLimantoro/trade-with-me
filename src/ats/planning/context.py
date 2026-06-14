@@ -203,6 +203,49 @@ def _htf_rsi_state(higher_timeframes: dict[str, Any]) -> str:
     return "neutral"
 
 
+def preferred_direction(
+    regime_cell: str | None,
+    exhaustion_ctx: dict[str, Any],
+    structure_ctx: dict[str, Any],
+) -> str | None:
+    """Deterministic soft directional steer (#4) from regime + exhaustion + structure.
+
+    Returns ``"long"``/``"short"`` when the deterministic context favors a side, else
+    ``None`` (ambiguous — let the strategist use the full ``allowed_directions`` gate).
+    Mirrors the gate's logic: trend regimes steer with-trend, unless a higher timeframe is
+    RSI-exhausted against the trend AND the base RSI/momentum slopes have turned (→ counter-
+    trend mean reversion). Sideways regimes fade the range extreme.
+    """
+    head = (regime_cell or "").split("-", 1)[0].lower()
+    htf_state = str(exhaustion_ctx.get("htf_rsi_state") or "neutral")
+    rsi_slope = exhaustion_ctx.get("base_rsi_slope")
+    mom_slope = exhaustion_ctx.get("momentum_slope")
+
+    if head == "bull":
+        if (
+            htf_state.endswith("overbought")
+            and rsi_slope == "falling"
+            and mom_slope in {"falling", "flat"}
+        ):
+            return "short"
+        return "long"
+    if head == "bear":
+        if (
+            htf_state.endswith("oversold")
+            and rsi_slope == "rising"
+            and mom_slope in {"rising", "flat"}
+        ):
+            return "long"
+        return "short"
+    if head == "side":
+        loc = structure_ctx.get("price_location")
+        if loc == "upper_range":
+            return "short"
+        if loc == "lower_range":
+            return "long"
+    return None
+
+
 def build_exhaustion_context(
     recent_features: list[dict[str, Any]],
     feature_row: dict[str, Any],

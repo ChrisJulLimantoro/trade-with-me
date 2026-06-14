@@ -140,7 +140,12 @@ def _open_risk_usd(position: dict[str, Any]) -> float:
     return float(position.get("risk_usd") or 0.0)
 
 
-def regime_allows(regime_cell: str | None, direction: str) -> bool:
+def regime_allows(
+    regime_cell: str | None,
+    direction: str,
+    *,
+    htf_rsi_state: str | None = None,
+) -> bool:
     """Whether a setup's direction is aligned with the current regime.
 
     Rule of thumb:
@@ -148,16 +153,29 @@ def regime_allows(regime_cell: str | None, direction: str) -> bool:
     - bull regimes ("bull-*"): longs only,
     - bear regimes ("bear-*"): shorts only,
     - unknown / missing regime: allow (no information to gate on).
+
+    Counter-trend relief: ``htf_rsi_state`` is the higher-timeframe RSI label produced by
+    :func:`ats.planning.context._htf_rsi_state` (e.g. ``"4h_oversold"`` / ``"4h_overbought"``
+    / ``"neutral"``). When it signals exhaustion *against* the regime trend, the opposite
+    (mean-reversion) direction is also permitted: longs in an oversold bear, shorts in an
+    overbought bull. Pass ``None`` (the default) to keep the strict trend-only gate. This
+    function stays pure — callers decide, via ``settings.counter_trend_on_htf_exhaustion``,
+    whether to feed it a state at all.
     """
     if not regime_cell:
         return True
     head = regime_cell.split("-", 1)[0].lower()
+    state = htf_rsi_state or ""
     if head == "side":
         return direction in {"long", "short"}
     if head == "bull":
-        return direction == "long"
+        if direction == "long":
+            return True
+        return state.endswith("overbought")
     if head == "bear":
-        return direction == "short"
+        if direction == "short":
+            return True
+        return state.endswith("oversold")
     return True
 
 

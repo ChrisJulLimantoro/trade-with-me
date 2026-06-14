@@ -366,3 +366,19 @@ def test_regime_gate() -> None:
     assert regime_allows("side-low", "long") is True
     assert regime_allows("side-high", "short") is True
     assert regime_allows(None, "long") is True
+
+
+def test_regime_gate_counter_trend_on_htf_exhaustion() -> None:
+    # Trend direction is always allowed regardless of HTF state.
+    assert regime_allows("bear-low", "short", htf_rsi_state="4h_oversold") is True
+    assert regime_allows("bull-low", "long", htf_rsi_state="4h_overbought") is True
+    # Counter-trend opens only when the HTF is exhausted the matching way.
+    assert regime_allows("bear-low", "long", htf_rsi_state="4h_oversold") is True
+    assert regime_allows("bull-low", "short", htf_rsi_state="1h_overbought") is True
+    # A neutral / wrong-side HTF state keeps the strict trend-only gate.
+    assert regime_allows("bear-low", "long", htf_rsi_state="neutral") is False
+    assert regime_allows("bear-low", "long", htf_rsi_state="4h_overbought") is False
+    assert regime_allows("bull-low", "short", htf_rsi_state="neutral") is False
+    # Sideways still allows both; missing state is the strict default.
+    assert regime_allows("side-low", "long", htf_rsi_state="neutral") is True
+    assert regime_allows("bear-low", "long") is False

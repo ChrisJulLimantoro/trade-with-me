@@ -545,3 +545,81 @@ async def test_observer_context_marks_failed_short_as_broken(monkeypatch) -> Non
     assert observer_context["thesis_health"]["cvd_agreement"] == "against"
     assert observer_context["thesis_health"]["squeeze_risk"] == "against_trade"
     assert observer_context["recommended_pressure"] == "exit"
+
+
+# --- #1 entry-confirmation gate --------------------------------------------------------
+
+
+async def test_entry_confirmation_blocks_unconfirmed_setup(monkeypatch) -> None:
+    monkeypatch.setattr(settings, "entry_trigger_mode", "close")
+    monkeypatch.setattr(settings, "entry_confirmation_enabled", True)
+    plan_id = uuid.uuid4()
+    setups = [_setup(plan_id=plan_id, direction="long")]
+    opened_entries = await _patch_detector(monkeypatch, setups)
+    client = QueueClient(["CONFIRM"])
+
+    # Close moved DOWN vs prev (against the long) → not confirmed; no confirm call, no open.
+    report = await detector.evaluate_now(
+        FakeSession(),
+        client,
+        symbol="BTCUSDT",
+        tf="15m",
+        feature_row={
+            "open_time": datetime(2026, 1, 1),
+            "price": 100.0, "close": 100.0, "low": 99.0, "high": 101.0,
+            "cvd_slope_10": 1.0, "macd_hist": 0.5,
+        },
+        prev_row={"price": 101.0, "close": 101.0},
+    )
+
+    assert report.opened == 0
+    assert report.confirm_calls == 0
+    assert opened_entries == []
+    assert any("awaiting confirmation" in n for n in report.notes)
+
+
+async def test_entry_confirmation_allows_confirmed_setup(monkeypatch) -> None:
+    monkeypatch.setattr(settings, "entry_trigger_mode", "close")
+    monkeypatch.setattr(settings, "entry_confirmation_enabled", True)
+    plan_id = uuid.uuid4()
+    setups = [_setup(plan_id=plan_id, direction="long")]
+    opened_entries = await _patch_detector(monkeypatch, setups)
+
+    # Close moved UP vs prev (with the long) and macd_hist agrees → confirmed.
+    report = await detector.evaluate_now(
+        FakeSession(),
+        QueueClient(["CONFIRM"]),
+        symbol="BTCUSDT",
+        tf="15m",
+        feature_row={
+            "open_time": datetime(2026, 1, 1),
+            "price": 100.0, "close": 100.0, "low": 99.0, "high": 101.0,
+            "cvd_slope_10": 1.0, "macd_hist": 0.5,
+        },
+        prev_row={"price": 99.0, "close": 99.0},
+    )
+
+    assert report.opened == 1
+    assert opened_entries == [100.0]
+
+
+# --- #5 observer-call gate -------------------------------------------------------------
+
+
+def test_observer_call_due_consults_on_decaying_or_broken() -> None:
+    assert detector._observer_call_due("broken", stale_candidate=False, bars=1) is True
+    assert detector._observer_call_due("decaying", stale_candidate=False, bars=1) is True
+
+
+def test_observer_call_due_consults_when_stale() -> None:
+    assert detector._observer_call_due("healthy", stale_candidate=True, bars=1) is True
+
+
+def test_observer_call_due_skips_healthy_off_cadence(monkeypatch) -> None:
+    monkeypatch.setattr(settings, "observe_health_fallback_bars", 12)
+    assert detector._observer_call_due("healthy", stale_candidate=False, bars=7) is False
+
+
+def test_observer_call_due_fires_on_fallback_cadence(monkeypatch) -> None:
+    monkeypatch.setattr(settings, "observe_health_fallback_bars", 12)
+    assert detector._observer_call_due("healthy", stale_candidate=False, bars=12) is True

@@ -11,6 +11,7 @@ from ats.planning.context import (
     build_exhaustion_context,
     build_structure_context,
     build_volume_context,
+    preferred_direction,
 )
 from ats.planning.create_plan import build_envelope
 
@@ -218,7 +219,7 @@ def _envelope_state(monkeypatch: pytest.MonkeyPatch) -> None:
     async def recent_candles(session, symbol, tf, before_ts, *, n=50):  # noqa: ANN001
         return [_candle(i, high=100 + i, low=90 + i, close=95 + i) for i in range(min(n, 20))]
 
-    async def open_positions(session, *, symbol=None):  # noqa: ANN001
+    async def open_positions(session, *, symbol=None, run_id=None):  # noqa: ANN001
         return []
 
     async def latest_feature_row(session, symbol, tf, *, as_of=None):  # noqa: ANN001
@@ -261,3 +262,41 @@ async def test_build_envelope_includes_planner_context_and_prior_lessons(_envelo
     }
     assert env["planner_context"]["memory_summary"]["confidence"] == "low"
     assert "1h" in env["higher_timeframes"]
+
+
+# --- preferred_direction (#4) ---------------------------------------------------------
+
+
+def _exh(htf="neutral", rsi="flat", mom="flat"):
+    return {"htf_rsi_state": htf, "base_rsi_slope": rsi, "momentum_slope": mom}
+
+
+def test_preferred_direction_bear_trend_is_short() -> None:
+    assert preferred_direction("bear-low", _exh(), {}) == "short"
+
+
+def test_preferred_direction_bull_trend_is_long() -> None:
+    assert preferred_direction("bull-high", _exh(), {}) == "long"
+
+
+def test_preferred_direction_bear_with_htf_oversold_flips_long() -> None:
+    exh = _exh(htf="4h_oversold", rsi="rising", mom="rising")
+    assert preferred_direction("bear-low", exh, {}) == "long"
+
+
+def test_preferred_direction_bull_with_htf_overbought_flips_short() -> None:
+    exh = _exh(htf="4h_overbought", rsi="falling", mom="falling")
+    assert preferred_direction("bull-high", exh, {}) == "short"
+
+
+def test_preferred_direction_side_fades_range_extremes() -> None:
+    assert preferred_direction("side-low", _exh(), {"price_location": "upper_range"}) == "short"
+    assert preferred_direction("side-low", _exh(), {"price_location": "lower_range"}) == "long"
+
+
+def test_preferred_direction_side_mid_range_is_none() -> None:
+    assert preferred_direction("side-low", _exh(), {"price_location": "mid_range"}) is None
+
+
+def test_preferred_direction_unknown_regime_is_none() -> None:
+    assert preferred_direction(None, _exh(), {}) is None

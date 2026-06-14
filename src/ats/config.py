@@ -32,6 +32,11 @@ class Settings(BaseSettings):
     # detector of fills (measured ~40% of setups ever close-in-zone vs ~68% that touch it).
     # "wick_limit" fills at the zone edge on a touch — realistic and far higher hit rate.
     entry_trigger_mode: Literal["close", "wick_limit"] = "wick_limit"
+    # Deterministic entry-confirmation gate (#1, default OFF). When on, a detected setup only
+    # fills if, on the decision bar's close, price is actually turning in the trade's direction
+    # (close moved with-trade) AND at least one order-flow signal (cvd_slope_10 or macd_hist)
+    # agrees. Kills bounce-fills where wick_limit touches a level price immediately rejects.
+    entry_confirmation_enabled: bool = False
     plan_refresh_bars: int = 16  # replay: refresh the plan every N feature bars (~4h on 15m)
     soft_threshold: float = 0.6  # min weighted soft-rule score to "detect" a setup
     # risk: min reward:risk (lowered from 2.0 — ATR-wide stops reduce TP distance)
@@ -101,12 +106,29 @@ class Settings(BaseSettings):
     # Only take setups aligned with the regime: skip entries in sideways regimes and
     # require trend-aligned direction in trending regimes.
     regime_filter: bool = True
+    # Counter-trend relief: when a higher timeframe is deeply RSI-oversold (bear regime) or
+    # overbought (bull regime), let the gate also permit the mean-reversion direction. Without
+    # this, a long bear-low stretch forces shorts into every oversold bounce — the main
+    # win-rate sink observed in BTC replays. The HTF exhaustion state is read from the planner
+    # envelope at plan time and persisted onto the plan, so the runtime filter stays in sync.
+    counter_trend_on_htf_exhaustion: bool = True
+    # Deterministic preferred direction (#4, default OFF). When on, the planner computes a soft
+    # directional steer from regime + HTF exhaustion + price structure and passes it as
+    # risk_limits.preferred_direction; the prompt instructs the strategist to design in that
+    # direction or stand aside (it may still take another allowed direction with a stated
+    # contrarian reason). allowed_directions remains the hard gate.
+    deterministic_direction_hint: bool = False
 
     # --- Re-plan discipline ---
     # Don't refresh the strategist plan while a position is open (no thesis churn mid-trade,
     # no wasted create_plan calls); supersede the active plan on close so the next bar builds
     # a fresh one against current context.
     replan_on_close: bool = True
+    # Re-plan when the regime cell flips (#6, default OFF), not only on the plan_refresh_bars
+    # timer. Trade-close (replan_on_close) and hard-invalidation replans already exist; this
+    # adds the missing "the world changed" trigger while a plan rests with no open position.
+    # The timer / expires_at stay as a backstop.
+    replan_on_regime_change: bool = False
 
     # --- Dynamic exit observation (finer-timeframe trade management) ---
     # Open trades are managed on this finer timeframe between decision bars.
@@ -114,6 +136,12 @@ class Settings(BaseSettings):
     observe_enabled: bool = True
     # Cadence (in finer-tf bars) at which the LLM observation agent is consulted while holding.
     observe_every_bars: int = 1  # every 5m bar when observe_timeframe=5m (tightened from 3)
+    # Event-driven observer (#5, default OFF). When on, the per-bar LLM observer call is only
+    # made when the deterministic thesis health is decaying/broken, the trade is a stale
+    # candidate, or the periodic fallback cadence below elapses — deterministic exit management
+    # (step_trade: trailing/scale/breakeven/time-stop) still runs every bar regardless.
+    observe_only_on_health: bool = False
+    observe_health_fallback_bars: int = 12  # consult periodically even when healthy (~1h on 5m)
     # EXIT_NOW is only honoured when the observation confidence clears this floor.
     observe_exit_min_conf: float = 0.7
     # Stagnation heuristic shown to the observation agent: once this fraction of the current
