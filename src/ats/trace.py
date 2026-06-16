@@ -224,3 +224,24 @@ def trade_closed(
         f"TRADE CLOSED  {_ts(now)}  trade={_sid(trade_id)}  plan={_sid(plan_id)}  "
         f"reason={reason}  margin_pnl={pnl_pct * 100:+.2f}%"
     )
+
+
+def learning(
+    *,
+    trade_id: Any,
+    category: str,
+    outcome: str,
+    pnl_pct: float,
+    hypothesis: str,
+    proposed_adjustment: str,
+    confidence: Any,
+) -> None:
+    if _logger is None:
+        return
+    _w(
+        f"LEARNING      trade={_sid(trade_id)}  category={category}  "
+        f"outcome={outcome}  margin_pnl={pnl_pct * 100:+.2f}%  "
+        f"confidence={_num(confidence)}"
+    )
+    _w(f"  hypothesis: {hypothesis}")
+    _w(f"  adjustment: {proposed_adjustment}")

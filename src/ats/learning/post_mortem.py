@@ -13,6 +13,7 @@ from typing import Any
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ats import trace
 from ats.db.models import LlmCall, PaperTrade, Plan, Setup
 from ats.engine import state
 from ats.execution.reconcile import ExitResult
@@ -128,4 +129,13 @@ async def reflect_and_store(
         trade_id=str(trade.trade_id),
         category=reflection.category,
         outcome=_outcome(exit_result.pnl_pct),
+    )
+    trace.learning(
+        trade_id=trade.trade_id,
+        category=reflection.category,
+        outcome=_outcome(exit_result.pnl_pct),
+        pnl_pct=exit_result.pnl_pct,
+        hypothesis=reflection.hypothesis,
+        proposed_adjustment=reflection.proposed_adjustment,
+        confidence=reflection.confidence_in_lesson,
     )

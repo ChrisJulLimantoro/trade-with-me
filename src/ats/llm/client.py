@@ -142,6 +142,14 @@ class OpenAIClient:
         self, *, model: str, system: str, envelope: dict[str, Any], schema: type
     ) -> tuple[Any | None, LlmResult]:
         t0 = time.perf_counter()
+        # Derive a stable seed from the bar timestamp so identical inputs produce
+        # identical outputs on providers that honour it (OpenAI, most OpenRouter models).
+        _as_of = envelope.get("as_of")
+        seed = (
+            int(_as_of.timestamp())
+            if hasattr(_as_of, "timestamp")
+            else abs(hash(str(_as_of))) % (2**31)
+        )
         try:
             resp = await self._client.chat.completions.create(
                 model=model,
@@ -155,6 +163,7 @@ class OpenAIClient:
                 # opencode zen / OpenRouter convention: disable the reasoning trace so
                 # the token budget goes to the JSON answer, not hidden chain-of-thought.
                 temperature=0.0,
+                seed=seed,
                 extra_body={
                     "reasoning": {"enabled": False},
                     "thinking": {"type": "disabled"}
