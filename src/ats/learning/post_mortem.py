@@ -18,7 +18,7 @@ from ats.db.models import LlmCall, PaperTrade, Plan, Setup
 from ats.engine import state
 from ats.execution.reconcile import ExitResult
 from ats.learning.fingerprint import build_fingerprint, to_vector_literal
-from ats.llm.client import LlmClient
+from ats.llm.client import Reflector
 from ats.logging import get_logger
 
 log = get_logger(__name__)
@@ -30,7 +30,7 @@ def _outcome(pnl: float) -> str:
 
 async def reflect_and_store(
     session: AsyncSession,
-    client: LlmClient,
+    client: Reflector,
     trade: PaperTrade,
     exit_result: ExitResult,
 ) -> None:

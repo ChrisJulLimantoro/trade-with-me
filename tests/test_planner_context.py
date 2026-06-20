@@ -210,7 +210,7 @@ async def test_memory_summary_low_confidence_when_sample_is_sparse() -> None:
 
 @pytest.fixture
 def _envelope_state(monkeypatch: pytest.MonkeyPatch) -> None:
-    monkeypatch.setattr(config.settings, "context_timeframes", ["1h"])
+    monkeypatch.setattr(config.settings.plan, "context_timeframes", ["1h"])
     monkeypatch.setattr(config.settings, "memory_enabled", False)
 
     async def latest_regime(session, *, before_ts=None):  # noqa: ANN001

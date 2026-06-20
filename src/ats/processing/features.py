@@ -376,7 +376,7 @@ async def upsert_features(
 def _default_timeframes() -> tuple[str, ...]:
     """Decision timeframes plus the finer observe timeframe used for exit management."""
     base = ("15m", "1h", "4h")
-    tf = settings.observe_timeframe
+    tf = settings.observer.observe_timeframe
     return (tf, *base) if tf and tf not in base else base
 
 

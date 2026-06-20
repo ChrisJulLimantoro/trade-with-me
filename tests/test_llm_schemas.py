@@ -7,7 +7,7 @@ from pydantic import ValidationError
 
 from ats.llm.client import MockClient, get_client
 from ats.llm.schemas import (
-    ConfirmOutput,
+    AdjudicationOutput,
     ObservationOutput,
     PlanOutput,
     ReflectionOutput,
@@ -57,9 +57,27 @@ def test_reject_bad_operator() -> None:
         Rule(left="price", operator="~=", right=5)
 
 
-def test_confirm_output_defaults() -> None:
-    c = ConfirmOutput(action="CONFIRM")
-    assert c.size_multiplier == 1.0
+def test_adjudication_defaults_are_neutral_no_op() -> None:
+    a = AdjudicationOutput()
+    assert a.confidence_delta == 0.0 and a.bias == "neutral"
+    assert a.no_trade is False and a.reasons == []
+
+
+def test_adjudication_coerces_nulls_and_string_reasons() -> None:
+    a = AdjudicationOutput.model_validate(
+        {"confidence_delta": None, "bias": None, "no_trade": None, "reasons": "one phrase"}
+    )
+    assert a.confidence_delta == 0.0
+    assert a.bias == "neutral"
+    assert a.no_trade is False
+    assert a.reasons == ["one phrase"]
+
+
+def test_adjudication_keeps_raw_delta_unclamped() -> None:
+    # The ±0.20 bound is applied in code (strategy.adjudication), not the schema, so the raw
+    # model value survives parse and the clamp stays auditable.
+    assert AdjudicationOutput(confidence_delta=0.9).confidence_delta == 0.9
+    assert AdjudicationOutput(confidence_delta=-0.7).confidence_delta == -0.7
 
 
 def test_get_client_returns_mock_by_default() -> None:
@@ -67,27 +85,17 @@ def test_get_client_returns_mock_by_default() -> None:
     assert isinstance(get_client(), MockClient)
 
 
-async def test_mock_create_plan_is_schema_valid() -> None:
+async def test_mock_adjudicate_is_delta_zero_baseline() -> None:
     client = MockClient()
-    envelope = {
-        "features": {
-            "close": 50000, "rsi_14": 55, "macd_hist": 1.2, "ema_50": 49000, "ema_200": 48000,
-        },
-        "regime": {"trend": "bull"},
-        "risk_limits": {"risk_per_trade_pct": 0.01, "max_leverage": 3.0},
-    }
-    plan, result = await client.create_plan(envelope, symbol="BTCUSDT")
-    assert isinstance(plan, PlanOutput)
+    envelope = {"signal": {"direction": "long", "reasons": ["breakout", "momentum"]}}
+    adj, result = await client.adjudicate(envelope, symbol="BTCUSDT")
+    assert isinstance(adj, AdjudicationOutput)
     assert result.parse_ok and result.mock and result.cost_usd == 0.0
-    assert plan.market_bias == "bullish" and len(plan.allowed_setups) == 1
-    assert plan.allowed_setups[0].direction == "long"
-
-
-async def test_mock_neutral_regime_has_no_setups() -> None:
-    client = MockClient()
-    envelope = {"features": {"close": 100}, "regime": {"trend": "side"}, "risk_limits": {}}
-    plan, _ = await client.create_plan(envelope, symbol="BTCUSDT")
-    assert plan.market_bias == "neutral" and plan.allowed_setups == []
+    # Pure deterministic baseline: no nudge, no veto, bias agrees with the signal direction.
+    assert adj.confidence_delta == 0.0
+    assert adj.no_trade is False
+    assert adj.bias == "bullish"
+    assert adj.reasons == ["breakout", "momentum"]
 
 
 def test_observation_null_confidence_coerced_to_zero() -> None:
@@ -123,12 +131,6 @@ def test_observation_null_reason_coerced() -> None:
     assert ObservationOutput.model_validate({"action": "HOLD", "reason": None}).reason == ""
 
 
-def test_confirm_size_multiplier_normalized() -> None:
-    assert ConfirmOutput.model_validate({"action": "CONFIRM", "size_multiplier": 0}).size_multiplier == 1.0
-    assert ConfirmOutput.model_validate({"action": "CONFIRM", "size_multiplier": None}).size_multiplier == 1.0
-    assert ConfirmOutput(action="REDUCE_SIZE", size_multiplier=1.4).size_multiplier == 1.0
-
-
 def test_reflection_fields_normalized() -> None:
     r = ReflectionOutput.model_validate(
         {
@@ -141,13 +143,3 @@ def test_reflection_fields_normalized() -> None:
     assert r.hypothesis == ""
     assert len(r.proposed_adjustment) == 200
     assert r.confidence_in_lesson == 1.0
-
-
-async def test_mock_confirm_thresholds() -> None:
-    client = MockClient()
-    strong, _ = await client.confirm_setup({"rule_eval": {"soft_score": 0.9}}, symbol="X")
-    marginal, _ = await client.confirm_setup({"rule_eval": {"soft_score": 0.6}}, symbol="X")
-    weak, _ = await client.confirm_setup({"rule_eval": {"soft_score": 0.2}}, symbol="X")
-    assert strong.action == "CONFIRM"
-    assert marginal.action == "REDUCE_SIZE" and marginal.size_multiplier == 0.5
-    assert weak.action == "WAIT"

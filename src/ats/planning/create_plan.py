@@ -23,7 +23,7 @@ from ats.config import settings
 from ats.db.models import LlmCall, Plan, Setup
 from ats.engine import state
 from ats.engine.timeframes import timeframe_to_timedelta
-from ats.llm.client import LlmClient
+from ats.llm.client import Adjudicator
 from ats.llm.schemas import InvalidationRule, LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
 from ats.planning.context import (
@@ -236,7 +236,7 @@ async def build_envelope(
     # T <= as_of - htf_duration. Calling the readers with that shifted timestamp selects
     # the most-recent CLOSED htf bar and never leaks a still-forming one during replay.
     higher_timeframes: dict[str, Any] = {}
-    for htf in settings.context_timeframes:
+    for htf in settings.plan.context_timeframes:
         if htf == tf:
             continue
         htf_as_of = as_of - timeframe_to_timedelta(htf)
@@ -257,7 +257,7 @@ async def build_envelope(
     # higher-timeframe RSI extreme also opens the counter-trend (mean-reversion) direction.
     htf_rsi_state = (
         _htf_rsi_state(higher_timeframes)
-        if settings.counter_trend_on_htf_exhaustion
+        if settings.plan.counter_trend_on_htf_exhaustion
         else None
     )
     allowed_directions: list[str] = [
@@ -293,7 +293,7 @@ async def build_envelope(
     # Deterministic soft directional steer (#4). Kept inside the hard allowed_directions gate
     # so the hint can never point at a direction the runtime filter would discard.
     preferred = None
-    if settings.deterministic_direction_hint:
+    if settings.plan.deterministic_direction_hint:
         preferred = preferred_direction(
             regime_cell,
             planner_context["exhaustion"],
@@ -303,17 +303,17 @@ async def build_envelope(
             preferred = None
 
     risk_limits: dict[str, Any] = {
-        "risk_per_trade_pct": settings.risk_per_trade_pct,
-        "max_leverage": settings.max_leverage,
-        "max_margin_pct_per_trade": settings.max_margin_pct_per_trade,
-        "max_total_margin_pct": settings.max_total_margin_pct,
-        "max_portfolio_risk_pct": settings.max_portfolio_risk_pct,
-        "min_rr": settings.min_rr,
+        "risk_per_trade_pct": settings.risk.risk_per_trade_pct,
+        "max_leverage": settings.risk.max_leverage,
+        "max_margin_pct_per_trade": settings.risk.max_margin_pct_per_trade,
+        "max_total_margin_pct": settings.risk.max_total_margin_pct,
+        "max_portfolio_risk_pct": settings.risk.max_portfolio_risk_pct,
+        "min_rr": settings.risk.min_rr,
         "one_position_per_symbol": True,
         # Directions the runtime regime filter will allow. Propose ONLY these.
         "allowed_directions": allowed_directions,
     }
-    if settings.deterministic_direction_hint:
+    if settings.plan.deterministic_direction_hint:
         risk_limits["preferred_direction"] = preferred
 
     return {
@@ -325,7 +325,7 @@ async def build_envelope(
         "recent_ohlcv": candles,
         "higher_timeframes": higher_timeframes,
         "portfolio": {
-            "equity_usd": settings.paper_equity_usd,
+            "equity_usd": settings.risk.paper_equity_usd,
             "open_positions": positions,
         },
         "risk_limits": risk_limits,
@@ -352,7 +352,7 @@ async def _persist(
         where.append(Plan.run_id == run_id)
     await session.execute(update(Plan).where(*where).values(status="superseded"))
 
-    ttl = timeframe_to_timedelta(tf) * settings.plan_refresh_bars
+    ttl = timeframe_to_timedelta(tf) * settings.plan.plan_refresh_bars
     expires_at = as_of + ttl
     plan = Plan(
         plan_id=uuid.uuid4(),
@@ -373,7 +373,7 @@ async def _persist(
     session.add(plan)
 
     setups: list[Setup] = []
-    for s in _admissible_setups(plan_out.allowed_setups, min_rr=settings.min_rr):
+    for s in _admissible_setups(plan_out.allowed_setups, min_rr=settings.risk.min_rr):
         setup = Setup(
             setup_id=uuid.uuid4(),
             plan_id=plan.plan_id,
@@ -398,7 +398,7 @@ async def _persist(
 
 async def create_plan(
     session: AsyncSession,
-    client: LlmClient,
+    client: Adjudicator,
     *,
     symbol: str,
     tf: str,
@@ -411,8 +411,42 @@ async def create_plan(
         raise ValueError(f"no features for {symbol} {tf} (run `ats process backfill` first)")
     effective_as_of = as_of or feature_row["open_time"]
 
-    envelope = await build_envelope(session, symbol, tf, feature_row, as_of=effective_as_of, run_id=run_id)
-    plan_out, llm = await client.create_plan(envelope, symbol=symbol)
+    envelope = await build_envelope(
+        session, symbol, tf, feature_row, as_of=effective_as_of, run_id=run_id
+    )
+
+    # Part 1 proposes (deterministic spec-04 signal engine — $0, byte-reproducible, the
+    # control group). Part 2's LLM never authors: it only adjudicates the signal's
+    # confidence within a hard ±0.20 budget (or stands the trade aside). Direction and all
+    # price levels stay deterministic, so the detector/risk/exit machine are untouched.
+    from ats.strategy.adjudication import (
+        adjudication_envelope,
+        apply_adjudication,
+    )
+    from ats.strategy.bridge import signal_to_plan
+    from ats.strategy.deterministic import propose_signal
+
+    signal = propose_signal(envelope, symbol=symbol)
+
+    adj_llm: LlmResult | None = None
+    if signal is not None and settings.adjudication_enabled:
+        adj_env = adjudication_envelope(envelope, signal)
+        adj, adj_llm = await client.adjudicate(adj_env, symbol=symbol)
+        if adj_llm.parse_ok and adj is not None:
+            signal = apply_adjudication(
+                signal, adj, min_confidence=settings.plan.signal_min_confidence, log=log
+            )
+        else:
+            # Degrade to the deterministic baseline (delta 0) rather than trust a bad parse.
+            log.warning("adjudication_parse_failed", symbol=symbol, model=adj_llm.model)
+
+    plan_out = signal_to_plan(signal, envelope.get("features") or {})
+    llm = LlmResult(
+        parse_ok=True,
+        model="deterministic",
+        mock=True,
+        raw=plan_out.model_dump(mode="json"),
+    )
 
     plan: Plan | None = None
     setups: list[Setup] = []
@@ -433,7 +467,7 @@ async def create_plan(
             preferred_dir=preferred_dir,
             run_id=run_id,
         )
-        trace.plan(plan, setups)
+        trace.plan(plan, setups, agent_scores=signal.agent_scores if signal else None)
     else:
         log.warning("create_plan_llm_failed", symbol=symbol, model=llm.model)
 
@@ -454,5 +488,33 @@ async def create_plan(
             response=llm.raw,
         )
     )
+    if adj_llm is not None:
+        # Bounded judge audit: one row per plan envelope (cache hits cost nothing). Greppable
+        # alongside the "adjudication" structured log emitted by apply_adjudication.
+        log.info(
+            "adjudication_applied",
+            symbol=symbol,
+            plan_id=str(plan.plan_id) if plan else None,
+            model=adj_llm.model,
+            cached=adj_llm.cached,
+            cost_usd=adj_llm.cost_usd,
+            vetoed=plan is None or not setups,
+        )
+        session.add(
+            LlmCall(
+                call_id=uuid.uuid4(),
+                kind="adjudication",
+                model=adj_llm.model,
+                mock=adj_llm.mock,
+                symbol=symbol,
+                plan_id=plan.plan_id if plan else None,
+                input_tokens=adj_llm.input_tokens,
+                output_tokens=adj_llm.output_tokens,
+                cost_usd=adj_llm.cost_usd,
+                latency_ms=adj_llm.latency_ms,
+                parse_ok=adj_llm.parse_ok,
+                response=adj_llm.raw,
+            )
+        )
     await session.flush()
     return PlanResult(plan=plan, setups=setups, llm=llm)

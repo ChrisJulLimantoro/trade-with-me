@@ -50,8 +50,8 @@ async def _patch(
 
 
 async def test_no_replan_when_regime_unchanged(monkeypatch) -> None:
-    monkeypatch.setattr(settings, "replan_on_regime_change", True)
-    monkeypatch.setattr(settings, "plan_refresh_bars", 16)
+    monkeypatch.setattr(settings.plan, "replan_on_regime_change", True)
+    monkeypatch.setattr(settings.plan, "plan_refresh_bars", 16)
     calls = await _patch(monkeypatch, plan=_plan("bull-high"), regime_cell="bull-high")
 
     created, bars, setups = await loop._ensure_plan(
@@ -64,8 +64,8 @@ async def test_no_replan_when_regime_unchanged(monkeypatch) -> None:
 
 
 async def test_replan_when_regime_cell_flips(monkeypatch) -> None:
-    monkeypatch.setattr(settings, "replan_on_regime_change", True)
-    monkeypatch.setattr(settings, "plan_refresh_bars", 16)
+    monkeypatch.setattr(settings.plan, "replan_on_regime_change", True)
+    monkeypatch.setattr(settings.plan, "plan_refresh_bars", 16)
     calls = await _patch(monkeypatch, plan=_plan("bull-high"), regime_cell="bear-low")
 
     created, bars, setups = await loop._ensure_plan(
@@ -78,8 +78,8 @@ async def test_replan_when_regime_cell_flips(monkeypatch) -> None:
 
 
 async def test_no_replan_on_regime_flip_when_flag_off(monkeypatch) -> None:
-    monkeypatch.setattr(settings, "replan_on_regime_change", False)
-    monkeypatch.setattr(settings, "plan_refresh_bars", 16)
+    monkeypatch.setattr(settings.plan, "replan_on_regime_change", False)
+    monkeypatch.setattr(settings.plan, "plan_refresh_bars", 16)
     calls = await _patch(monkeypatch, plan=_plan("bull-high"), regime_cell="bear-low")
 
     created, _bars, _setups = await loop._ensure_plan(

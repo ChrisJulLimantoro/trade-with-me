@@ -303,7 +303,7 @@ class LlmCall(Base):
         UUID(as_uuid=True), primary_key=True, default=uuid.uuid4
     )
     created_at: Mapped[datetime] = mapped_column(_TZ, server_default=func.now(), nullable=False)
-    kind: Mapped[str] = mapped_column(String, nullable=False)  # create_plan|confirm_setup
+    kind: Mapped[str] = mapped_column(String, nullable=False)  # create_plan|adjudication|observe_trade|reflect_trade
     model: Mapped[str] = mapped_column(String, nullable=False)
     mock: Mapped[bool] = mapped_column(Boolean, nullable=False)
     symbol: Mapped[str | None] = mapped_column(String, nullable=True)

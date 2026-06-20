@@ -1,9 +1,8 @@
-"""Tests for profile-specific strategy prompt guidance."""
+"""Tests for named strategy profiles."""
 
 from __future__ import annotations
 
-from ats.config import Settings, settings
-from ats.llm import prompts
+from ats.config import Settings
 from ats.strategy_profiles import apply_profile
 
 
@@ -14,20 +13,25 @@ def test_scalper_profile_sets_strategy_metadata() -> None:
 
     assert applied["strategy_profile"] == "scalper"
     assert target.strategy_profile == "scalper"
-    assert target.max_setups_per_plan == 3
+    assert target.plan.max_setups_per_plan == 3
 
 
-def test_plan_prompt_includes_profile_addendum(monkeypatch) -> None:
-    monkeypatch.setattr(settings, "strategy_profile", "scalper")
-    monkeypatch.setattr(settings, "max_setups_per_plan", 3)
+def test_scalper_profiles_enable_time_stop() -> None:
+    # Defect 0.1: max_hold_bars must be a positive bound, not 0 (which disables the time-stop
+    # in _advance_trade). Both scalper variants set the intended ~2h bound on 15m.
+    for name in ("scalper", "scalper_v2"):
+        target = Settings(_env_file=None)
+        apply_profile(name, target)
+        assert target.exits.max_hold_bars > 0, f"{name} silently disables the time-stop"
+        assert target.exits.max_hold_bars == 8
 
-    prompt = prompts.plan_system_prompt()
 
-    assert "PROFILE GUIDANCE (scalper)" in prompt
-    assert "up to 3 distinct allowed_setups" in prompt
-    assert "sideways regimes" in prompt
-    assert "range mean-reversion" in prompt
-    assert "support/range lows" in prompt
-    assert "range midpoint" in prompt
-    assert "VWAP" in prompt
-    assert "avoid breakout-continuation" in prompt
+def test_scalper_promotes_event_gated_observer() -> None:
+    # Part 2 Role 2: the exit-strategy observer is event-gated in the shipped scalper, not
+    # only the scalper_v2 A/B variant (it was 99.5% no-op at per-bar cadence).
+    for name in ("scalper", "scalper_v2"):
+        target = Settings(_env_file=None)
+        apply_profile(name, target)
+        assert target.observer.observe_only_on_health is True, (
+            f"{name} runs the observer every bar"
+        )

@@ -149,20 +149,20 @@ def replay(
         "profile": profile,
         "symbol": symbol,
         "timeframe": timeframe,
-        "max_leverage": settings.max_leverage,
-        "risk_per_trade_pct": settings.risk_per_trade_pct,
-        "min_rr": settings.min_rr,
-        "min_stop_atr_mult": settings.min_stop_atr_mult,
-        "max_hold_bars": settings.max_hold_bars,
-        "scale_out_frac": settings.scale_out_frac,
-        "trail_atr_mult": settings.trail_atr_mult,
-        "early_stop_mode": settings.early_stop_mode,
-        "early_trail_arm_atr": settings.early_trail_arm_atr,
-        "early_trail_atr_mult": settings.early_trail_atr_mult,
-        "breakeven_arm_atr": settings.breakeven_arm_atr,
-        "regime_filter": settings.regime_filter,
-        "fee_bps": settings.fee_bps,
-        "slippage_bps": settings.slippage_bps,
+        "max_leverage": settings.risk.max_leverage,
+        "risk_per_trade_pct": settings.risk.risk_per_trade_pct,
+        "min_rr": settings.risk.min_rr,
+        "min_stop_atr_mult": settings.risk.min_stop_atr_mult,
+        "max_hold_bars": settings.exits.max_hold_bars,
+        "scale_out_frac": settings.exits.scale_out_frac,
+        "trail_atr_mult": settings.exits.trail_atr_mult,
+        "early_stop_mode": settings.exits.early_stop_mode,
+        "early_trail_arm_atr": settings.exits.early_trail_arm_atr,
+        "early_trail_atr_mult": settings.exits.early_trail_atr_mult,
+        "breakeven_arm_atr": settings.exits.breakeven_arm_atr,
+        "regime_filter": settings.plan.regime_filter,
+        "fee_bps": settings.risk.fee_bps,
+        "slippage_bps": settings.risk.slippage_bps,
     }
     config_hash = hashlib.sha256(
         json.dumps(behavior_knobs, sort_keys=True, default=str).encode()
@@ -179,9 +179,9 @@ def replay(
     else:
         console.print(
             f"[dim]profile {profile}: "
-            f"equity=${settings.paper_equity_usd:g} max_lev={settings.max_leverage:g}x "
-            f"min_rr={settings.min_rr:g} min_stop_atr={settings.min_stop_atr_mult:g}x "
-            f"max_hold={settings.max_hold_bars}b[/dim]"
+            f"equity=${settings.risk.paper_equity_usd:g} max_lev={settings.risk.max_leverage:g}x "
+            f"min_rr={settings.risk.min_rr:g} min_stop_atr={settings.risk.min_stop_atr_mult:g}x "
+            f"max_hold={settings.exits.max_hold_bars}b[/dim]"
         )
 
     if not no_log:

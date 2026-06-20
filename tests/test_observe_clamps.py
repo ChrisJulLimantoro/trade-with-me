@@ -6,7 +6,7 @@ open trade, but the engine never lets it widen risk.
 
 from __future__ import annotations
 
-from ats.engine.detector import clamp_extended_tp, clamp_tightened_stop
+from ats.engine.exits.policy import clamp_extended_tp, clamp_tightened_stop
 from ats.llm.mock_data import canned_observation
 
 # --- stop clamp: never widen, never cross price -----------------------------------------

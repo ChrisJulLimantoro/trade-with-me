@@ -28,7 +28,7 @@ def _patch_state(monkeypatch: pytest.MonkeyPatch) -> None:
     Each tf has bars on its natural grid; the feature reader returns the latest bar whose
     open_time <= the as_of it is called with (mirroring the real SQL filter).
     """
-    monkeypatch.setattr(config.settings, "context_timeframes", ["1h", "4h"])
+    monkeypatch.setattr(config.settings.plan, "context_timeframes", ["1h", "4h"])
     monkeypatch.setattr(config.settings, "memory_enabled", False)
 
     def _grid(tf: str, count: int = 20) -> list[datetime]:

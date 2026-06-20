@@ -159,7 +159,7 @@ def regime_allows(
     / ``"neutral"``). When it signals exhaustion *against* the regime trend, the opposite
     (mean-reversion) direction is also permitted: longs in an oversold bear, shorts in an
     overbought bull. Pass ``None`` (the default) to keep the strict trend-only gate. This
-    function stays pure — callers decide, via ``settings.counter_trend_on_htf_exhaustion``,
+    function stays pure — callers decide, via ``settings.plan.counter_trend_on_htf_exhaustion``,
     whether to feed it a state at all.
     """
     if not regime_cell:

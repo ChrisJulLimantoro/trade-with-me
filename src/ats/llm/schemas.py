@@ -1,12 +1,15 @@
-"""Pydantic I/O schemas for the LLM-plan trading layer.
+"""Pydantic I/O schemas for the LLM trading layer.
 
-These are the *contract* with the LLM: create_plan returns a ``PlanOutput``,
-confirm_setup returns a ``ConfirmOutput``. The OpenAI client validates raw model
-output against these; a validation failure means we fall back to deterministic
-behaviour rather than trusting unstructured text.
+These are the *contract* with the LLM. Since Part 2 the deterministic 8-agent engine
+authors the plan (``PlanOutput``/``SetupOutput``); the LLM's only plan-time role is a
+**bounded veto/bias** — ``adjudicate`` returns an ``AdjudicationOutput`` that can shift
+the deterministic confidence by at most ±0.20 or stand the trade aside, never set
+direction or move a level. The OpenAI client validates raw model output against these;
+a validation failure means we fall back to deterministic behaviour (delta 0) rather than
+trusting unstructured text.
 
-The same rule shapes (``Rule`` / ``InvalidationRule``) are what the deterministic
-rule engine evaluates at run time — so a plan the LLM emits is directly executable.
+The same rule shapes (``Rule`` / ``InvalidationRule``) are what the deterministic rule
+engine evaluates at run time — so a bridged plan is directly executable.
 """
 
 from __future__ import annotations
@@ -19,7 +22,6 @@ Operator = Literal[">", "<", ">=", "<=", "==", "!=", "crosses_above", "crosses_b
 Severity = Literal["warning", "soft", "hard"]
 Direction = Literal["long", "short"]
 MarketBias = Literal["bullish", "bearish", "neutral"]
-ConfirmAction = Literal["CONFIRM", "REJECT", "WAIT", "REDUCE_SIZE"]
 ObserveAction = Literal["HOLD", "TIGHTEN_STOP", "RAISE_TP", "SCALE_OUT", "EXIT_NOW"]
 LearningCategory = Literal[
     "false_breakout",
@@ -158,26 +160,55 @@ class PlanOutput(BaseModel):
         return _coerce_str(v)
 
 
-class ConfirmOutput(BaseModel):
-    """The confirm_setup result. ``size_multiplier`` only applies to REDUCE_SIZE."""
+class AdjudicationOutput(BaseModel):
+    """The plan-time bounded veto/bias result (spec 07, Part 2 Role 1).
 
-    action: ConfirmAction
-    reason: str = ""
-    size_multiplier: float = Field(default=1.0, gt=0, le=1)
+    The LLM *judges* the deterministic signal; it cannot author it. Only two fields move
+    the outcome: ``confidence_delta`` (clamped to ±0.20 **in code**, regardless of what the
+    model returns — see ``strategy.adjudication.CONFIDENCE_DELTA_CLAMP``) and a hard
+    ``no_trade`` stand-aside. ``bias`` is advisory and ignored unless it agrees with the
+    deterministic direction; ``reasons`` replace the synthesizer's template reasons.
+    Direction, entry_zone, stop_loss and take_profit are never read from this output.
+    """
 
-    @field_validator("reason", mode="before")
+    confidence_delta: float = 0.0
+    bias: MarketBias = "neutral"
+    no_trade: bool = False
+    reasons: list[str] = Field(default_factory=list)
+
+    @field_validator("confidence_delta", mode="before")
     @classmethod
-    def _null_reason(cls, v: object) -> object:
-        return _coerce_str(v)
+    def _coerce_delta(cls, v: object) -> object:
+        """Null/non-numeric → 0.0 (a neutral judgement) so a stray value never sinks parse.
 
-    @field_validator("size_multiplier", mode="before")
-    @classmethod
-    def _normalize_size_multiplier(cls, v: object) -> object:
-        """Null/non-positive → full size (1.0); overshoot → clamped to 1.0.
-
-        A bad multiplier should fall back to "trade full size" rather than fail the confirm.
+        The ±0.20 bound is applied in code, not here: the raw float is kept so the clamp is
+        auditable (we log the raw delta the model wanted vs. the bounded one we applied).
         """
-        return _coerce_positive_fraction(v, 1.0)
+        if v is None:
+            return 0.0
+        try:
+            return float(v)  # type: ignore[arg-type]
+        except (TypeError, ValueError):
+            return 0.0
+
+    @field_validator("bias", mode="before")
+    @classmethod
+    def _coerce_bias(cls, v: object) -> object:
+        return "neutral" if v is None else v
+
+    @field_validator("no_trade", mode="before")
+    @classmethod
+    def _coerce_no_trade(cls, v: object) -> object:
+        return False if v is None else bool(v)
+
+    @field_validator("reasons", mode="before")
+    @classmethod
+    def _coerce_reasons(cls, v: object) -> object:
+        if v is None:
+            return []
+        if isinstance(v, str):
+            return [v]
+        return v
 
 
 class ObservationOutput(BaseModel):
@@ -264,4 +295,5 @@ class LlmResult(BaseModel):
     output_tokens: int = 0
     cost_usd: float = 0.0
     latency_ms: int | None = None
+    cached: bool = False  # adjudication served from the envelope-hash cache (no API call)
     raw: dict[str, object] | None = None  # raw parsed response for the audit row

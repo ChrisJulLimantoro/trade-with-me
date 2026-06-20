@@ -382,3 +382,39 @@ def test_regime_gate_counter_trend_on_htf_exhaustion() -> None:
     # Sideways still allows both; missing state is the strict default.
     assert regime_allows("side-low", "long", htf_rsi_state="neutral") is True
     assert regime_allows("bear-low", "long") is False
+
+
+# --- close-confirmed base stop on the intrabar cadence (defect 0.2) --------------------
+
+
+def test_stop_on_close_rides_through_noise_wick() -> None:
+    # Acceptance (0.2): on the finer-tf walk a sub-bar wicks through the base stop (low 94 <
+    # stop 95) but closes back inside the thesis (96). With close-confirm on it is treated as
+    # noise — the trade does NOT stop out and a note records the ignored wick.
+    step = _step(LONG, _c(101, 94, 96), TradeState(), stop_on_close=True)
+    assert not step.closed
+    assert any("wick ignored" in n for n in step.notes)
+
+
+def test_stop_on_close_exits_when_close_confirms_break() -> None:
+    # A sub-bar that actually CLOSES beyond the stop (94.5 < 95) is a real break → stop out
+    # at the stop price, even with close-confirm enabled.
+    step = _step(LONG, _c(101, 94, 94.5), TradeState(), stop_on_close=True)
+    assert step.closed and step.exit_result.exit_reason == "sl"
+    assert step.exit_result.exit_price == pytest.approx(95.0)
+
+
+def test_stop_on_close_off_keeps_intrabar_wick_stop() -> None:
+    # Default (single decision-bar path): the original intrabar-wick stop still fills, so the
+    # behaviour is unchanged where there is no finer-tf resolution to confirm a close.
+    step = _step(LONG, _c(101, 94, 96), TradeState())
+    assert step.closed and step.exit_result.exit_reason == "sl"
+
+
+def test_stop_on_close_does_not_shield_breakeven_stop() -> None:
+    # Close-confirm only shields the UNPROTECTED base stop. A breakeven runner whose wick dips
+    # to its breakeven stop (100) but closes above it (101) still stops flat — protective
+    # stops only ever lock in gains and must fill on the wick.
+    after_tp1 = _step(LONG, _c(111, 99, 109), TradeState()).state  # stop → breakeven(100)
+    step = _step(LONG, _c(108, 99, 101), after_tp1, stop_on_close=True)
+    assert step.closed and step.exit_result.exit_reason == "breakeven"

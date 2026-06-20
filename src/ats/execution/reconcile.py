@@ -215,6 +215,7 @@ def step_trade(
     review_on_expiry: bool = False,
     hard_invalidation: bool = False,
     liq_price: float | None = None,
+    stop_on_close: bool = False,
 ) -> BarStep:
     """Advance one open trade by a single bar. Returns the resulting :class:`BarStep`.
 
@@ -232,6 +233,13 @@ def step_trade(
 
     ``liq_price`` is a hard backstop: sizing guarantees the stop sits inside it, so the
     stop normally fills first; liquidation only fires if the working stop is somehow looser.
+
+    ``stop_on_close`` close-confirms the *unprotected* base stop on the intrabar (finer-tf)
+    cadence: a sub-bar whose wick pierces the original stop but whose close is back inside
+    the thesis is treated as noise and ridden through, so the bar-close structural/
+    invalidation guard gets a say on the same cadence instead of losing to a wick. Protective
+    stops (breakeven / trail, which only ever lock in gains) and liquidation still fire on the
+    wick. No-op when ``stop_on_close`` is False (the single decision-bar path).
     """
     direction = trade["direction"]
     entry = float(trade["entry_price"])
@@ -270,6 +278,9 @@ def step_trade(
     if hard_invalidation:
         return close_all(close, "invalidation")
 
+    # Notes accumulated across the bar (stop ride-through, early arms, trail moves).
+    arm_notes: list[str] = []
+
     if direction == "long":
         sl_hit, tp_hit = low <= working_stop, high >= target
     else:
@@ -283,7 +294,16 @@ def step_trade(
             reason = "trail"
         else:
             reason = "sl"
-        return close_all(working_stop, reason)
+        # Close-confirm the unprotected base stop on the intrabar cadence: a wick that pierces
+        # the original stop but closes back inside the thesis is noise — ride through it and
+        # let the bar-close guard decide. Protective stops still fill on the wick.
+        wick_only = (close > working_stop) if direction == "long" else (close < working_stop)
+        if stop_on_close and reason == "sl" and wick_only:
+            arm_notes.append(
+                f"stop wick ignored (close {close:g} inside stop {working_stop:g})"
+            )
+        else:
+            return close_all(working_stop, reason)
 
     if liq_price is not None and _liq_hit(direction, high, low, liq_price):
         return close_all(liq_price, "liquidation")
@@ -310,7 +330,6 @@ def step_trade(
 
     # Early protection before TP1. In trail mode this arms an ATR trail without jumping
     # straight to breakeven; breakeven mode preserves the legacy behavior for comparison.
-    arm_notes: list[str] = []
     if atr and state.tp_index == 0:
         favorable = (high - entry) if direction == "long" else (entry - low)
         if (
@@ -320,7 +339,7 @@ def step_trade(
             and favorable >= early_trail_arm_atr * atr
         ):
             state = replace(state, trail_armed=True)
-            arm_notes = [f"early_trail armed at {early_trail_arm_atr:g}x ATR"]
+            arm_notes.append(f"early_trail armed at {early_trail_arm_atr:g}x ATR")
         can_arm_breakeven = not (breakeven_requires_tp1 and state.tp_index == 0)
         if (
             early_stop_mode == "breakeven"
@@ -335,7 +354,7 @@ def step_trade(
                     working_stop=breakeven_stop(direction, entry, cost_bps),
                     breakeven=True,
                 )
-                arm_notes = [f"armed breakeven early at {breakeven_arm_atr:g}x ATR"]
+                arm_notes.append(f"armed breakeven early at {breakeven_arm_atr:g}x ATR")
 
     if state.trail_armed and state.tp_index == 0 and early_trail_atr_mult and atr:
         cur_ws = state.working_stop if state.working_stop is not None else full_stop
@@ -350,7 +369,7 @@ def step_trade(
     # Time-stop: let breakeven-protected runners keep going, and never cut a trade that is
     # currently in profit; close only what is still flat/at risk and unprotected. When
     # review_on_expiry is set, hand the decision to the caller (thesis review) instead.
-    # expires_at is None when the time-stop is disabled (settings.max_hold_bars <= 0).
+    # expires_at is None when the time-stop is disabled (settings.exits.max_hold_bars <= 0).
     if expires_at is not None and ts >= expires_at and not state.breakeven and pnl(close) <= 0:
         if review_on_expiry:
             return BarStep(state=state, expiry_due=True, notes=arm_notes)

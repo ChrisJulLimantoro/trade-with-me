@@ -9,7 +9,6 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from dataclasses import dataclass, field
 from datetime import datetime
 
 from sqlalchemy import text
@@ -17,7 +16,8 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ats.config import settings
 from ats.engine import state
-from ats.engine.detector import ClosedTradeInfo, TickReport, evaluate_now
+from ats.engine.orchestrator import evaluate_now
+from ats.engine.reports import ReplayReport, TickReport, TradeOutcome
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.execution.executor import RunTag, current_run
 from ats.llm.client import LlmClient
@@ -25,68 +25,6 @@ from ats.logging import get_logger
 from ats.planning.create_plan import create_plan
 
 log = get_logger(__name__)
-
-
-@dataclass
-class TradeOutcome:
-    """Lightweight summary captured for each closed trade during replay."""
-
-    direction: str
-    entry_price: float
-    stop_loss: float
-    exit_price: float
-    exit_reason: str
-    margin_usd: float
-    notional_usd: float
-    leverage: float | None
-    pnl_pct: float  # return on committed margin, signed
-    pnl_usd: float
-    atr_at_entry: float | None  # atr_14 at the bar we entered
-    stop_dist_pts: float  # abs(entry - stop_loss) in price points
-
-
-@dataclass
-class ReplayReport:
-    symbol: str
-    timeframe: str
-    bars: int = 0
-    plans_created: int = 0
-    plans_with_setups: int = 0
-    detections: int = 0
-    opened: int = 0
-    closed: int = 0
-    invalidations: int = 0
-    confirm_calls: int = 0
-    observe_calls: int = 0
-    risk_rejected: int = 0
-    trade_outcomes: list[TradeOutcome] = field(default_factory=list)
-    notes: list[str] = field(default_factory=list)
-
-    # --- derived metrics (populated by finalise()) ---
-    win_rate: float = 0.0
-    avg_pnl_pct: float = 0.0  # average return on committed margin
-    expectancy_pct: float = 0.0  # margin avg_win * win_rate + avg_loss * loss_rate
-    avg_stop_dist_atr: float | None = None  # avg stop distance in ATR multiples
-
-    def finalise(self) -> None:
-        """Compute summary metrics from trade_outcomes. Call once after the loop."""
-        if not self.trade_outcomes:
-            return
-        wins = [t for t in self.trade_outcomes if t.pnl_pct > 0]
-        losses = [t for t in self.trade_outcomes if t.pnl_pct <= 0]
-        n = len(self.trade_outcomes)
-        self.win_rate = len(wins) / n
-        self.avg_pnl_pct = sum(t.pnl_pct for t in self.trade_outcomes) / n
-        avg_win = sum(t.pnl_pct for t in wins) / len(wins) if wins else 0.0
-        avg_loss = sum(t.pnl_pct for t in losses) / len(losses) if losses else 0.0
-        self.expectancy_pct = avg_win * self.win_rate + avg_loss * (1 - self.win_rate)
-        atr_multiples = [
-            t.stop_dist_pts / t.atr_at_entry
-            for t in self.trade_outcomes
-            if t.atr_at_entry and t.atr_at_entry > 0
-        ]
-        if atr_multiples:
-            self.avg_stop_dist_atr = sum(atr_multiples) / len(atr_multiples)
 
 
 # Per-bar status notes that persist across many consecutive bars. We collapse these
@@ -165,8 +103,12 @@ async def _ensure_plan(
     if await state.open_positions(session, symbol=symbol, run_id=run_id):
         return False, bars_since_plan, 0
     plan = await state.active_plan(session, symbol, run_id=run_id)
-    stale = plan is None or now >= plan.expires_at or bars_since_plan >= settings.plan_refresh_bars
-    if not stale and settings.replan_on_regime_change and plan is not None:
+    stale = (
+        plan is None
+        or now >= plan.expires_at
+        or bars_since_plan >= settings.plan.plan_refresh_bars
+    )
+    if not stale and settings.plan.replan_on_regime_change and plan is not None:
         # Re-plan when the world changes (#6): the regime cell that anchored this plan flipped,
         # so its thesis is stale even though the refresh timer hasn't elapsed.
         regime = await state.latest_regime(session, before_ts=now)
@@ -218,9 +160,9 @@ async def _walk_replay(
 ) -> ReplayReport:
     run = current_run.get()
     run_id = run.run_id if run else None
-    bars_since_plan = settings.plan_refresh_bars  # force a plan on the first bar
+    bars_since_plan = settings.plan.plan_refresh_bars  # force a plan on the first bar
     active_sticky: str | None = None
-    observe_tf = settings.observe_timeframe
+    observe_tf = settings.observer.observe_timeframe
     base_dt = timeframe_to_timedelta(tf)
     obs_dt = timeframe_to_timedelta(observe_tf) if observe_tf != tf else base_dt
     for i, row in enumerate(rows):
@@ -237,7 +179,7 @@ async def _walk_replay(
         fine_candles = None
         if (
             open_before
-            and settings.observe_enabled
+            and settings.observer.observe_enabled
             and prev is not None
             and observe_tf != tf
         ):
@@ -264,11 +206,11 @@ async def _walk_replay(
         # Re-plan on close: the thesis that anchored the just-closed trade is stale, so
         # discard the active plan and force a fresh one on the next bar.
         if (
-            settings.replan_on_close
+            settings.plan.replan_on_close
             and tick.closed > 0
             and await state.supersede_active_plan(session, symbol, run_id=run_id)
         ):
-            bars_since_plan = settings.plan_refresh_bars
+            bars_since_plan = settings.plan.plan_refresh_bars
 
     await session.commit()
     report.finalise()
@@ -295,13 +237,14 @@ async def run_tick(
     prev = await state.latest_feature_row(session, symbol, tf, as_of=prev_ts) if prev_ts else None
 
     await _ensure_plan(
-        session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=settings.plan_refresh_bars
+        session, client, symbol=symbol, tf=tf, now=now,
+        bars_since_plan=settings.plan.plan_refresh_bars,
     )
     tick = await evaluate_now(
         session, client, symbol=symbol, tf=tf, feature_row=latest, prev_row=prev,
         candle_closed=True, now=now,
     )
-    if settings.replan_on_close and tick.closed > 0:
+    if settings.plan.replan_on_close and tick.closed > 0:
         await state.supersede_active_plan(session, symbol)
     await session.commit()
     return tick

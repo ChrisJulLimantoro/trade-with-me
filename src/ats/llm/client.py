@@ -1,27 +1,29 @@
 """LLM client abstraction: a deterministic mock and a real OpenAI implementation.
 
-Both expose the same async ``create_plan`` / ``confirm_setup`` signatures returning
-``(parsed | None, LlmResult)``, so callers are mode-agnostic. ``get_client()`` returns
-the mock whenever ``settings.llm_mock`` is set or no API key is present — which is the
-default — so a fresh checkout runs end to end with no secrets and no token spend.
+Since Part 2 the LLM is a bounded *judge*, not an author. The live calls are
+``adjudicate`` (plan-time ±0.20 veto/bias over the deterministic signal),
+``observe_trade`` (tactical exit strategy on open trades) and ``reflect_trade``
+(post-mortem). All return ``(parsed | None, LlmResult)`` so callers are mode-agnostic.
+``get_client()`` returns the mock whenever ``settings.llm_mock`` is set or no API key is
+present — the default — so a fresh checkout runs end to end with no secrets and no spend.
 
 On any error or schema-validation failure the real client returns ``(None, result)``
-with ``parse_ok=False``; callers then fall back to deterministic behaviour rather than
-trusting unstructured output.
+with ``parse_ok=False``; callers then fall back to deterministic behaviour (delta 0)
+rather than trusting unstructured output.
 """
 
 from __future__ import annotations
 
+import hashlib
 import time
-from typing import Any, Protocol
+from typing import Any, Protocol, runtime_checkable
 
 from ats.config import settings
 from ats.llm import mock_data, prompts
 from ats.llm.schemas import (
-    ConfirmOutput,
+    AdjudicationOutput,
     LlmResult,
     ObservationOutput,
-    PlanOutput,
     ReflectionOutput,
 )
 from ats.logging import get_logger
@@ -65,22 +67,34 @@ def _cost_usd(model: str, tokens_in: int, tokens_out: int) -> float:
     return round(pin * tokens_in / 1_000_000 + pout * tokens_out / 1_000_000, 6)
 
 
-class LlmClient(Protocol):
-    async def create_plan(
+# Interface segregation: each LLM role is its own narrow Protocol so a collaborator depends
+# only on the call it actually makes — the planner on Adjudicator, the post-mortem on
+# Reflector, the trade-review path on Observer. ``LlmClient`` composes all three for the
+# runtime/factory that needs the whole surface.
+@runtime_checkable
+class Adjudicator(Protocol):
+    async def adjudicate(
         self, envelope: dict[str, Any], *, symbol: str
-    ) -> tuple[PlanOutput | None, LlmResult]: ...
+    ) -> tuple[AdjudicationOutput | None, LlmResult]: ...
 
-    async def confirm_setup(
-        self, envelope: dict[str, Any], *, symbol: str
-    ) -> tuple[ConfirmOutput | None, LlmResult]: ...
 
+@runtime_checkable
+class Observer(Protocol):
     async def observe_trade(
         self, envelope: dict[str, Any], *, symbol: str
     ) -> tuple[ObservationOutput | None, LlmResult]: ...
 
+
+@runtime_checkable
+class Reflector(Protocol):
     async def reflect_trade(
         self, envelope: dict[str, Any], *, symbol: str
     ) -> tuple[ReflectionOutput | None, LlmResult]: ...
+
+
+@runtime_checkable
+class LlmClient(Adjudicator, Observer, Reflector, Protocol):
+    """The full LLM surface (every role). Use a narrower role Protocol where only one is needed."""
 
 
 class MockClient:
@@ -88,23 +102,14 @@ class MockClient:
 
     mock = True
 
-    async def create_plan(
+    async def adjudicate(
         self, envelope: dict[str, Any], *, symbol: str
-    ) -> tuple[PlanOutput, LlmResult]:
-        plan = mock_data.canned_plan(envelope)
+    ) -> tuple[AdjudicationOutput, LlmResult]:
+        adj = mock_data.canned_adjudication(envelope)
         result = LlmResult(
-            parse_ok=True, model="mock", mock=True, raw=plan.model_dump(mode="json")
+            parse_ok=True, model="mock", mock=True, raw=adj.model_dump(mode="json")
         )
-        return plan, result
-
-    async def confirm_setup(
-        self, envelope: dict[str, Any], *, symbol: str
-    ) -> tuple[ConfirmOutput, LlmResult]:
-        confirm = mock_data.canned_confirm(envelope)
-        result = LlmResult(
-            parse_ok=True, model="mock", mock=True, raw=confirm.model_dump(mode="json")
-        )
-        return confirm, result
+        return adj, result
 
     async def observe_trade(
         self, envelope: dict[str, Any], *, symbol: str
@@ -137,6 +142,11 @@ class OpenAIClient:
             api_key=api_key,
             **({"base_url": settings.openai_base_url} if settings.openai_base_url else {}),
         )
+        # Plan-time adjudication is cached by envelope hash: an identical signal + context
+        # returns the same bounded delta without a second API call, so repeated identical
+        # replays are reproducible and the only residual LLM variance is one ±0.20 delta
+        # per distinct plan envelope.
+        self._adjudication_cache: dict[str, AdjudicationOutput] = {}
 
     async def _parse(
         self, *, model: str, system: str, envelope: dict[str, Any], schema: type
@@ -201,34 +211,30 @@ class OpenAIClient:
                 parse_ok=False, model=model, mock=False, latency_ms=latency
             )
 
-    async def create_plan(
+    async def adjudicate(
         self, envelope: dict[str, Any], *, symbol: str
-    ) -> tuple[PlanOutput | None, LlmResult]:
-        return await self._parse(
-            model=settings.llm_plan_model,
-            system=prompts.plan_system_prompt(),
-            envelope=envelope,
-            schema=PlanOutput,
-        )
-
-    async def confirm_setup(
-        self, envelope: dict[str, Any], *, symbol: str
-    ) -> tuple[ConfirmOutput | None, LlmResult]:
-        parsed, result = await self._parse(
-            model=settings.llm_confirm_model,
-            system=prompts.CONFIRM_SYSTEM_PROMPT,
-            envelope=envelope,
-            schema=ConfirmOutput,
-        )
-        if not result.parse_ok:
-            # Retry once — a single JSON format hiccup shouldn't drop a valid setup.
-            log.info("confirm_setup_retry", symbol=symbol)
-            parsed, result = await self._parse(
-                model=settings.llm_confirm_model,
-                system=prompts.CONFIRM_SYSTEM_PROMPT,
-                envelope=envelope,
-                schema=ConfirmOutput,
+    ) -> tuple[AdjudicationOutput | None, LlmResult]:
+        key = hashlib.sha256(
+            (settings.llm_adjudicate_model + "|" + prompts.user_message(envelope)).encode()
+        ).hexdigest()
+        cached = self._adjudication_cache.get(key)
+        if cached is not None:
+            return cached, LlmResult(
+                parse_ok=True,
+                model=settings.llm_adjudicate_model,
+                mock=False,
+                cached=True,
+                latency_ms=0,
+                raw=cached.model_dump(mode="json"),
             )
+        parsed, result = await self._parse(
+            model=settings.llm_adjudicate_model,
+            system=prompts.ADJUDICATE_SYSTEM_PROMPT,
+            envelope=envelope,
+            schema=AdjudicationOutput,
+        )
+        if result.parse_ok and parsed is not None:
+            self._adjudication_cache[key] = parsed
         return parsed, result
 
     async def observe_trade(

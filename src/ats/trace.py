@@ -79,7 +79,9 @@ def block(text: str) -> None:
         _w(line)
 
 
-def plan(plan_obj: Any, setups: list[Any]) -> None:
+def plan(
+    plan_obj: Any, setups: list[Any], agent_scores: dict[str, float] | None = None
+) -> None:
     """Record a freshly created plan and its setups."""
     if _logger is None:
         return
@@ -91,6 +93,12 @@ def plan(plan_obj: Any, setups: list[Any]) -> None:
     )
     if plan_obj.rationale:
         _w(f"  rationale: {plan_obj.rationale}")
+    if agent_scores:
+        scores = "  ".join(
+            f"{name}={_num(score)}"
+            for name, score in sorted(agent_scores.items(), key=lambda kv: kv[1], reverse=True)
+        )
+        _w(f"  agent_scores: {scores}")
     for i, s in enumerate(setups, 1):
         _w(
             f"  setup[{i}] {_sid(s.setup_id)}  {s.direction.upper()}  "
