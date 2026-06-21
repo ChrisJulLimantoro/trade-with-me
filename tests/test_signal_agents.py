@@ -77,7 +77,8 @@ def test_funding_fades_extreme_and_abstains_otherwise() -> None:
     flat = FundingAgent().run(_ai({"funding_z_30d": 1.0}))
     missing = FundingAgent().run(_ai({}))
     assert short.direction == "short" and long.direction == "long"
-    assert abs(short.score - 2.5 / 3.0) < 1e-5
+    # New formula: score ramps from z=1.0, full at z=3.0 → (2.5-1.0)/2.0 = 0.75
+    assert abs(short.score - 0.75) < 1e-5
     assert flat.direction == "neutral"
     assert missing.direction == "neutral" and missing.metadata["reason"] == "no_funding_z"
 
@@ -111,7 +112,8 @@ def test_basis_abstains_on_null_and_fades_extreme() -> None:
 
 
 def test_cvd_abstains_on_null_cvd() -> None:
-    s = CvdAgent().run(_ai({"pr_cvd_divergence": 0.8}, [_candle(10, 9, 9)]))
+    # No CVD data at all (neither cvd_slope_10 nor pr_cvd_divergence) → abstain
+    s = CvdAgent().run(_ai({}, [_candle(10, 9, 9), _candle(11, 10, 10)]))
     assert s.score == 0.0 and s.metadata["reason"] == "no_cvd"
 
 

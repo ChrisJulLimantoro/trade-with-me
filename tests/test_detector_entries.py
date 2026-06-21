@@ -310,6 +310,7 @@ async def test_sideways_exit_policy_passes_range_knobs_to_step_trade(monkeypatch
 
     assert captured["scale_out_frac"] == pytest.approx(0.75)
     assert captured["trail_atr_mult"] == pytest.approx(2.0)
+    assert captured["trail_mode"] == "chandelier"
     assert captured["breakeven_requires_tp1"] is True
     assert captured["trail_after_tp1_only"] is True
     assert captured["early_stop_mode"] == "trail"
@@ -355,6 +356,7 @@ async def test_trend_exit_policy_passes_global_knobs_to_step_trade(monkeypatch) 
 
     assert captured["scale_out_frac"] == pytest.approx(0.5)
     assert captured["trail_atr_mult"] == pytest.approx(1.5)
+    assert captured["trail_mode"] == "chandelier"
     assert captured["breakeven_requires_tp1"] is False
     assert captured["trail_after_tp1_only"] is False
     assert captured["early_stop_mode"] == "trail"

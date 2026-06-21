@@ -8,16 +8,21 @@ survivors are renormalized arithmetically (each ÷ sum of survivors), never re-d
 
 from __future__ import annotations
 
-# M1 weights — eight agents (spec 04 §Synthesizer). Sum must be 1.0.
+# M1 weights — nine agents (spec 04 §Synthesizer + the HTF-trend voter). Sum must be 1.0.
+# The original eight are diluted uniformly to 0.75 of their mass so their *relative* shape
+# is untouched (no per-agent re-tuning); the freed 0.25 goes to ``htf_trend``, making the
+# dominant higher-timeframe trend a quarter of the direction vote. This biases the
+# 15m-myopic synthesizer with the macro trend without re-discovering any single weight.
 WEIGHTS: dict[str, float] = {
-    "structure": 0.25,
-    "momentum": 0.15,
-    "funding": 0.10,
-    "liquidity": 0.05,
-    "price_action": 0.15,
-    "cross_venue": 0.15,
-    "basis": 0.10,
-    "cvd": 0.05,
+    "structure": 0.1875,
+    "momentum": 0.1125,
+    "funding": 0.075,
+    "liquidity": 0.0375,
+    "price_action": 0.1125,
+    "cross_venue": 0.1125,
+    "basis": 0.075,
+    "cvd": 0.0375,
+    "htf_trend": 0.25,
 }
 
 # Fail loudly at import if the weights drift off the simplex.

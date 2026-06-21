@@ -22,6 +22,11 @@ class RiskConfig(BaseModel):
     max_portfolio_risk_pct: float = 0.03
     # min reward:risk (lowered from 2.0 — ATR-wide stops reduce TP distance)
     min_rr: float = 1.5
+    # Take-profit distance as an ATR multiple (structural target in sl_tp.compute_levels).
+    # 3.0 ATR is rarely tagged on the 15m scalper (TP1 hit on ~3% of trades in BTC replay),
+    # so scale-out wins never bank. A profile may pull this in to a more reachable target;
+    # the synthesizer's RR floor still rejects geometry that doesn't clear ``min_rr``.
+    reward_atr_mult: float = 3.0
     # Minimum stop distance as a multiple of ATR. Stops tighter than this multiple are
     # noise-stops that get swept by normal bar wiggle; the risk layer rejects them before they
     # waste a confirm call or execute into a structural loss. 0 = disabled.
@@ -58,9 +63,20 @@ class ExitConfig(BaseModel):
     # clears this many round-trip costs of profit. Stops the arm from scratching trades at
     # entry for a guaranteed fee-only loss when price wiggles straight back. 0 disables.
     breakeven_arm_cost_mult: float = 2.0
+    # Profit lock on the early breakeven arm: instead of parking the stop at the cost-only
+    # breakeven (which scratches the trade to ~0% — a non-win that tanks win rate), lock the
+    # stop this many ATR of *profit* beyond the cost breakeven. A trade that arms and then
+    # retraces then exits at a small REAL gain (a win) rather than flat. 0 = legacy behavior
+    # (park at cost-breakeven). The trail still ratchets above this floor as the runner extends.
+    breakeven_lock_atr: float = 0.0
     # Trailing-stop distance as a multiple of atr_14, applied to the runner once the
     # stop is at breakeven. 0 disables trailing.
     trail_atr_mult: float = 1.5
+    # What the trail distance is measured FROM. "chandelier" anchors off the high-water extreme
+    # since entry (highest high for longs / lowest low for shorts), so a winner keeps the room
+    # it earned through a pullback; "close" trails the current bar close (legacy behavior, kept
+    # for replay/ablation A/B). Either way the stop only ever tightens.
+    trail_mode: Literal["close", "chandelier"] = "chandelier"
     # Early protection before TP1. "trail" arms a real ATR trail instead of jumping the
     # stop to breakeven; "breakeven" preserves the old early-arm behavior; "off" disables.
     early_stop_mode: Literal["off", "breakeven", "trail"] = "trail"
@@ -72,6 +88,7 @@ class ExitConfig(BaseModel):
     sideways_scale_out_frac: float = 0.75
     sideways_breakeven_requires_tp1: bool = True
     sideways_trail_atr_mult: float = 2.0
+    sideways_trail_mode: Literal["close", "chandelier"] = "chandelier"
     sideways_trail_after_tp1_only: bool = True
     sideways_early_stop_mode: Literal["off", "breakeven", "trail"] = "trail"
     sideways_early_trail_arm_atr: float = 1.0
@@ -146,6 +163,13 @@ class PlanConfig(BaseModel):
     # adds the missing "the world changed" trigger while a plan rests with no open position.
     # The timer / expires_at stay as a backstop.
     replan_on_regime_change: bool = False
+    # Higher-timeframe trend filter (default OFF). When on, the plan-time allowed_directions
+    # gate also drops the direction that fights the higher-timeframe (4h, then 1h) trend —
+    # no longs when the 4h close is below its EMA50 with MACD negative, no shorts in the
+    # mirror case. The existing HTF-exhaustion counter-trend relief is preserved (a deeply
+    # oversold 4h still permits a mean-reversion long). Kills the dominant BTC-replay loss
+    # bucket: 15m "bull-low"/chop longs taken inside a 4h downtrend.
+    htf_trend_filter: bool = False
     # Slower charts whose most-recent CLOSED bar is shown to the strategist for bias and
     # direction only. Executable rules still reference base-timeframe features. Empty = off.
     context_timeframes: list[str] = ["1h", "4h"]
@@ -171,7 +195,7 @@ class Settings(BaseSettings):
     # is the bounded ±0.20 veto/bias (adjudicate). When False, the run is the pure
     # deterministic baseline (no plan-time LLM call at all). With llm_mock=True the judge
     # returns delta 0, so leaving this on still reproduces the deterministic baseline.
-    adjudication_enabled: bool = True
+    adjudication_enabled: bool = False
     llm_adjudicate_model: str = "deepseek-v4-flash"  # plan-time bounded veto/bias — heavier reasoning
     llm_max_tokens: int = 2048
     llm_observe_model: str = "deepseek-v4-flash"  # tactical exit manager — cheap/fast
@@ -184,7 +208,7 @@ class Settings(BaseSettings):
     plan: PlanConfig = Field(default_factory=PlanConfig)
 
     # --- Episodic memory (post-mortem learnings + retrieval into create_plan) ---
-    memory_enabled: bool = True
+    memory_enabled: bool = False
     memory_top_k: int = 3  # prior learnings injected into the plan envelope
     llm_reflect_model: str = "deepseek-v4-flash"  # post-mortem — cheap, one call per close
 

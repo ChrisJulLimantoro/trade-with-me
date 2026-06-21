@@ -6,11 +6,14 @@ import asyncio
 from datetime import UTC, datetime, timedelta
 from typing import Any
 
+import structlog
 import typer
 from rich.console import Console
 
 from ats.db.session import SessionLocal
 from ats.llm.client import get_client
+
+log = structlog.get_logger(__name__)
 
 app = typer.Typer(name="engine", help="Run the rule engine + trade loop.")
 console = Console()
@@ -253,12 +256,41 @@ def replay(
                 if rep.avg_stop_dist_atr is not None
                 else ""
             )
+            vol_str = (
+                f"  volatility={rep.volatility_pct:.2f}%"
+                if rep.volatility_pct is not None
+                else ""
+            )
+            sharpe_str = (
+                f"  sharpe={rep.sharpe_ratio:.2f}"
+                if rep.sharpe_ratio is not None
+                else ""
+            )
+            sortino_str = (
+                f"  sortino={rep.sortino_ratio:.2f}"
+                if rep.sortino_ratio is not None
+                else ""
+            )
             emit(
                 f"  [bold]trade metrics[/bold]  "
                 f"win_rate={rep.win_rate * 100:.0f}%  "
                 f"avg_margin_pnl={rep.avg_pnl_pct * 100:+.3f}%  "
                 f"margin_expectancy={rep.expectancy_pct * 100:+.3f}%"
-                + atr_str
+                + atr_str + vol_str + sharpe_str + sortino_str
+            )
+            log.info(
+                "replay_summary",
+                symbol=symbol,
+                timeframe=timeframe,
+                bars=rep.bars,
+                closed=rep.closed,
+                win_rate=round(rep.win_rate, 4),
+                avg_margin_pnl_pct=round(rep.avg_pnl_pct * 100, 4),
+                expectancy_pct=round(rep.expectancy_pct * 100, 4),
+                volatility_pct=round(rep.volatility_pct, 4) if rep.volatility_pct is not None else None,
+                sharpe_ratio=round(rep.sharpe_ratio, 4) if rep.sharpe_ratio is not None else None,
+                sortino_ratio=round(rep.sortino_ratio, 4) if rep.sortino_ratio is not None else None,
+                avg_stop_dist_atr=round(rep.avg_stop_dist_atr, 4) if rep.avg_stop_dist_atr is not None else None,
             )
             from rich.table import Table
 

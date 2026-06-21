@@ -1,9 +1,13 @@
 """CVD — cumulative volume-delta divergence vs price.
 
-When price prints a new 30-bar high but aggressive buying (CVD) doesn't confirm, the
-move is distribution → bearish; symmetric for a new low not confirmed by selling →
-bullish. Spec 02 precomputes ``pr_cvd_divergence`` (0..1) as the divergence magnitude;
-the new-high/low test runs on the 15m candles. Abstains when ``cvd_30`` is NULL.
+Flow-based signal: when price trends up but CVD trends flat/down, aggressive buyers
+aren't confirming the move (distribution → short). Symmetric for a down-move not
+confirmed by selling (accumulation → long). Score is derived from the slope divergence
+between price and CVD over the lookback window — price extremes are no longer required,
+making this a leading flow signal rather than a lagging divergence detector.
+
+Falls back to the ``pr_cvd_divergence`` precomputed feature when ``cvd_slope_10``
+is unavailable.
 """
 
 from __future__ import annotations
@@ -12,7 +16,8 @@ from typing import ClassVar
 
 from ats.agents.base import AgentInput, AgentScore, abstain, clamp01, f, primary_close
 
-_WINDOW = 30
+_WINDOW = 10        # bars for slope computation (uses cvd_slope_10 + price slope)
+_SCALE = 50.0       # price-slope normalizer (bps units keep numbers tractable)
 
 
 class CvdAgent:
@@ -21,9 +26,10 @@ class CvdAgent:
 
     def run(self, ai: AgentInput) -> AgentScore:
         feats = ai.features or {}
-        cvd_30 = f(feats.get("cvd_30"))
+        cvd_slope = f(feats.get("cvd_slope_10"))
         divergence = f(feats.get("pr_cvd_divergence"))
-        if cvd_30 is None or divergence is None:
+
+        if cvd_slope is None and divergence is None:
             return abstain(self.name, "no_cvd")
 
         close = primary_close(ai)
@@ -31,33 +37,50 @@ class CvdAgent:
         if close is None or len(bars) < 2:
             return abstain(self.name, "insufficient_bars")
 
-        tail = bars[-_WINDOW:] if len(bars) >= _WINDOW else bars
-        highs = [f(c.get("high")) for c in tail]
-        lows = [f(c.get("low")) for c in tail]
-        highs = [x for x in highs if x is not None]
-        lows = [x for x in lows if x is not None]
-        last_high = f(bars[-1].get("high"))
-        last_low = f(bars[-1].get("low"))
-        price_nh = bool(highs) and last_high is not None and last_high >= max(highs)
-        price_nl = bool(lows) and last_low is not None and last_low <= min(lows)
+        # Price slope over _WINDOW bars in bps (normalised so scale is stable).
+        lookback = bars[-(_WINDOW + 1) : -1] if len(bars) > _WINDOW else bars[:-1]
+        anchor_close = f(lookback[0].get("close")) if lookback else None
+        if anchor_close and anchor_close > 0:
+            price_slope = (close - anchor_close) / anchor_close * 10_000  # bps
+        else:
+            price_slope = 0.0
 
-        # A new price extreme that the divergence flags is the unconfirmed move.
+        # Slope divergence: price_slope and cvd_slope have opposite signs → divergence.
         direction = "neutral"
-        div_type = "none"
-        if price_nh and divergence > 0:
-            direction, div_type = "short", "bearish"
-        elif price_nl and divergence > 0:
-            direction, div_type = "long", "bullish"
+        if cvd_slope is not None:
+            # price up, CVD down/flat = distribution → short
+            if price_slope > 0 and cvd_slope < 0:
+                direction = "short"
+            # price down, CVD up/flat = accumulation → long
+            elif price_slope < 0 and cvd_slope > 0:
+                direction = "long"
 
-        score = clamp01(divergence) if direction != "neutral" else 0.0
+            if direction != "neutral":
+                # Magnitude: how far apart the two slopes are, normalised.
+                div_magnitude = clamp01(abs(price_slope / _SCALE) + clamp01(abs(cvd_slope)))
+                score = clamp01(round(div_magnitude / 2.0, 6))
+            else:
+                score = 0.0
+        else:
+            # Fallback: use precomputed divergence feature with old extreme-gate stripped.
+            if price_slope > 0 and divergence > 0:
+                direction = "short"
+            elif price_slope < 0 and divergence > 0:
+                direction = "long"
+            score = clamp01(divergence) if direction != "neutral" else 0.0
+            score = round(score, 6)
+
         return AgentScore(
             agent=self.name,
-            score=round(score, 6),
+            score=score,
             direction=direction,
-            deterministic_score=round(score, 6),
+            deterministic_score=score,
             metadata={
-                "cvd_slope_10": f(feats.get("cvd_slope_10")),
-                "divergence_type": div_type,
-                "pr_cvd_divergence": round(divergence, 6),
+                "price_slope_bps": round(price_slope, 4),
+                "cvd_slope_10": cvd_slope,
+                "pr_cvd_divergence": round(divergence, 6) if divergence is not None else None,
+                "divergence_type": "bearish" if direction == "short" else (
+                    "bullish" if direction == "long" else "none"
+                ),
             },
         )

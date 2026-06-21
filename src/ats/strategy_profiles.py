@@ -36,16 +36,62 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "max_total_margin_pct": 0.60,
             "max_portfolio_risk_pct": 0.03,
             "min_rr": 1.0,                 # accept ~1:1 — scalps take quick, nearby targets
-            "min_stop_atr_mult": 0.5,      # allow tight stops (relax the noise-stop guard)
+            # Stops were 1.0 ATR (swept by noise → 69% stop-outs) then widened to 1.5. Iter 8:
+            # tighten to 1.3. With the iter7 profit-lock arming on the FAVORABLE side, the only
+            # thing the stop distance controls now is how far an adverse-from-entry loser runs
+            # before it's cut — the 29 unprotected losers (−259% margin) were the entire residual
+            # loss. 1.3 ATR shrinks each loser ~13% and lifts RR (2.0/1.3 ≈ 1.54).
+            "min_stop_atr_mult": 1.3,
+            # Pull the take-profit in from 3.0→2.0 ATR so the scale-out-at-TP1 leg actually
+            # banks a win (the 3-ATR target was tagged on ~3% of trades). With the 1.5-ATR
+            # stop this is RR≈1.33, still clearing the scalper min_rr (1.0).
+            "reward_atr_mult": 2.0,
         },
         "plan": {
             "max_setups_per_plan": 3,
-            "plan_refresh_bars": 8,        # re-think the plan more often (~2h on 15m)
+            # Iter 7: replan every ~3h (was 6/~1.5h). The fast 6-bar churn re-created plans
+            # constantly and fed marginal entries; slow it back down so only fresh, qualified
+            # setups fire.
+            "plan_refresh_bars": 12,
+            # Iter 7: revert the confidence loosening (0.50→0.60). The loosen flooded the book
+            # with immediate-adverse entries — 33 stop-outs at -10.9% margin each (-360% total)
+            # and killed the previously-profitable short book. The stop-loss bleed is an
+            # entry-quality problem, so raise the conviction floor.
+            "signal_min_confidence": 0.60,
+            # Iter 3: entry zones now sit on the pullback side (sell rallies / buy dips), so the
+            # momentum confirmation (require decision bar to close WITH the trade) directly
+            # fights the design — a bounce-fill closes UP, which the gate would reject. Turn it
+            # off; the pullback location is the quality filter now.
+            "entry_confirmation_enabled": False,
+            # Drop trades that fight the 4h trend — the biggest BTC-replay loss bucket was
+            # 15m longs taken inside a 4h downtrend (bull-low/chop drift).
+            "htf_trend_filter": True,
+            # Iter 2: the HTF-exhaustion relief re-opened mean-reversion longs on every
+            # oversold bounce inside the 4h downtrend — knife-catches that were the single
+            # worst loss bucket (-92.8% margin). Turn it off so the gate stays trend-aligned.
+            "counter_trend_on_htf_exhaustion": False,
         },
         "exits": {
             "max_hold_bars": 8,            # ~2h on 15m; scalps don't marinate (>0 = time-stop ON)
             "trail_atr_mult": 1.0,         # trail closer to lock small gains fast
             "scale_out_frac": 0.5,         # bank half at the first target, ride the rest
+            # Iter 1: the default early protection arms a 2-ATR trail at +1 ATR favorable, so a
+            # trade that reaches +1 ATR can still reverse 2 ATR into a -1 ATR LOSS — it converts
+            # would-be small winners into losers (the win-rate sink). For a scalper, lock
+            # no-loss instead: jump the stop to breakeven once +1 ATR (and >2x cost) is earned.
+            "early_stop_mode": "breakeven",
+            "sideways_early_stop_mode": "breakeven",
+            # Iter 6: arm the no-loss lock sooner. At +1.0 ATR many trades reverse before they
+            # ever protect; +0.6 ATR catches more of them at breakeven (a scratch beats a -1.5
+            # ATR stop) — the direct win-rate lever. Drop the profit floor to 1x cost so the
+            # earlier arm actually fires in low-ATR bars instead of being gated out.
+            "breakeven_arm_atr": 0.6,
+            "breakeven_arm_cost_mult": 1.0,
+            # Iter 7: profit-lock the early arm. Parking the stop at cost-breakeven scratched
+            # 94/178 trades to ~0% — non-wins that crushed win rate to 22%. Lock +0.2 ATR of
+            # real profit beyond cost-breakeven so an armed-then-retraced trade exits as a
+            # small WIN, not flat. The chandelier trail still ratchets above this floor.
+            "breakeven_lock_atr": 0.2,
         },
         "observer": {
             "observe_enabled": False,
@@ -67,7 +113,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "risk_per_trade_pct": 0.025,
             "max_margin_pct_per_trade": 0.20,
             "max_total_margin_pct": 0.60,
-            "max_portfolio_risk_pct": 0.03,
+            "max_portfolio_risk_pct": 0.01,
             "min_rr": 1.0,
             "min_stop_atr_mult": 0.5,
         },

@@ -69,6 +69,7 @@ def synthesize(
     min_stop_atr_mult: float,
     fee_bps: float,
     slippage_bps: float,
+    reward_atr_mult: float = 3.0,
     preferred_direction: str | None = None,
     log=None,
 ) -> Signal | None:
@@ -102,7 +103,7 @@ def synthesize(
     if close is None or atr is None or atr <= 0:
         _reject(log, "no_price_or_atr", agent_scores)
         return None
-    entry_zone = default_band(close, atr)
+    entry_zone = default_band(close, atr, direction)
     fvg_override = False
 
     # 6. FVG entry-zone override — the only single-agent shape change.
@@ -121,6 +122,7 @@ def synthesize(
         min_stop_atr_mult=min_stop_atr_mult,
         fee_bps=fee_bps,
         slippage_bps=slippage_bps,
+        reward_atr_mult=reward_atr_mult,
     )
 
     # 7. RR floor (scalper min_rr, not the spec's hardcoded 2.0).

@@ -22,6 +22,7 @@ class ExitPolicy:
     exit_mode: str
     scale_out_frac: float
     trail_atr_mult: float
+    trail_mode: str
     breakeven_requires_tp1: bool
     trail_after_tp1_only: bool
     early_stop_mode: str
@@ -40,6 +41,7 @@ def exit_policy_for_regime(regime_cell: str | None) -> ExitPolicy:
             exit_mode="range",
             scale_out_frac=settings.exits.sideways_scale_out_frac,
             trail_atr_mult=settings.exits.sideways_trail_atr_mult,
+            trail_mode=settings.exits.sideways_trail_mode,
             breakeven_requires_tp1=settings.exits.sideways_breakeven_requires_tp1,
             trail_after_tp1_only=settings.exits.sideways_trail_after_tp1_only,
             early_stop_mode=settings.exits.sideways_early_stop_mode,
@@ -51,6 +53,7 @@ def exit_policy_for_regime(regime_cell: str | None) -> ExitPolicy:
         exit_mode="trend",
         scale_out_frac=settings.exits.scale_out_frac,
         trail_atr_mult=settings.exits.trail_atr_mult,
+        trail_mode=settings.exits.trail_mode,
         breakeven_requires_tp1=False,
         trail_after_tp1_only=False,
         early_stop_mode=settings.exits.early_stop_mode,
@@ -65,6 +68,7 @@ def exit_policy_metadata(policy: ExitPolicy) -> dict[str, Any]:
         "exit_mode": policy.exit_mode,
         "exit_scale_out_frac": policy.scale_out_frac,
         "exit_trail_atr_mult": policy.trail_atr_mult,
+        "exit_trail_mode": policy.trail_mode,
         "exit_breakeven_requires_tp1": policy.breakeven_requires_tp1,
         "exit_trail_after_tp1_only": policy.trail_after_tp1_only,
         "exit_early_stop_mode": policy.early_stop_mode,
@@ -82,6 +86,7 @@ def exit_policy_from_metadata(md: dict[str, Any] | None) -> ExitPolicy:
             exit_mode=str(mode),
             scale_out_frac=float(md.get("exit_scale_out_frac", settings.exits.scale_out_frac)),
             trail_atr_mult=float(md.get("exit_trail_atr_mult", settings.exits.trail_atr_mult)),
+            trail_mode=str(md.get("exit_trail_mode", settings.exits.trail_mode)),
             breakeven_requires_tp1=bool(md.get("exit_breakeven_requires_tp1", False)),
             trail_after_tp1_only=bool(md.get("exit_trail_after_tp1_only", False)),
             early_stop_mode=str(md.get("exit_early_stop_mode", settings.exits.early_stop_mode)),

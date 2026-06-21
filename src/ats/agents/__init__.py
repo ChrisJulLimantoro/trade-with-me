@@ -13,6 +13,7 @@ from ats.agents.basis import BasisAgent
 from ats.agents.cross_venue import CrossVenueAgent
 from ats.agents.cvd import CvdAgent
 from ats.agents.funding import FundingAgent
+from ats.agents.htf_trend import HtfTrendAgent
 from ats.agents.liquidity import LiquidityAgent
 from ats.agents.momentum import MomentumAgent
 from ats.agents.price_action import PriceActionAgent
@@ -29,6 +30,7 @@ AGENTS = [
     CrossVenueAgent(),
     BasisAgent(),
     CvdAgent(),
+    HtfTrendAgent(),
 ]
 
 __all__ = [
@@ -39,6 +41,7 @@ __all__ = [
     "CrossVenueAgent",
     "CvdAgent",
     "FundingAgent",
+    "HtfTrendAgent",
     "LiquidityAgent",
     "MomentumAgent",
     "PriceActionAgent",

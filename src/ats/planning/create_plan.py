@@ -28,6 +28,7 @@ from ats.llm.schemas import InvalidationRule, LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
 from ats.planning.context import (
     _htf_rsi_state,
+    _htf_trend,
     build_planner_context,
     preferred_direction,
 )
@@ -264,6 +265,32 @@ async def build_envelope(
         d for d in ("long", "short")
         if regime_allows(regime_cell, d, htf_rsi_state=htf_rsi_state)
     ]
+
+    # Higher-timeframe trend filter (#trend-align): DROP the direction that fights the 4h
+    # trend, but never force the other side (forcing counter-regime shorts on 1h bounces
+    # loses — the agents must still vote the trade). The 1h classifier tags low-vol drift
+    # inside a 4h downtrend as "bull-low" and forces longs into the fade; removing them
+    # leaves the high-quality agent-chosen shorts. An HTF RSI extreme against the trend keeps
+    # the mean-reversion side (oversold→long, overbought→short). When dropping empties the
+    # gate (e.g. bull-low + 4h-down), no setup is taken that bar — exactly the intent.
+    if settings.plan.htf_trend_filter:
+        htf_trend = _htf_trend(higher_timeframes)
+        rsi_state = htf_rsi_state or ""
+        if (
+            htf_trend == "down"
+            and "long" in allowed_directions
+            and not rsi_state.endswith("oversold")
+        ):
+            allowed_directions.remove("long")
+        elif (
+            htf_trend == "up"
+            and "short" in allowed_directions
+            and not rsi_state.endswith("overbought")
+        ):
+            allowed_directions.remove("short")
+        log.info(
+            "htf_trend_filter", htf_trend=htf_trend, allowed_directions=allowed_directions
+        )
 
     # Episodic memory: surface the most-similar prior post-mortems as non-binding context.
     prior_lessons: list[dict[str, Any]] = []

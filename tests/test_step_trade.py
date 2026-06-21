@@ -6,7 +6,7 @@ from datetime import UTC, datetime, timedelta
 
 import pytest
 
-from ats.execution.reconcile import TradeState, breakeven_stop, step_trade
+from ats.execution.reconcile import TradeState, _trail_anchor, breakeven_stop, step_trade
 from ats.risk.manager import regime_allows
 
 T0 = datetime(2026, 1, 1, tzinfo=UTC)
@@ -280,6 +280,85 @@ def test_trailing_stop_locks_in_profit() -> None:
     out = _step(LONG, _c(110, 106, 107), trailed.state, trail_atr_mult=1.0, atr=5.0)
     assert out.closed and out.exit_result.exit_reason == "trail"
     assert out.exit_result.pnl_pct == pytest.approx(0.5 * 0.10 + 0.5 * 0.07)
+
+
+# --- chandelier trail anchor ------------------------------------------------------------
+
+
+def test_trail_anchor_resolver() -> None:
+    # close mode always returns the bar close; chandelier returns the high-water extreme
+    # once seeded and falls back to the close until then.
+    assert _trail_anchor("close", "long", 100.0, 116.0) == pytest.approx(100.0)
+    assert _trail_anchor("chandelier", "long", 100.0, 116.0) == pytest.approx(116.0)
+    assert _trail_anchor("chandelier", "short", 100.0, 84.0) == pytest.approx(84.0)
+    assert _trail_anchor("chandelier", "long", 100.0, None) == pytest.approx(100.0)
+
+
+def test_chandelier_runner_trails_off_high_water_mark() -> None:
+    # TP1 fills (high 111 ≥ 110): scale out, stop→breakeven(100), high-water = 111.
+    after_tp1 = _step(LONG, _c(111, 99, 109), TradeState()).state
+    assert after_tp1.extreme_favorable_px == pytest.approx(111.0)
+    # Runner pushes to a 116 high but closes off it at 112. Chandelier anchors off the 116
+    # high: stop -> 116 - 1*ATR(5) = 111.
+    trailed = _step(
+        LONG, _c(116, 108, 112), after_tp1, trail_atr_mult=1.0, trail_mode="chandelier", atr=5.0
+    )
+    assert trailed.state.extreme_favorable_px == pytest.approx(116.0)
+    assert trailed.state.working_stop == pytest.approx(111.0)
+    assert any("trail stop" in note and "chandelier" in note for note in trailed.notes)
+    # Close-anchoring on the SAME bar only reaches 112 - 5 = 107 — looser by design.
+    close_anchored = _step(
+        LONG, _c(116, 108, 112), after_tp1, trail_atr_mult=1.0, trail_mode="close", atr=5.0
+    )
+    assert close_anchored.state.working_stop == pytest.approx(107.0)
+    # A later inside bar (no new high) must NOT pull the chandelier stop back down.
+    held = _step(
+        LONG, _c(114, 109, 110), trailed.state, trail_atr_mult=1.0, trail_mode="chandelier", atr=5.0
+    )
+    assert held.state.working_stop == pytest.approx(111.0)
+
+
+def test_chandelier_runner_short_mirror() -> None:
+    # TP1 fills (low 89 ≤ 90): scale out, stop→breakeven(100), low-water = 89.
+    after_tp1 = _step(SHORT, _c(100, 89, 91), TradeState()).state
+    assert after_tp1.extreme_favorable_px == pytest.approx(89.0)
+    # Runner pushes to an 84 low: chandelier anchors off it -> stop = 84 + 1*ATR(5) = 89.
+    trailed = _step(
+        SHORT, _c(92, 84, 88), after_tp1, trail_atr_mult=1.0, trail_mode="chandelier", atr=5.0
+    )
+    assert trailed.state.extreme_favorable_px == pytest.approx(84.0)
+    assert trailed.state.working_stop == pytest.approx(89.0)
+    # Close-anchoring would only reach 88 + 5 = 93 — looser.
+    close_anchored = _step(
+        SHORT, _c(92, 84, 88), after_tp1, trail_atr_mult=1.0, trail_mode="close", atr=5.0
+    )
+    assert close_anchored.state.working_stop == pytest.approx(93.0)
+
+
+def test_chandelier_early_trail_before_tp1() -> None:
+    # Pre-TP1 trail armed (excursion 7 ≥ 1*ATR(5)); chandelier anchors off the 107 high:
+    # stop -> 107 - 2*ATR(5) = 97, vs close-anchoring which would stay pinned at the base 95.
+    step = _step(
+        LONG,
+        _c(107, 100, 103),
+        TradeState(),
+        early_stop_mode="trail",
+        early_trail_arm_atr=1.0,
+        early_trail_atr_mult=2.0,
+        trail_mode="chandelier",
+        atr=5.0,
+    )
+    assert step.state.trail_armed is True
+    assert step.state.working_stop == pytest.approx(97.0)
+    assert any("early_trail stop" in note and "chandelier" in note for note in step.notes)
+
+
+def test_trade_state_metadata_round_trips_extreme_and_tolerates_missing() -> None:
+    # New field survives a metadata round-trip...
+    st = TradeState(extreme_favorable_px=116.0)
+    assert TradeState.from_metadata(st.to_metadata()).extreme_favorable_px == pytest.approx(116.0)
+    # ...and trades opened before this change (no key) deserialize to None, not a crash.
+    assert TradeState.from_metadata({"remaining_frac": 1.0}).extreme_favorable_px is None
 
 
 def test_range_mode_does_not_trail_before_tp1() -> None:

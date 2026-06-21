@@ -13,7 +13,7 @@ from ats.synthesis.synthesizer import Signal
 
 def test_weights_sum_to_one() -> None:
     assert round(sum(WEIGHTS.values()), 9) == 1.0
-    assert len(WEIGHTS) == 8
+    assert len(WEIGHTS) == 9
 
 
 def test_renormalize_after_drop_sums_to_one() -> None:

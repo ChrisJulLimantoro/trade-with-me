@@ -76,7 +76,8 @@ async def advance_trade(
             f"trade={str(trade.trade_id)[:8]} mode={policy.exit_mode} "
             f"early={policy.early_stop_mode} "
             f"be_after_tp1={policy.breakeven_requires_tp1} "
-            f"trail_atr={policy.trail_atr_mult:g} tp1_hit={state.tp_index > 0}"
+            f"trail_atr={policy.trail_atr_mult:g} trail={policy.trail_mode} "
+            f"tp1_hit={state.tp_index > 0}"
         )
     # Review-gate the time-stop only when the exit manager is actually available.
     can_review = (
@@ -98,12 +99,14 @@ async def advance_trade(
             expires_at=expires_at,
             scale_out_frac=policy.scale_out_frac,
             trail_atr_mult=policy.trail_atr_mult,
+            trail_mode=policy.trail_mode,
             atr=atr,
             early_stop_mode=policy.early_stop_mode,
             early_trail_arm_atr=policy.early_trail_arm_atr,
             early_trail_atr_mult=policy.early_trail_atr_mult,
             breakeven_arm_atr=settings.exits.breakeven_arm_atr,
             breakeven_arm_cost_mult=settings.exits.breakeven_arm_cost_mult,
+            breakeven_lock_atr=settings.exits.breakeven_lock_atr,
             breakeven_requires_tp1=policy.breakeven_requires_tp1,
             trail_after_tp1_only=policy.trail_after_tp1_only,
             cost_bps=cost_bps,

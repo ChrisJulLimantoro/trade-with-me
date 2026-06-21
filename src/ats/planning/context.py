@@ -203,6 +203,36 @@ def _htf_rsi_state(higher_timeframes: dict[str, Any]) -> str:
     return "neutral"
 
 
+def _htf_trend(higher_timeframes: dict[str, Any]) -> str | None:
+    """Dominant trend from the most-recent CLOSED 4h (then 1h) bar: price vs EMA50.
+
+    The 4h EMA50 is ~8 days of context, so its side is a stable macro-trend read that the
+    15m agents (momentum-myopic) routinely fight: they kept voting long on intraday bounces
+    inside a 4h downtrend — the dominant BTC-replay loss bucket. Returns ``"up"`` when price
+    is above the slow EMA, ``"down"`` below, ``None`` only when neither chart has an EMA50
+    yet (early in a replay window). The plan-time gate makes this the primary direction.
+    """
+    for tf in ("4h", "1h"):
+        feats = ((higher_timeframes.get(tf) or {}).get("features")) or {}
+        close = _f(feats.get("close")) or _f(feats.get("price"))
+        ema50 = _f(feats.get("ema_50"))
+        if close is None or ema50 is None:
+            continue
+        # Prefer the slow EMA stack (ema_50 vs ema_200): in a sustained downtrend the stack
+        # stays bearish through intraday bounces, whereas close-vs-ema_50 flips to "up" on every
+        # pop above the fast EMA and leaked counter-trend longs into the fade (the dominant loss
+        # bucket). Fall back to close-vs-ema_50 only when ema_200 isn't warm yet.
+        ema200 = _f(feats.get("ema_200"))
+        if ema200 is not None:
+            # Slow EMA stack (ema_50 vs ema_200): stays bearish through intraday bounces so the
+            # gate blocks counter-trend longs across the whole established downtrend. (Adding a
+            # `close >= ema_200` term was tried and regressed: it unblocks shorts too early in the
+            # choppy top, where they whipsaw — iter5 shorts +36% → -16%. Reverted.)
+            return "up" if ema50 >= ema200 else "down"
+        return "up" if close > ema50 else "down"
+    return None
+
+
 def preferred_direction(
     regime_cell: str | None,
     exhaustion_ctx: dict[str, Any],

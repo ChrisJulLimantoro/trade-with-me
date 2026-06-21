@@ -84,7 +84,9 @@ def test_fvg_override_skipped_below_threshold() -> None:
     scores["price_action"] = _sc("price_action", 0.5, "long", fvg_zone=[100.0, 100.6])
     sig = synthesize(scores, {}, _FEATURES, [], **_KW)
     assert sig is not None and sig.fvg_override is False
-    assert sig.entry_zone == [99.5, 100.5]  # default close ± 0.25 ATR band
+    # Pullback band for a long sits BELOW close: fill (zone high) = close - 0.25 ATR = 99.5,
+    # extending another 2×0.25 ATR down to 98.5 (limit-buy-the-dip).
+    assert sig.entry_zone == [98.5, 99.5]
 
 
 def test_identical_input_is_byte_identical() -> None:
