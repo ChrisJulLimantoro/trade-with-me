@@ -305,6 +305,19 @@ async def build_envelope(
             allowed_directions=allowed_directions,
         )
 
+    # Sideways short gate: companion to the long gate. With honest fills the side-* shorts also
+    # whipsaw (34% win) — no edge in chop on either side. With both flags on, skip side-* entirely.
+    if (
+        settings.plan.sideways_block_shorts
+        and (regime_cell or "").lower().startswith("side")
+        and "short" in allowed_directions
+    ):
+        allowed_directions.remove("short")
+        log.info(
+            "sideways_block_shorts", regime_cell=regime_cell,
+            allowed_directions=allowed_directions,
+        )
+
     # Episodic memory: surface the most-similar prior post-mortems as non-binding context.
     prior_lessons: list[dict[str, Any]] = []
     if settings.memory_enabled:

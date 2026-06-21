@@ -181,6 +181,12 @@ class PlanConfig(BaseModel):
     # -70% margin) while side-low shorts were ~neutral — so this gate removes the bleed without
     # killing the (with-bearish-bias) short side or the trade-count floor.
     sideways_block_longs: bool = False
+    # Drop SHORT setups in sideways ("side-*") regimes (default OFF). Companion to
+    # sideways_block_longs. Under the look-ahead-corrected fills the side-low shorts that were
+    # ~neutral became a clear sink (35t / 34% win / -32% margin): a trend-pullback short has no
+    # edge in low-vol chop either — the limit fills on a bounce that simply chops back. With both
+    # flags ON the engine takes NO trades in side-* regimes (skip chop entirely).
+    sideways_block_shorts: bool = False
     # Slower charts whose most-recent CLOSED bar is shown to the strategist for bias and
     # direction only. Executable rules still reference base-timeframe features. Empty = off.
     context_timeframes: list[str] = ["1h", "4h"]
