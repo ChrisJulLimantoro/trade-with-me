@@ -48,7 +48,7 @@ async def execute_setup(
     plan: Plan,
     setup: Setup,
     setup_d: dict[str, Any],
-    ev: Any,
+    entry_price: float,
     feature_row: dict[str, Any],
     now: datetime,
     open_positions: list[dict[str, Any]],
@@ -56,17 +56,19 @@ async def execute_setup(
     *,
     tf: str,
 ) -> None:
-    """Size and open a detected setup deterministically.
+    """Size and open a detected setup deterministically at ``entry_price``.
 
-    The per-setup LLM confirm is retired (Part 2): the bounded plan-time adjudication already
-    vetoed-or-sized this setup before it was persisted, so a detection that clears the
-    deterministic gates (rule engine + regime + entry-confirmation) goes straight to the risk
-    manager and opens at full size. No LLM call happens on the entry path.
+    ``entry_price`` is the fill the caller resolved: a resting limit price (wick_limit, filled
+    on a later bar) or the decision bar's close (close mode). The per-setup LLM confirm is
+    retired (Part 2): the bounded plan-time adjudication already vetoed-or-sized this setup
+    before it was persisted, so a detection that clears the deterministic gates (rule engine +
+    regime + entry-confirmation) goes straight to the risk manager and opens at full size. No
+    LLM call happens on the entry path.
     """
     raw_atr = feature_row.get("atr_14")
     decision = assess(
         setup_d,
-        price=ev.price,
+        price=entry_price,
         open_positions=open_positions,
         equity_usd=settings.risk.paper_equity_usd,
         risk_per_trade_pct=settings.risk.risk_per_trade_pct,
@@ -89,7 +91,7 @@ async def execute_setup(
     trade_id = await open_paper_trade(
         session,
         {**setup_d, "trade_metadata": None},
-        entry_price=ev.price,
+        entry_price=entry_price,
         entry_time=now,
         size_pct=decision.size_pct,
         reasons=["detected", *decision.reasons],

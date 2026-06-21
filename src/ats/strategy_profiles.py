@@ -36,11 +36,10 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "max_total_margin_pct": 0.60,
             "max_portfolio_risk_pct": 0.03,
             "min_rr": 1.0,                 # accept ~1:1 — scalps take quick, nearby targets
-            # Stops were 1.0 ATR (swept by noise → 69% stop-outs) then widened to 1.5. Iter 8:
-            # tighten to 1.3. With the iter7 profit-lock arming on the FAVORABLE side, the only
-            # thing the stop distance controls now is how far an adverse-from-entry loser runs
-            # before it's cut — the 29 unprotected losers (−259% margin) were the entire residual
-            # loss. 1.3 ATR shrinks each loser ~13% and lifts RR (2.0/1.3 ≈ 1.54).
+            # Stops were 1.0 ATR (swept by noise → 69% stop-outs) then widened to 1.5, tightened
+            # to 1.3 (iter8). Iter 9 tried 1.2 on the full 2026 window → −$470 (too tight: clips
+            # winners into losers, win 70%→64%). 1.3 is the optimum; the residual bleed is an
+            # entry-quality/direction problem, not stop distance.
             "min_stop_atr_mult": 1.3,
             # Pull the take-profit in from 3.0→2.0 ATR so the scale-out-at-TP1 leg actually
             # banks a win (the 3-ATR target was tagged on ~3% of trades). With the 1.5-ATR
@@ -70,10 +69,20 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # oversold bounce inside the 4h downtrend — knife-catches that were the single
             # worst loss bucket (-92.8% margin). Turn it off so the gate stays trend-aligned.
             "counter_trend_on_htf_exhaustion": False,
+            # Iter 12: regime-PnL breakdown on the full-2026 window showed the strategy makes
+            # all its money in bear-low (179t/79%/+133%) and loses only in side-low (90t/42%/
+            # -65%) — driven entirely by side-low LONGs (43t/40%/-70%). The pullback entries
+            # whipsaw in low-vol chop. Drop sideways longs; keep the ~neutral sideways shorts.
+            "sideways_block_longs": True,
         },
         "exits": {
             "max_hold_bars": 8,            # ~2h on 15m; scalps don't marinate (>0 = time-stop ON)
-            "trail_atr_mult": 1.0,         # trail closer to lock small gains fast
+            # Iter 10: widen the runner trail 1.0 → 1.5. The +0.2 ATR profit-lock floor (iter7)
+            # already guarantees an armed trade exits a winner, so a wider trail can't turn a
+            # winner into a loss — it only lets winners ride the (large) trends in this window
+            # further before the chandelier cuts them. Targets the +2.9%-avg trail bucket: more
+            # runners reach the bigger trail/tp exits instead of scratching out at +0.2 ATR.
+            "trail_atr_mult": 1.5,
             "scale_out_frac": 0.5,         # bank half at the first target, ride the rest
             # Iter 1: the default early protection arms a 2-ATR trail at +1 ATR favorable, so a
             # trade that reaches +1 ATR can still reverse 2 ATR into a -1 ATR LOSS — it converts

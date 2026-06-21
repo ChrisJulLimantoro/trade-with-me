@@ -126,11 +126,16 @@ class PlanConfig(BaseModel):
     # floor the adjudicated (post-delta) confidence must still clear or the trade is vetoed.
     signal_min_confidence: float = 0.55
     max_setups_per_plan: int = 2
-    # Setups are resting limit orders at a narrow entry_zone; a limit fills when price
-    # TOUCHES the zone, not only when a bar CLOSES inside it. "close" mode requires a 15m
-    # bar to close inside a ~0.1%-wide band, which almost never happens and starves the
-    # detector of fills (measured ~40% of setups ever close-in-zone vs ~68% that touch it).
-    # "wick_limit" fills at the zone edge on a touch — realistic and far higher hit rate.
+    # How a detected setup turns into a fill:
+    #  - "close": market-on-close. The decision bar closes inside the entry_zone → fill at that
+    #    close. Deciding on and filling at the same close is executable (no look-ahead).
+    #  - "wick_limit": a real resting limit order. The thesis (hard+soft rules) is validated on a
+    #    CLOSED bar, which ARMS a resting limit at the zone edge; the fill is then deferred to a
+    #    LATER bar that trades through that limit (orchestrator Phase 1). The fill never consults
+    #    the filling bar's own close. NOTE: an earlier implementation armed AND filled inside the
+    #    same closed bar — that booked entries at intrabar wicks authorized by that bar's own
+    #    close (look-ahead), which inflated backtest win rate and did not survive live. The
+    #    arm→pending→fill split removes it; re-baseline any tuning done before this change.
     entry_trigger_mode: Literal["close", "wick_limit"] = "wick_limit"
     # Deterministic entry-confirmation gate (#1, default OFF). When on, a detected setup only
     # fills if, on the decision bar's close, price is actually turning in the trade's direction
@@ -170,6 +175,12 @@ class PlanConfig(BaseModel):
     # oversold 4h still permits a mean-reversion long). Kills the dominant BTC-replay loss
     # bucket: 15m "bull-low"/chop longs taken inside a 4h downtrend.
     htf_trend_filter: bool = False
+    # Drop LONG setups in sideways ("side-*") regimes (default OFF). A trend-pullback strategy
+    # has no long edge in low-vol chop: the pullback entries are just noise and get whipsawed.
+    # In the full-2026 BTC replay, side-low LONGs were the single worst bucket (43t / 40% win /
+    # -70% margin) while side-low shorts were ~neutral — so this gate removes the bleed without
+    # killing the (with-bearish-bias) short side or the trade-count floor.
+    sideways_block_longs: bool = False
     # Slower charts whose most-recent CLOSED bar is shown to the strategist for bias and
     # direction only. Executable rules still reference base-timeframe features. Empty = off.
     context_timeframes: list[str] = ["1h", "4h"]

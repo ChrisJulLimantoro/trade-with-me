@@ -61,14 +61,16 @@ async def feature_rows_since(
 ) -> list[dict[str, Any]]:
     """Ordered feature+candle rows for replay (oldest → newest).
 
-    Timing note: each row is labelled with its bar's ``open_time`` (= T).  The features
-    (RSI, EMA, MACD …) are computed from that bar's *close* at T+tf, so the decision
-    loop uses close-based indicators but timestamps the decision as T (the open).  This
-    means entries are filled at the *close* of the bar being evaluated — slightly
-    optimistic vs. reality (real fill = open of the next bar), but the bias is consistent
-    across all trades and does not explain losses.  It does NOT constitute look-ahead
-    bias in the usual sense because the bar's close is already known before the replay
-    engine processes it; in a live system the same features are only available at T+tf.
+    Timing note: each row is labelled with its bar's ``open_time`` (= T). The features
+    (RSI, EMA, MACD …) are computed from that bar's *close* at T+tf, so a decision made on
+    a row uses indicators that are only known once the bar has closed.
+
+    "close" entry mode fills at that same close — executable, because acting at the close
+    you just decided on is something a live system can do. "wick_limit" mode must NOT fill
+    on the deciding bar: doing so books a fill at an intrabar wick that the bar has already
+    retraced from by its close, while the authorization to fill came from that same close —
+    a price unreachable live. That is why wick_limit ARMS a resting limit on the deciding
+    bar and only fills on a *later* bar that trades through it (orchestrator Phase 1).
     """
     sql = _FEATURE_SQL + " AND f.open_time >= :since"
     params: dict[str, Any] = {"symbol": symbol, "tf": tf, "since": since}

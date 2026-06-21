@@ -233,7 +233,9 @@ class Setup(Base):
     direction: Mapped[str] = mapped_column(String, nullable=False)  # long|short
     status: Mapped[str] = mapped_column(
         String, nullable=False, default="proposed"
-    )  # proposed|active|detected|expired|invalidated|realized|rejected
+    )  # proposed|active|armed|detected|expired|invalidated|realized|rejected
+    # armed = wick_limit thesis passed on a closed bar; a resting limit now waits for a
+    # later bar to trade through the zone edge before it fills (see orchestrator Phase 1).
     entry_zone_low: Mapped[float] = mapped_column(Numeric, nullable=False)
     entry_zone_high: Mapped[float] = mapped_column(Numeric, nullable=False)
     take_profit: Mapped[list[float]] = mapped_column(JSONB, nullable=False)

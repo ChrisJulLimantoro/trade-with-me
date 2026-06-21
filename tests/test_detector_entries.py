@@ -70,6 +70,7 @@ def _setup(
         invalidation_rules=[],
         expires_at=datetime(2026, 1, 1) + timedelta(days=1),
         detected_at=None,
+        setup_metadata={},
     )
 
 
@@ -104,6 +105,9 @@ async def _patch_detector(
     async def reconcile(*_args: Any, **_kwargs: Any) -> None:
         return None
 
+    async def entry_bar_reconcile(*_args: Any, **_kwargs: Any) -> None:
+        return None
+
     async def invalidation(*_args: Any, **_kwargs: Any) -> bool:
         return False
 
@@ -126,13 +130,16 @@ async def _patch_detector(
     monkeypatch.setattr(orchestrator.state, "plan_setups", plan_setups)
     monkeypatch.setattr(orchestrator.state, "open_positions", open_positions)
     monkeypatch.setattr(orchestrator, "reconcile_open_trades", reconcile)
+    monkeypatch.setattr(orchestrator, "_reconcile_entry_bar", entry_bar_reconcile)
     monkeypatch.setattr(orchestrator, "handle_invalidation", invalidation)
     monkeypatch.setattr(entries, "assess", approve)
     monkeypatch.setattr(entries, "open_paper_trade", open_trade)
     return opened_entries
 
 
-async def test_wick_triggered_setup_opens_at_simulated_entry_price(monkeypatch) -> None:
+async def test_wick_setup_arms_without_filling_on_the_signal_bar(monkeypatch) -> None:
+    # The look-ahead guarantee: a wick_limit setup must NOT fill on the bar that arms it —
+    # even when that bar's range already trades through the limit. The order only rests.
     monkeypatch.setattr(settings.plan, "entry_trigger_mode", "wick_limit")
     plan_id = uuid.uuid4()
     setups = [_setup(plan_id=plan_id, direction="long", zone=(101.0, 105.0))]
@@ -148,7 +155,40 @@ async def test_wick_triggered_setup_opens_at_simulated_entry_price(monkeypatch) 
             "price": 100.0,
             "close": 100.0,
             "low": 99.0,
-            "high": 102.0,
+            "high": 106.0,  # spans the 105 limit, yet must still only ARM
+        },
+        prev_row=None,
+    )
+
+    assert report.opened == 0
+    assert opened_entries == []
+    assert setups[0].status == "armed"
+
+
+async def test_armed_setup_fills_on_a_later_touch_at_limit_price(monkeypatch) -> None:
+    monkeypatch.setattr(settings.plan, "entry_trigger_mode", "wick_limit")
+    plan_id = uuid.uuid4()
+    setups = [_setup(plan_id=plan_id, direction="long", zone=(101.0, 105.0))]
+    opened_entries = await _patch_detector(monkeypatch, setups)
+    base = datetime(2026, 1, 1)
+
+    # Bar 1 — thesis passes → arm a resting limit at the zone high (105); no fill yet.
+    await orchestrator.evaluate_now(
+        FakeSession(), None, symbol="BTCUSDT", tf="15m",
+        feature_row={
+            "open_time": base, "price": 100.0, "close": 100.0, "low": 99.0, "high": 100.0,
+        },
+        prev_row=None,
+    )
+    assert setups[0].status == "armed"
+    assert opened_entries == []
+
+    # Bar 2 — a later bar trades through the resting limit → fills at the limit price (105).
+    report = await orchestrator.evaluate_now(
+        FakeSession(), None, symbol="BTCUSDT", tf="15m",
+        feature_row={
+            "open_time": base + timedelta(minutes=15),
+            "price": 104.0, "close": 104.0, "low": 103.0, "high": 106.0,
         },
         prev_row=None,
     )

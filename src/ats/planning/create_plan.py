@@ -292,6 +292,19 @@ async def build_envelope(
             "htf_trend_filter", htf_trend=htf_trend, allowed_directions=allowed_directions
         )
 
+    # Sideways long gate: a trend-pullback strategy has no long edge in low-vol chop. Drop
+    # longs in any "side-*" regime so the engine only takes the (with-trend) short side there.
+    if (
+        settings.plan.sideways_block_longs
+        and (regime_cell or "").lower().startswith("side")
+        and "long" in allowed_directions
+    ):
+        allowed_directions.remove("long")
+        log.info(
+            "sideways_block_longs", regime_cell=regime_cell,
+            allowed_directions=allowed_directions,
+        )
+
     # Episodic memory: surface the most-similar prior post-mortems as non-binding context.
     prior_lessons: list[dict[str, Any]] = []
     if settings.memory_enabled:
