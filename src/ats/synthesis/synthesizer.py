@@ -13,7 +13,7 @@ from dataclasses import dataclass, field
 from ats.agents.base import AgentScore, clamp01, f
 from ats.synthesis.direction import direction_vote, score_variance, weighted_mean
 from ats.synthesis.reasons import render_reasons
-from ats.synthesis.sl_tp import compute_levels, default_band
+from ats.synthesis.sl_tp import adaptive_stop_mult, compute_levels, default_band
 
 
 @dataclass
@@ -70,6 +70,11 @@ def synthesize(
     fee_bps: float,
     slippage_bps: float,
     reward_atr_mult: float = 3.0,
+    pullback_atr_frac: float = 0.25,
+    adaptive_stop_enabled: bool = False,
+    stop_atr_wide: float = 0.0,
+    stop_vol_lo: float = 0.0,
+    stop_vol_hi: float = 0.0,
     preferred_direction: str | None = None,
     log=None,
 ) -> Signal | None:
@@ -103,8 +108,17 @@ def synthesize(
     if close is None or atr is None or atr <= 0:
         _reject(log, "no_price_or_atr", agent_scores)
         return None
-    entry_zone = default_band(close, atr, direction)
+    entry_zone = default_band(close, atr, direction, pullback_atr_frac=pullback_atr_frac)
     fvg_override = False
+
+    # Volatility-adaptive stop width: widen the stop in locally COMPRESSED volatility (low
+    # pr_atr — choppy ranges that whipsaw a tight stop) and keep it tight in locally EXPANDED
+    # volatility (high pr_atr — trend legs that pay off). pr_atr is the causal trailing ATR
+    # percentile rank. Falls back to the fixed min_stop_atr_mult when disabled or pr_atr is missing.
+    stop_mult = adaptive_stop_mult(
+        f(features.get("atr_pct")), min_stop_atr_mult, stop_atr_wide,
+        stop_vol_lo, stop_vol_hi, adaptive_stop_enabled,
+    )
 
     # 6. FVG entry-zone override — the only single-agent shape change.
     pa = scores.get("price_action")
@@ -119,7 +133,7 @@ def synthesize(
         close=close,
         atr=atr,
         entry_zone=entry_zone,
-        min_stop_atr_mult=min_stop_atr_mult,
+        min_stop_atr_mult=stop_mult,
         fee_bps=fee_bps,
         slippage_bps=slippage_bps,
         reward_atr_mult=reward_atr_mult,

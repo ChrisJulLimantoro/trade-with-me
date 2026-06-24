@@ -13,6 +13,22 @@ from ats.processing.normalize import percentile_rank
 if TYPE_CHECKING:
     from sqlalchemy.ext.asyncio import AsyncSession
 
+# Trend classification cut: |EMA-30 slope| must exceed this many %/day to read as a trend rather
+# than chop. A FIXED cut (the legacy 0.5) bakes in one volatility era — 0.5%/day looks like a
+# "trend" when BTC is calm but like "chop" when BTC is wild, so the same tape is labeled
+# differently across regimes and every downstream gate that keys off ``regime_cell`` drifts with
+# it. Instead, scale the cut by BTC's own realized vol: it equals the legacy 0.5 AT a reference
+# daily vol and moves proportionally with vol, so "trend vs chop" is a constant signal-to-noise
+# judgement. At the reference vol the classification is byte-identical to the legacy constant (no
+# BTC re-baseline at typical vol); it only diverges when vol is unusually high or low.
+_LEGACY_TREND_SLOPE_PCT_PER_DAY: float = 0.5
+# BTC's typical 30d realized daily vol (%/day): ~50% annualized / sqrt(252) ≈ 3.15. The reference
+# at which the adaptive threshold reproduces the legacy 0.5.
+_REFERENCE_DAILY_VOL_PCT: float = 3.15
+# Clamp the adaptive threshold so a vol spike/crash can't make every bar trend or every bar chop.
+_MIN_TREND_SLOPE_PCT_PER_DAY: float = 0.25
+_MAX_TREND_SLOPE_PCT_PER_DAY: float = 1.5
+
 
 def compute_regime(
     btc_1h_df: pd.DataFrame,
@@ -52,10 +68,22 @@ def compute_regime(
     last_pct = rv_pct_series.iloc[-1]
     vol_pct = float(last_pct) if not np.isnan(last_pct) else float("nan")
 
+    # Vol-adaptive trend cut: annualized realized vol → daily %/day (÷ sqrt(252)), scaled so the
+    # cut equals the legacy 0.5 at the reference vol, then clamped to a sane band. Falls back to
+    # the reference (→ legacy 0.5) when realized vol is unavailable.
+    daily_vol_pct = (current_rv / np.sqrt(252.0)) * 100.0 if current_rv > 0 else _REFERENCE_DAILY_VOL_PCT
+    trend_slope_threshold = float(
+        np.clip(
+            _LEGACY_TREND_SLOPE_PCT_PER_DAY * (daily_vol_pct / _REFERENCE_DAILY_VOL_PCT),
+            _MIN_TREND_SLOPE_PCT_PER_DAY,
+            _MAX_TREND_SLOPE_PCT_PER_DAY,
+        )
+    )
+
     # Trend
-    if slope_pct_per_day > 0.5:
+    if slope_pct_per_day > trend_slope_threshold:
         trend = "bull"
-    elif slope_pct_per_day < -0.5:
+    elif slope_pct_per_day < -trend_slope_threshold:
         trend = "bear"
     else:
         trend = "side"
@@ -84,6 +112,9 @@ def compute_regime(
         "trend": trend,
         "volatility": volatility,
         "regime_cell": f"{trend}-{volatility}",
+        # Diagnostic: the vol-adaptive cut used for this row (not persisted — the upsert ignores
+        # unused bind params). Lets a run show WHY a bar was labeled trend vs chop.
+        "trend_slope_threshold": trend_slope_threshold,
     }
 
 

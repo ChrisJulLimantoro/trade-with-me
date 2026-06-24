@@ -248,8 +248,10 @@ def assess(
                 ],
             )
 
-    # Fixed cap + scaling: the multiplier (<= 1) trims risk, never raises it past the cap.
-    eff_risk_pct = min(risk_per_trade_pct * float(size_multiplier), risk_per_trade_pct)
+    # Scaling: a confirm REDUCE trims risk (multiplier < 1); the LOOP5 volatility sizer may also
+    # raise it (multiplier > 1) to concentrate capital on higher-edge trades. Bounded to 2x the
+    # base risk; the margin / leverage / portfolio-risk caps below still bound absolute exposure.
+    eff_risk_pct = min(risk_per_trade_pct * float(size_multiplier), risk_per_trade_pct * 2.0)
     open_margin_usd = sum(_open_margin_usd(p, equity_usd) for p in open_positions)
     open_risk_usd = sum(_open_risk_usd(p) for p in open_positions)
     remaining_margin_usd = equity_usd * max_total_margin_pct - open_margin_usd

@@ -112,10 +112,13 @@ def compute_features_frame(
         r = float(rsi_14.iloc[i]) if not np.isnan(rsi_14.iloc[i]) else float("nan")
         m = float(macd_res.hist.iloc[i]) if not np.isnan(macd_res.hist.iloc[i]) else float("nan")
         rc = float(roc_5.iloc[i]) if not np.isnan(roc_5.iloc[i]) else float("nan")
+        # atr-normalize macd_hist so the momentum signal is coin/scale-invariant (see
+        # composite.momentum_composite). None when atr is unavailable → legacy absolute scale.
+        a = float(atr_14.iloc[i]) if not np.isnan(atr_14.iloc[i]) else None
         if any(np.isnan(v) for v in [r, m, rc]):
             momentum_vals.append(float("nan"))
         else:
-            momentum_vals.append(momentum_composite(r, m, rc))
+            momentum_vals.append(momentum_composite(r, m, rc, atr=a))
     momentum_col = pd.Series(momentum_vals, dtype=float)
 
     # ── Percentile ranks ─────────────────────────────────────────────────────

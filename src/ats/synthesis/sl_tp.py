@@ -34,12 +34,37 @@ class Levels:
     risk_reward: float
 
 
+def adaptive_stop_mult(
+    atr_pct: float | None, tight: float, wide: float, lo: float, hi: float, enabled: bool
+) -> float:
+    """Volatility-adaptive stop multiple from ABSOLUTE volatility (``atr_pct`` = ATR/price).
+
+    High absolute volatility (``atr_pct >= hi`` — trend legs / inherently volatile symbols like
+    ETH) → the TIGHT end (better payoff). Low absolute volatility (``atr_pct <= lo`` — compressed
+    chop, e.g. quiet BTC ranges that whipsaw a tight stop) → the WIDE end. Linear in between:
+    score = clamp((atr_pct − lo)/(hi − lo), 0, 1); mult = tight + (wide − tight) * (1 − score).
+    Absolute (not percentile) so it keeps a high-vol symbol uniformly tight while widening only a
+    genuinely quiet symbol's chop — the per-symbol effect a relative percentile can't give. Falls
+    back to ``tight`` when disabled / degenerate / missing. Shared by the synthesizer (which BUILDS
+    the stop) and the entry risk gate (whose noise floor must TRACK the built width so admission
+    matches the fixed-stop case — otherwise widening lifts setups over a fixed floor and floods the
+    book with chop trades, the iter-11 confound).
+    """
+    if not enabled or wide <= tight or atr_pct is None or hi <= lo:
+        return tight
+    score = min(1.0, max(0.0, (atr_pct - lo) / (hi - lo)))
+    return tight + (wide - tight) * (1.0 - score)
+
+
 def _round_trip_cost_frac(fee_bps: float, slippage_bps: float) -> float:
     """Entry+exit cost as a fraction of notional (both legs, fee + slippage)."""
     return 2.0 * (fee_bps + slippage_bps) / 10_000.0
 
 
-def default_band(close: float, atr: float, direction: str = "long") -> list[float]:
+def default_band(
+    close: float, atr: float, direction: str = "long",
+    pullback_atr_frac: float = _PULLBACK_ATR_FRAC,
+) -> list[float]:
     """The non-FVG entry zone: a narrow band on the pullback side of the current close.
 
     For a ``short`` the band sits ABOVE close (fill = its low, ``close + pullback``) so the
@@ -49,7 +74,7 @@ def default_band(close: float, atr: float, direction: str = "long") -> list[floa
     band's worst edge and far less prone to filling at the extreme of an impulse leg.
     """
     half = _BAND_ATR_FRAC * atr
-    pull = _PULLBACK_ATR_FRAC * atr
+    pull = pullback_atr_frac * atr
     if direction == "short":
         near = close + pull          # fill (zone low) sits a pullback above close
         return [round(near, 8), round(near + 2 * half, 8)]
@@ -77,7 +102,14 @@ def compute_levels(
     engine's admissibility recheck (``_worst_case_fill`` / ``_admissible_setups``).
     """
     low, high = entry_zone
-    stop_atr = max(min_stop_atr_mult, 1.0)
+    # LOOP5 / Iter 5: the stop width is ``min_stop_atr_mult`` ATR, floored at a small sanity
+    # value (0.3) rather than the old hard 1.0-ATR clamp. The 1.0 clamp meant the stop could
+    # never be tested below 1.0 ATR — every loser ran a full ~1.0R stop, the dominant book bleed.
+    # With the iter-3 5m close-confirm now riding through wicks that reclaim the level, a tighter
+    # base stop cuts loser SIZE without adding the noise stop-outs that made tight stops lose win
+    # rate under the old 15m-touch machine. ``min_stop_atr_mult`` doubles as the risk-layer noise
+    # floor, so it stays the single source of truth for the stop distance.
+    stop_atr = max(min_stop_atr_mult, 0.3)
     cost_floor = 2.0 * _round_trip_cost_frac(fee_bps, slippage_bps)
 
     if direction == "long":

@@ -22,6 +22,7 @@ from ats.engine.reports import TickReport
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.execution.executor import open_paper_trade
 from ats.risk.manager import assess
+from ats.synthesis.sl_tp import adaptive_stop_mult
 
 
 def setup_dict(s: Setup) -> dict[str, Any]:
@@ -66,6 +67,31 @@ async def execute_setup(
     LLM call happens on the entry path.
     """
     raw_atr = feature_row.get("atr_14")
+    pr_atr_raw = feature_row.get("pr_atr")
+    pr_atr = float(pr_atr_raw) if pr_atr_raw is not None else None
+    # Volatility-scaled sizing: bias risk toward locally expanded volatility (high pr_atr — trend
+    # legs that pay off) and away from compressed chop (low pr_atr — the 59%-win bleed). Causal:
+    # pr_atr is a trailing percentile. Applied here (post-admission) so it never changes which
+    # setups trade — only how much risk each gets.
+    size_mult = 1.0
+    if settings.risk.vol_sizing_enabled and pr_atr is not None:
+        p = min(1.0, max(0.0, pr_atr))
+        size_mult = settings.risk.vol_size_min + (
+            settings.risk.vol_size_max - settings.risk.vol_size_min
+        ) * p
+    # Noise-stop admission floor must TRACK the adaptive stop width (built in the synthesizer from
+    # the same pr_atr) — otherwise a widened chop stop clears a fixed floor and the chop trades the
+    # widening was meant to protect get ADMITTED instead (the iter-11 confound). With the floor
+    # tracking the width, admission keeps the same ATR-drift rejection behavior as the fixed stop.
+    atr_pct_raw = feature_row.get("atr_pct")
+    noise_floor = adaptive_stop_mult(
+        float(atr_pct_raw) if atr_pct_raw is not None else None,
+        settings.risk.min_stop_atr_mult,
+        settings.risk.stop_atr_wide,
+        settings.risk.stop_vol_lo,
+        settings.risk.stop_vol_hi,
+        settings.risk.adaptive_stop_enabled,
+    )
     decision = assess(
         setup_d,
         price=entry_price,
@@ -77,9 +103,9 @@ async def execute_setup(
         max_margin_pct_per_trade=settings.risk.max_margin_pct_per_trade,
         max_total_margin_pct=settings.risk.max_total_margin_pct,
         max_portfolio_risk_pct=settings.risk.max_portfolio_risk_pct,
-        size_multiplier=1.0,
+        size_multiplier=size_mult,
         atr=float(raw_atr) if raw_atr is not None else None,
-        min_stop_atr_mult=settings.risk.min_stop_atr_mult,
+        min_stop_atr_mult=noise_floor,
     )
     if not decision.approved:
         report.risk_rejected += 1

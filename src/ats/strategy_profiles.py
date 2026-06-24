@@ -34,7 +34,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "risk_per_trade_pct": 0.025,    # still risk ~1% of (the smaller) equity per stop-out
             "max_margin_pct_per_trade": 0.20,
             "max_total_margin_pct": 0.60,
-            "max_portfolio_risk_pct": 0.03,
+            "max_portfolio_risk_pct": 0.075,
             # Iter 14: correct the round-trip cost model for this strategy's order types. The
             # entry is a RESTING LIMIT (wick_limit) → a MAKER fill at the limit price: it earns
             # the maker fee (~2 bps) and suffers ZERO adverse slippage (a limit fills at your
@@ -59,18 +59,55 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # Iter 18: push to 1.0 (the floor — sl_tp clamps stop_atr to max(min,1.0)). iter17 at
             # 1.1 held win rate (74→73%) and flipped PnL positive, confirming the early arm shields
             # winners; 1.0 shrinks losers further (−9.5% → ~−8.6%) and admits still more setups.
-            "min_stop_atr_mult": 1.0,
+            # LOOP5 / Iter 5: 1.0 → 0.8 (now that the sl_tp 1.0-ATR clamp is lifted). The dominant
+            # bleed is the full-stop loser bucket (~1.0R). Under the iter-3 5m close-confirm, wicks
+            # that pierce the stop but reclaim the level on the 5m close are ridden through, so a
+            # tighter 0.8-ATR stop shrinks every loser to ~0.8R without re-introducing the noise
+            # stop-outs that sank tight stops on the old 15m-touch machine. Also raises realized
+            # payoff (winner harvest 0.50 ATR / stop 0.8 ATR = 0.625R vs 0.50R at a 1.0 stop).
+            # Iter 5 RESULT: 0.8 lifted PnL hugely (net +$1655→+$2505, 4/6 pass) at a small win-rate
+            # cost — but BTC26 over-paid win rate (70→65%). Iter 6 RESULT (REVERTED): 0.9 recovered
+            # BTC26 win (68%) but broke ETH26 (67→65%, +296→−6) — ETH and BTC want OPPOSITE stops.
+            # 0.8 passes 4/6 vs 0.9's 3/6, so 0.8 stays the base.
+            # LOOP5 / Iter 10: VOLATILITY-ADAPTIVE stop. BTC and ETH wanted opposite fixed stops
+            # (BTC chop needs wide to survive whipsaw, ETH high-vol needs tight for payoff) — the
+            # bleed is uniformly the low-pr_atr (compressed/chop) bucket (59% win vs 74-83%). So
+            # tie the stop to the trailing ATR percentile: 0.7 ATR at high vol (tight, payoff),
+            # widening to 1.1 ATR at low vol (survive chop). min_stop_atr_mult is the TIGHT end
+            # and doubles as the risk-layer noise floor; stop_atr_wide is the chop end.
+            # Iter 10 RESULT: tight end 0.7 ALSO dropped the noise-admission floor → volume flooded
+            # (244→361) with marginal setups, win rate fell, PnL cratered. The tight end must stay
+            # 0.8 (= the proven iter8 admission floor); only the chop-end widening is new.
+            # Iter 11 RESULT (REVERTED): widening chop stops lifted borderline chop setups ABOVE
+            # the noise-rejection floor (which had been silently filtering them) → +volume of the
+            # 59%-win chop bleed, PnL cratered. The fixed-0.8 stop's noise rejections are a hidden
+            # quality filter; keep them. Adaptive stop disabled.
+            # LOOP5 / Iter 13 (REVERTED): the absolute/relative-vol adaptive stop helped BTC26 but
+            # traded it against ETH26 / BTC25H2 — no net gain over the fixed 0.8. BEST SETUP keeps
+            # the fixed 0.8 stop with the adaptive machinery present but DISABLED.
+            "min_stop_atr_mult": 0.8,
+            "adaptive_stop_enabled": False,
+            "stop_atr_wide": 1.15,
+            # LOOP5 / Iter 12: volatility-scaled sizing — concentrate risk on high-pr_atr (trend,
+            # higher win + bigger winners) and starve low-pr_atr chop. The lever to push BTC26
+            # past its ~+$91 expectancy ceiling without changing which setups trade.
+            # Iter 12 RESULT (REVERTED): helped 2025 windows but hurt both 2026 windows (their edge
+            # isn't in the highest-vol bars) → 3/6. Disabled; revisit params later.
+            "vol_sizing_enabled": False,
+            "vol_size_min": 0.6,
+            "vol_size_max": 1.6,
             # Pull the take-profit in from 3.0→2.0 ATR so the scale-out-at-TP1 leg actually
             # banks a win (the 3-ATR target was tagged on ~3% of trades). With the 1.5-ATR
             # stop this is RR≈1.33, still clearing the scalper min_rr (1.0).
             "reward_atr_mult": 2.0,
+            "entry_pullback_atr_frac": 0.25,
         },
         "plan": {
             "max_setups_per_plan": 3,
             # Iter 7: replan every ~3h (was 6/~1.5h). The fast 6-bar churn re-created plans
             # constantly and fed marginal entries; slow it back down so only fresh, qualified
             # setups fire.
-            "plan_refresh_bars": 12,
+            "plan_refresh_bars": 6,
             # Iter 7: revert the confidence loosening (0.50→0.60). The loosen flooded the book
             # with immediate-adverse entries — 33 stop-outs at -10.9% margin each (-360% total)
             # and killed the previously-profitable short book. The stop-loss bleed is an
@@ -80,7 +117,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # next-best setups as ~+EV volume — crossing the 300-trade floor and adding PnL. This
             # is NOT the iter6.5 disaster (0.50 + refresh-6 under look-ahead = 22% win): the
             # quality bar moves only slightly and win-rate headroom (71% vs 60%) absorbs it.
-            "signal_min_confidence": 0.57,
+            "signal_min_confidence": 0.70,
             # Iter 3: entry zones now sit on the pullback side (sell rallies / buy dips), so the
             # momentum confirmation (require decision bar to close WITH the trade) directly
             # fights the design — a bounce-fill closes UP, which the gate would reject. Turn it
@@ -115,7 +152,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # A 0.9-ATR chandelier ratchets above the floor from +1.1 ATR on, so medium runners
             # bank +0.4..0.8 ATR instead of +0.2. Win-rate headroom (67% vs 60% target) absorbs
             # any early-chop cost; the +0.2 lock still guarantees no armed trade becomes a loss.
-            "trail_atr_mult": 0.9,
+            "trail_atr_mult": 0.6,
             "scale_out_frac": 0.5,         # bank half at the first target, ride the rest
             # Iter 1: the default early protection arms a 2-ATR trail at +1 ATR favorable, so a
             # trade that reaches +1 ATR can still reverse 2 ATR into a -1 ATR LOSS — it converts
@@ -123,6 +160,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # no-loss instead: jump the stop to breakeven once +1 ATR (and >2x cost) is earned.
             "early_stop_mode": "breakeven",
             "sideways_early_stop_mode": "breakeven",
+            "sideways_exit_mode": "trend",
             # Iter 6: arm the no-loss lock sooner. At +1.0 ATR many trades reverse before they
             # ever protect; +0.6 ATR catches more of them at breakeven (a scratch beats a -1.5
             # ATR stop) — the direct win-rate lever. Drop the profit floor to 1x cost so the
@@ -134,7 +172,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # the marginal trades. A universal win-rate/expectancy lever (not a subtractive block).
             # The 0.9-ATR chandelier still rides genuine runners above the lock, so big winners
             # are preserved; only stalled trades exit at the +0.35 floor.
-            "breakeven_arm_atr": 0.45,
+            "breakeven_arm_atr": 0.50,
             "breakeven_arm_cost_mult": 1.0,
             # Iter 7: profit-lock the early arm. Parking the stop at cost-breakeven scratched
             # 94/178 trades to ~0% — non-wins that crushed win rate to 22%. Lock real profit
@@ -147,7 +185,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # winners (~190 trail exits) harvest exactly at this floor; lifting it +0.07 ATR adds
             # ~+0.6% margin to each. The 0.03-ATR give-back still lets genuine runners arm the
             # 0.9-ATR trail and ride higher; floor-harvested trades just bank more.
-            "breakeven_lock_atr": 0.42,
+            "breakeven_lock_atr": 0.45,
         },
         "observer": {
             "observe_enabled": False,

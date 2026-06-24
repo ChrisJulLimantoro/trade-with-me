@@ -67,6 +67,11 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
         fee_bps=settings.risk.fee_bps,
         slippage_bps=settings.risk.slippage_bps,
         reward_atr_mult=settings.risk.reward_atr_mult,
+        pullback_atr_frac=settings.risk.entry_pullback_atr_frac,
+        adaptive_stop_enabled=settings.risk.adaptive_stop_enabled,
+        stop_atr_wide=settings.risk.stop_atr_wide,
+        stop_vol_lo=settings.risk.stop_vol_lo,
+        stop_vol_hi=settings.risk.stop_vol_hi,
         preferred_direction=preferred if settings.plan.deterministic_direction_hint else None,
         log=log,
     )

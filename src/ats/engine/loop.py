@@ -177,12 +177,7 @@ async def _walk_replay(
         # now+base_dt-obs_dt includes the last sub-candle and excludes the next bar's open.
         open_before = bool(await state.open_positions(session, symbol=symbol, run_id=run_id))
         fine_candles = None
-        if (
-            open_before
-            and settings.observer.observe_enabled
-            and prev is not None
-            and observe_tf != tf
-        ):
+        if open_before and prev is not None and observe_tf != tf:
             fine_candles = await state.candles_between(
                 session, symbol, observe_tf, now - obs_dt, now + base_dt - obs_dt
             )

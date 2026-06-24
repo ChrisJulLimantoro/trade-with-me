@@ -31,6 +31,36 @@ class RiskConfig(BaseModel):
     # noise-stops that get swept by normal bar wiggle; the risk layer rejects them before they
     # waste a confirm call or execute into a structural loss. 0 = disabled.
     min_stop_atr_mult: float = 1.5
+    # When enabled, the stop multiple scales
+    # with the trailing ATR percentile rank (``pr_atr`` ∈ [0,1], causal): locally EXPANDED
+    # volatility (high pr_atr — trend legs) uses the TIGHT end (``min_stop_atr_mult``) for a
+    # better payoff, while locally COMPRESSED volatility (low pr_atr — the choppy regimes whose
+    # tight-stop whipsaw losses are the dominant bleed, esp. on BTC) widens toward
+    # ``stop_atr_wide`` so the noise can't sweep the stop. stop_mult = min_stop_atr_mult +
+    # (stop_atr_wide − min_stop_atr_mult) * (1 − pr_atr). min_stop_atr_mult stays the risk-layer
+    # noise floor, so the adaptive stop (always ≥ it) is never rejected. 0/False = legacy fixed.
+    adaptive_stop_enabled: bool = False
+    stop_atr_wide: float = 1.1
+    # Absolute-volatility band (atr_pct = ATR/price) the adaptive stop interpolates across:
+    # atr_pct >= stop_vol_hi → tight (min_stop_atr_mult); atr_pct <= stop_vol_lo → wide.
+    stop_vol_lo: float = 0.0020
+    stop_vol_hi: float = 0.0050
+    # Win rate is flat across most features,
+    # but PnL/trade is structurally higher in locally EXPANDED volatility (high pr_atr — trend
+    # legs run further at the SAME win rate) and negative in compressed chop (low pr_atr, 59% win
+    # vs 74-83%). So scale the per-trade risk budget by the causal ATR percentile rank:
+    # mult = vol_size_min + (vol_size_max − vol_size_min) * pr_atr. This concentrates capital on
+    # the higher-edge trades and starves the chop bleed. Applied AFTER admission (does not change
+    # which setups trade, so no volume side-effect). 0/False = flat sizing.
+    vol_sizing_enabled: bool = False
+    vol_size_min: float = 0.6
+    vol_size_max: float = 1.6
+    # Depth (as an ATR fraction) the default entry zone sits on the *favorable/pullback* side of
+    # the current close — a long limit-buys this far below close, a short limit-sells this far
+    # above. A deeper pullback fills at a better price closer to local exhaustion (fewer immediate-
+    # adverse stop-outs, bigger room to target) at the cost of fewer fills. 0.25 = the historical
+    # default baked into sl_tp._PULLBACK_ATR_FRAC.
+    entry_pullback_atr_frac: float = 0.25
     # Round-trip trading costs charged at each leg-banking site (entry + exit), in basis
     # points. fee_bps = taker fee per side; slippage_bps = assumed adverse fill per side.
     fee_bps: float = 5.0
