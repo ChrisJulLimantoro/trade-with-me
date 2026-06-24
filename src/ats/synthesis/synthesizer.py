@@ -66,6 +66,8 @@ def synthesize(
     weights: Mapping[str, float],
     min_rr: float,
     min_confidence: float,
+    chop_atr_pct_max: float = 0.0,
+    chop_min_confidence: float = 0.0,
     min_stop_atr_mult: float,
     fee_bps: float,
     slippage_bps: float,
@@ -144,9 +146,17 @@ def synthesize(
         _reject(log, "rr_floor", agent_scores, rr=levels.risk_reward)
         return None
 
-    # 8. Confidence threshold.
-    if conf < min_confidence:
-        _reject(log, "low_conf", agent_scores, conf=round(conf, 6))
+    # 8. Confidence threshold. In low-volatility chop (absolute ATR/price at/below
+    # chop_atr_pct_max) the trend-pullback edge is weakest, so demand a higher floor there;
+    # higher-vol bars keep the base floor. Absolute vol distinguishes chop from trend ACROSS
+    # symbols without subtracting a regime (which reshuffles non-locally under single-position).
+    floor = min_confidence
+    if chop_min_confidence > 0.0:
+        atr_pct = f(features.get("atr_pct"))
+        if atr_pct is not None and atr_pct <= chop_atr_pct_max:
+            floor = max(floor, chop_min_confidence)
+    if conf < floor:
+        _reject(log, "low_conf", agent_scores, conf=round(conf, 6), floor=round(floor, 6))
         return None
 
     reasons = render_reasons(

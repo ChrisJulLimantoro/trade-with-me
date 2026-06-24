@@ -118,6 +118,19 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # is NOT the iter6.5 disaster (0.50 + refresh-6 under look-ahead = 22% win): the
             # quality bar moves only slightly and win-rate headroom (71% vs 60%) absorbs it.
             "signal_min_confidence": 0.70,
+            # LOOP6 / Iter 6: volatility-conditional confidence floor on ABSOLUTE atr_pct. Iter 5
+            # proved the chop floor fixes a bleeding window (BTC25h2 148→255, win 70→73) but
+            # gated on the within-symbol pr_atr percentile, which also gated ETH's quiet bars and
+            # broke ETH26h1. atr_pct (ATR/price) is structurally lower on BTC (p35≈0.0023) than
+            # ETH (p20≈0.0031), so a 0.0023 cutoff tightens BTC's choppiest ~35% of bars to a 0.80
+            # bar while touching ~zero ETH bars. Targets the chop entry-quality bleed cross-symbol
+            # without subtracting a regime (the iter1 non-local trap). Trend bars keep the 0.70 base.
+            # LOOP6 / Iter 7 (REVERTED): widened cutoff 0.0023 → 0.0028. Made BTC26h1 MUCH worse
+            # (−19.60 → −125.43, win 68→64) — removing the moderate-vol bear-low/side-low trades
+            # reshuffled the single-position sequence into worse fills (non-locality again; even
+            # the chop FLOOR triggers it when it removes too many trades). 0.0023 is the sweet spot.
+            "chop_atr_pct_max": 0.0023,
+            "chop_min_confidence": 0.80,
             # Iter 3: entry zones now sit on the pullback side (sell rallies / buy dips), so the
             # momentum confirmation (require decision bar to close WITH the trade) directly
             # fights the design — a bounce-fill closes UP, which the gate would reject. Turn it
@@ -140,6 +153,11 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # side-* let the engine fill different, worse trades and flipped bear-low SHORT from
             # +13% to −40% (same ~135 trades, reshuffled timing). Subtractive regime blocks are
             # unreliable here; the robust levers are universal per-trade ones. Flag kept OFF.
+            # LOOP6 / Iter 1 (REVERTED): re-tested blocking sideways SHORTS under the +EV LOOP5
+            # config. Regressed broadly (btc25h1 −92, eth25h2 −149, etc.; only eth26h1 +106) and
+            # cut trade counts toward the 150 floor. The single-position non-locality holds even
+            # under a profitable book — subtractive regime blocks reshuffle the whole sequence.
+            # Confirms: only UNIVERSAL per-trade levers are robust here. Flag stays OFF.
             "sideways_block_shorts": False,
         },
         "exits": {
@@ -152,7 +170,19 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # A 0.9-ATR chandelier ratchets above the floor from +1.1 ATR on, so medium runners
             # bank +0.4..0.8 ATR instead of +0.2. Win-rate headroom (67% vs 60% target) absorbs
             # any early-chop cost; the +0.2 lock still guarantees no armed trade becomes a loss.
+            # LOOP6 / Iter 4 (REVERTED): loosened trail 0.6 → 1.0. Helped BTC's larger windows
+            # (25h1 +9, 25h2 +16) but hurt BTC26h1 (−8) and ALL ETH (−52/−32/−24), dropping
+            # ETH26h1 below $200. The chop give-back exceeds the trend-ride gain. 0.6 is near
+            # the trail optimum; like every universal knob it trades BTC-chop ↔ ETH-trend.
             "trail_atr_mult": 0.6,
+            # LOOP6 / Iter 8 (REVERTED): within-symbol vol-conditional trail (loosen to 1.2 ATR on
+            # top-third pr_atr bars). Helped some windows (BTC25h1 +13, ETH26h1 +41) but made the
+            # BTC26h1 holdout WORSE (−19.6 → −37.4) and dented ETH25h1/25h2. In BTC26h1 even the
+            # high-pr_atr bars are low-amplitude chop, so a looser trail just gives back more. The
+            # infra (trail_atr_mult_trend / trail_trend_pr_atr_min in ExitConfig + manager.py) is
+            # kept but DISABLED. Confirms BTC26h1's winner-size ceiling can't be lifted by trail.
+            "trail_atr_mult_trend": 0.0,
+            "trail_trend_pr_atr_min": 0.0,
             "scale_out_frac": 0.5,         # bank half at the first target, ride the rest
             # Iter 1: the default early protection arms a 2-ATR trail at +1 ATR favorable, so a
             # trade that reaches +1 ATR can still reverse 2 ATR into a -1 ATR LOSS — it converts
@@ -172,6 +202,13 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # the marginal trades. A universal win-rate/expectancy lever (not a subtractive block).
             # The 0.9-ATR chandelier still rides genuine runners above the lock, so big winners
             # are preserved; only stalled trades exit at the +0.35 floor.
+            # LOOP6 / Iter 2 (REVERTED): raised harvest floor arm 0.50→0.58 / lock 0.45→0.53.
+            # Helped ETH but badly hurt ALL BTC (win −4–5pts). Arming LATER converts BTC's
+            # marginal ~0.5-ATR peakers into stops. BTC and ETH want OPPOSITE arm timing.
+            # LOOP6 / Iter 3 (REVERTED): arm EARLIER (0.42) / lock 0.38. Raised win rate
+            # (68→70 on BTC26h1) but LOWERED PnL (banks tiny +0.38-ATR wins) and crashed
+            # ETH25h1 (−374). The arm/lock floor is already at its PnL-optimal point (0.50/0.45);
+            # moving it either way trades PnL↔win-rate. Knobs exhausted — need a STRUCTURAL edge.
             "breakeven_arm_atr": 0.50,
             "breakeven_arm_cost_mult": 1.0,
             # Iter 7: profit-lock the early arm. Parking the stop at cost-breakeven scratched

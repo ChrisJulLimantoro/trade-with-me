@@ -88,6 +88,15 @@ async def advance_trade(
     )
     extensions = int(md0.get("hold_extensions", 0))
     window_s = float(md0.get("hold_window_seconds", 0.0))
+    # Within-symbol vol-conditional trail: on the trade's own high-pr_atr (expanded/trend) bars,
+    # loosen the runner trail so winners ride further; quiet (chop) bars keep the tight base. Uses
+    # the causal trailing percentile from the current feature row; the trail only ratchets, so a
+    # widen never loosens an already-locked stop. Falls back to the policy trail when disabled.
+    trail_atr_mult = policy.trail_atr_mult
+    if settings.exits.trail_atr_mult_trend > 0.0 and feature_row is not None:
+        pr_atr = _f(feature_row.get("pr_atr"))
+        if pr_atr is not None and pr_atr >= settings.exits.trail_trend_pr_atr_min:
+            trail_atr_mult = settings.exits.trail_atr_mult_trend
     bars = 0
     for candle in candles:
         if trade.entry_time >= candle["open_time"]:
@@ -98,7 +107,7 @@ async def advance_trade(
             state,
             expires_at=expires_at,
             scale_out_frac=policy.scale_out_frac,
-            trail_atr_mult=policy.trail_atr_mult,
+            trail_atr_mult=trail_atr_mult,
             trail_mode=policy.trail_mode,
             atr=atr,
             early_stop_mode=policy.early_stop_mode,

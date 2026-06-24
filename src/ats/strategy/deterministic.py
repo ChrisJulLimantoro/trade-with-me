@@ -63,6 +63,8 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
         weights=WEIGHTS,
         min_rr=settings.risk.min_rr,
         min_confidence=settings.plan.signal_min_confidence,
+        chop_atr_pct_max=settings.plan.chop_atr_pct_max,
+        chop_min_confidence=settings.plan.chop_min_confidence,
         min_stop_atr_mult=settings.risk.min_stop_atr_mult,
         fee_bps=settings.risk.fee_bps,
         slippage_bps=settings.risk.slippage_bps,

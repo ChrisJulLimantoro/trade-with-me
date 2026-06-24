@@ -107,6 +107,15 @@ class ExitConfig(BaseModel):
     # it earned through a pullback; "close" trails the current bar close (legacy behavior, kept
     # for replay/ablation A/B). Either way the stop only ever tightens.
     trail_mode: Literal["close", "chandelier"] = "chandelier"
+    # Within-symbol vol-conditional runner trail (LOOP6). The fixed trail trades BTC-chop against
+    # ETH-trend: a loose trail rides trend legs but bleeds give-back in chop. Absolute vol can't
+    # separate them (a high-vol symbol's chop ≈ a low-vol symbol's trend), so key off the WITHIN-
+    # symbol ATR percentile ``pr_atr``: on bars with ``pr_atr >= trail_trend_pr_atr_min`` (each
+    # symbol's own expanded/trend regime) loosen the trail to ``trail_atr_mult_trend`` so winners
+    # ride further; quieter (chop) bars keep the tight base ``trail_atr_mult``. The trail still
+    # only ratchets, so a per-bar widen never loosens an already-locked stop. 0.0 = disabled.
+    trail_atr_mult_trend: float = 0.0
+    trail_trend_pr_atr_min: float = 0.0
     # Early protection before TP1. "trail" arms a real ATR trail instead of jumping the
     # stop to breakeven; "breakeven" preserves the old early-arm behavior; "off" disables.
     early_stop_mode: Literal["off", "breakeven", "trail"] = "trail"
@@ -155,6 +164,18 @@ class PlanConfig(BaseModel):
     # Minimum synthesized confidence for the deterministic proposer to emit a setup, and the
     # floor the adjudicated (post-delta) confidence must still clear or the trade is vetoed.
     signal_min_confidence: float = 0.55
+    # Volatility-conditional confidence floor (LOOP6). The strategy is a trend-pullback system
+    # with no edge in low-volatility CHOP — the bleed is the quiet, compressed bars where
+    # pullback entries whipsaw (~54–62% win vs 74–83% in trend). Rather than subtract a regime
+    # (non-local under single-position), RAISE the confidence bar only when ABSOLUTE volatility
+    # ``atr_pct`` (= ATR/price) sits at/below ``chop_atr_pct_max``: such bars must clear
+    # ``chop_min_confidence`` instead of the base ``signal_min_confidence``. Absolute (not a
+    # within-symbol percentile) is deliberate — a structurally low-vol symbol (BTC, p65≈0.0034)
+    # is mostly below the threshold while a high-vol one (ETH, p20≈0.0031) is mostly above it,
+    # so the gate tightens chop where it actually lives without touching the high-vol book. This
+    # is the cross-symbol discrimination a single universal knob cannot give. 0.0 floor = disabled.
+    chop_atr_pct_max: float = 0.0
+    chop_min_confidence: float = 0.0
     max_setups_per_plan: int = 2
     # How a detected setup turns into a fill:
     #  - "close": market-on-close. The decision bar closes inside the entry_zone → fill at that
