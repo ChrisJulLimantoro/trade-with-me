@@ -168,3 +168,74 @@ Beating the raised BTC bar by parameter tuning looks unlikely without overfittin
 losers), which is a larger change than a one-knob iteration. Options: (a) accept iteration 1 as
 the validated baseline and keep the raised bar as an aspirational target; (b) lower the BTC PnL
 bar to what OOS supports; or (c) invest in a structural feature, then resume the loop.
+
+---
+
+## Iteration 3 — structural exit change: conditional loser-cut → REJECTED (non-robust)
+
+Picked the **exit strategy** as the structural lever (the payoff problem *is* an exit problem).
+Root cause (from the exit-engine map): `step_trade` gives winners a ratcheting protective stop
+(early arm → profit lock → trail) but losers nothing symmetric — an unprotected red trade waits for
+the full ~0.8-ATR stop, so `avg_loss ≈ 0.8R` vs `avg_win ≈ 0.45R`.
+
+### What changed (code, not just a knob)
+
+A **conditional, time-gated loser-cut** — give losers the ratchet winners already have:
+- `src/ats/config.py` (ExitConfig): new `loss_cut_hold_frac`, `loss_cut_atr_mult` (default 0.0 = off).
+- `src/ats/execution/reconcile.py` (`step_trade`): a loss-cut block mirroring the trail — once a
+  still-red, never-armed trade passes `loss_cut_at`, tighten its stop to `loss_cut_atr_mult` ATR
+  from entry (only-tighten, next-bar effect, fully causal/no-lookahead).
+- `src/ats/engine/exits/manager.py`: compute `loss_cut_at = entry + frac·(expires_at − entry)`.
+- `src/ats/strategy_profiles.py` (`scalper`): opted in at `0.5 / 0.4`.
+- `tests/test_step_trade.py`: 6 unit tests (ratchet fires on stalled-red; inert before threshold;
+  skips in-profit; only-tightens; off by default). Full exit suite (81 tests) green.
+
+### Mechanism verified (TRAIN, loss-cut OFF→ON)
+
+| Coin | avg_loss | avg_win | payoff |
+| ---- | -------- | ------- | ------ |
+| BTC  | −7.1% → −6.7% | 3.4% (unch.) | 0.48 → 0.51 |
+| ETH  | −10.8% → −9.9% | 5.9% (unch.) | 0.54 → 0.59 |
+| SOL  | −11.7% → −10.7% | 6.2% (unch.) | 0.53 → 0.58 |
+
+It does exactly what it targets: shrinks the loser tail, lifts payoff, leaves winners untouched.
+
+### TRAIN (gate win≥72% / pnl≥$400)
+
+| Coin | baseline OFF | i3 ON | verdict |
+| ---- | ------------ | ----- | ------- |
+| BTC  | 72% / $339.77 | 70% / $283.80 | win↓ pnl↓ |
+| ETH  | 71% / $645.85 | 69% / $733.54 | pnl↑ but win↓ (71→69) |
+| SOL  | 74% / $1256.10 | 73% / $1275.02 | ~flat |
+
+Win-rate falls 1–2 pts everywhere (clips would-have-recovered trades). TRAIN not cleanly improved.
+
+### VALIDATION (A/B vs loss-cut-OFF baseline, same window 2025-09→2026-02)
+
+| Coin | OFF (i2base) | i3 ON | pnl Δ | win Δ |
+| ---- | ------------ | ----- | ----- | ----- |
+| BTC  | 69% / +$35.08 | 65% / +$78.28 | **+$43** | −4 |
+| ETH  | 77% / $830.80 | 70% / $450.97 | **−$380** | −7 |
+| SOL  | 71% / $595.21 | 70% / $793.04 | **+$198** | −1 |
+|      | **aggregate** |       | **−$139** | all ↓ |
+
+### Accept / reject → REJECTED
+
+The loss-cut **helped BTC** (its design goal — BTC bled in the 2026 drawdown; val PnL doubled) and
+**SOL**, but **hurt ETH** hard (−$380; ETH even flipped TRAIN↑/VAL↓). **Aggregate validation PnL
+degraded (−$139) and win-rate dropped on all three** → the non-degradation veto rejects it. This is
+the same **BTC↔ETH opposite-preference tension** every prior universal knob hit, now confirmed for
+the exit side too: a single global loser-cut can't satisfy both. Reverted the scalper opt-in to 0.0;
+the infrastructure stays (default-off, tested) like `adaptive_stop` / `vol_sizing`.
+
+### Holdout NOT run — stop condition never met (no accepted change).
+
+### Takeaway
+
+Three iterations now converge on one conclusion: with a **single global config**, the BTC↔ETH
+tension is binding on every lever tried (entry confidence, take-profit, and now exits). The honest
+next step is **not another global knob** but either (a) accept iteration 1 as the validated baseline,
+(b) make the loss-cut **regime- or symbol-gated** (e.g. enable it only in `bear-*`/drawdown regimes
+where it helped BTC, via `policy.py` — a larger, non-global change), or (c) a winner-side structural
+edge for BTC. The loop's value here was catching three plausible changes that in-sample looked fine
+and rejecting two overfits + one non-robust lever before any of them shipped.

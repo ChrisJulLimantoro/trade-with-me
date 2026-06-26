@@ -121,6 +121,17 @@ class ExitConfig(BaseModel):
     early_stop_mode: Literal["off", "breakeven", "trail"] = "trail"
     early_trail_arm_atr: float = 1.0
     early_trail_atr_mult: float = 2.0
+    # Conditional loser-cut (SPEC3-LOOP / Iter 3). The exit machine protects WINNERS with a
+    # ratcheting stop (early arm → profit lock → trail) but gives losers nothing symmetric: an
+    # unprotected red trade just waits for the full ``min_stop_atr_mult``-ATR stop, so avg_loss
+    # ≈ 0.8R while avg_win ≈ 0.45R (inverted payoff). This gives losers the same ratchet: once a
+    # still-red, never-armed trade has spent ``loss_cut_hold_frac`` of its hold window, tighten its
+    # stop to ``loss_cut_atr_mult`` ATR from entry (only-tighten, takes effect next bar like the
+    # trail). Unlike the reverted "tighten every stop from entry" experiments this touches ONLY the
+    # stalled-red bucket, so it cuts the loser tail without re-introducing entry-noise stop-outs.
+    # Both default 0.0 = DISABLED (baseline behavior byte-unchanged); the scalper profile opts in.
+    loss_cut_hold_frac: float = 0.0
+    loss_cut_atr_mult: float = 0.0
     # Sideways regimes use range-trading exits by default: bank more at TP1, then protect
     # the remainder. Trend regimes keep the global exit knobs above.
     sideways_exit_mode: Literal["trend", "range"] = "range"

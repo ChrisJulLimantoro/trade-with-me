@@ -61,6 +61,18 @@ async def advance_trade(
         expires_at = (
             datetime.fromisoformat(raw_expiry) if isinstance(raw_expiry, str) else last_ts
         )
+    # Conditional loser-cut threshold: the bar after which a still-red, unprotected trade has its
+    # stop ratcheted tighter (SPEC3-LOOP / Iter 3). ``entry + frac*(expires_at - entry)`` ==
+    # ``entry + frac*hold_window`` and needs no timeframe lookup. None when disabled.
+    loss_cut_at: datetime | None = None
+    if (
+        expires_at is not None
+        and settings.exits.loss_cut_hold_frac > 0
+        and settings.exits.loss_cut_atr_mult > 0
+    ):
+        loss_cut_at = trade.entry_time + settings.exits.loss_cut_hold_frac * (
+            expires_at - trade.entry_time
+        )
     trade_d = {
         "direction": trade.direction,
         "entry_price": _f(trade.entry_price),
@@ -106,6 +118,8 @@ async def advance_trade(
             candle,
             state,
             expires_at=expires_at,
+            loss_cut_at=loss_cut_at,
+            loss_cut_atr_mult=settings.exits.loss_cut_atr_mult,
             scale_out_frac=policy.scale_out_frac,
             trail_atr_mult=trail_atr_mult,
             trail_mode=policy.trail_mode,
