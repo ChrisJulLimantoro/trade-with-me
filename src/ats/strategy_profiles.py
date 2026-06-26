@@ -127,7 +127,16 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # ETH $831→$506, SOL $595→$530). TRAIN↑ / VALIDATION↓ is the overfitting signature — the
             # stricter floor memorizes 2025 entry quality that doesn't transfer to the 2026 regime.
             # Non-degradation veto → rejected. Base floor stays 0.70.
-            "signal_min_confidence": 0.70,
+            # LOOP7 / Iter 4 (hybrid-engine branch, objective = max portfolio PnL): the 0.70 floor
+            # was badly MISCALIBRATED — it suppressed good ETH/SOL setups. A TRAIN sweep is
+            # monotone in PnL as the floor drops (0.70→$2154, 0.60→$2623, 0.55→$3352, 0.50→$3387,
+            # 0.40→$3762) and — critically — the gain GENERALIZES: VALIDATION (incl. the 2026
+            # drawdown) rises too (0.70→$1500, 0.60→$1669, 0.55→$1903, 0.50→$1907). ETH win-rate
+            # RISES 69→76% as the floor drops (the gate was filtering winners, not losers). 0.55 is
+            # the robust knee: below it TRAIN keeps climbing on noise but VALIDATION flattens and
+            # SOL bleeds OOS ($639→$473 at 0.50), so 0.55 banks the validated edge without the
+            # overfit tail. +$1198 TRAIN / +$403 VALIDATION portfolio vs the 0.70 base.
+            "signal_min_confidence": 0.55,
             # LOOP6 / Iter 6: volatility-conditional confidence floor on ABSOLUTE atr_pct. Iter 5
             # proved the chop floor fixes a bleeding window (BTC25h2 148→255, win 70→73) but
             # gated on the within-symbol pr_atr percentile, which also gated ETH's quiet bars and
@@ -139,7 +148,14 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # (−19.60 → −125.43, win 68→64) — removing the moderate-vol bear-low/side-low trades
             # reshuffled the single-position sequence into worse fills (non-locality again; even
             # the chop FLOOR triggers it when it removes too many trades). 0.0023 is the sweet spot.
-            "chop_atr_pct_max": 0.0023,
+            # LOOP7 / Iter 1 (hybrid-engine branch): TRAIN diagnosis shows the band atr_pct
+            # 0.0023–0.0030 is net-NEGATIVE on TRAIN for BOTH BTC (75t/69%/−$13) and ETH
+            # (15t/47%/−$62), while SOL has ZERO trades that low (SOL is structurally high-vol).
+            # The 0.0023 cutoff lets this bleed band escape the 0.80 floor. Widen to 0.0030 to
+            # gate the band's marginal (<0.80 conf) entries cross-symbol while sparing SOL
+            # entirely. Motivated on TRAIN-2025 only (LOOP6's 0.0028 caution was a 2026-holdout
+            # non-locality observation, off-limits as a motivation here).
+            "chop_atr_pct_max": 0.0030,
             "chop_min_confidence": 0.80,
             # Iter 3: entry zones now sit on the pullback side (sell rallies / buy dips), so the
             # momentum confirmation (require decision bar to close WITH the trade) directly
@@ -300,5 +316,30 @@ def apply_profile(name: str, target: Settings = settings) -> dict[str, Any]:
                 )
             setattr(section, field, value)
             applied[f"{group}.{field}"] = value
+    # Test-harness override (inert unless ATS_PROFILE_OVERRIDE is set): a comma-separated list of
+    # "group.field=value" applied on top of the named profile, so a knob sweep doesn't need a file
+    # edit per run. The winning config is always baked back into the profile dict above; this is a
+    # convenience for the LOOP, not a shipping path. Values are coerced to the existing field type.
+    import os
+    raw = os.environ.get("ATS_PROFILE_OVERRIDE", "").strip()
+    if raw:
+        for item in raw.split(","):
+            item = item.strip()
+            if not item:
+                continue
+            key, _, val = item.partition("=")
+            group, _, field = key.strip().partition(".")
+            section = getattr(target, group)
+            cur = getattr(section, field)
+            if isinstance(cur, bool):
+                coerced: Any = val.strip().lower() in ("1", "true", "yes", "on")
+            elif isinstance(cur, int) and not isinstance(cur, bool):
+                coerced = int(val)
+            elif isinstance(cur, float):
+                coerced = float(val)
+            else:
+                coerced = val.strip()
+            setattr(section, field, coerced)
+            applied[f"{group}.{field}"] = coerced
     target.strategy_profile = name
     return {**applied, "strategy_profile": name}
