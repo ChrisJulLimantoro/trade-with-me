@@ -98,6 +98,52 @@ def test_first_bar_full_stop_is_a_loss() -> None:
     assert step.exit_result.pnl_pct == pytest.approx(-0.05)
 
 
+# --- Conditional loser-cut (SPEC3-LOOP / Iter 3) -------------------------------------------
+
+# atr=10, loss_cut_atr_mult=0.4 → tightened stop = entry ∓ 4.0 (long: 96, tighter than full 95).
+PAST = T0 - timedelta(hours=1)
+_LC = {"atr": 10.0, "loss_cut_atr_mult": 0.4}
+
+
+def test_loss_cut_ratchets_stalled_red_trade_stop_tighter() -> None:
+    # Still-red (close 98 < 100), unprotected, bar past loss_cut_at → stop tightens 95 → 96,
+    # but the bar holds (low 97 > 96) so it doesn't exit yet.
+    step = _step(LONG, _c(99, 97, 98), TradeState(), loss_cut_at=PAST, **_LC)
+    assert not step.closed
+    assert step.state.working_stop == pytest.approx(96.0)
+
+
+def test_loss_cut_capped_loss_is_smaller_than_full_stop() -> None:
+    state = _step(LONG, _c(99, 97, 98), TradeState(), loss_cut_at=PAST, **_LC).state
+    # next bar dips to the tightened stop: exits at 96 (−4%), not the full 95 (−5%).
+    step = _step(LONG, _c(98, 95.5, 96), state, loss_cut_at=PAST, **_LC)
+    assert step.closed and step.exit_result.exit_reason == "sl"
+    assert step.exit_result.exit_price == pytest.approx(96.0)
+
+
+def test_loss_cut_inert_before_threshold() -> None:
+    step = _step(LONG, _c(99, 97, 98), TradeState(), loss_cut_at=FAR, **_LC)
+    assert step.state.working_stop is None  # untouched; full stop still governs
+
+
+def test_loss_cut_skips_trade_in_profit() -> None:
+    # Green bar (close 101 > entry): the winner-side machine owns it, loss-cut must not fire.
+    step = _step(LONG, _c(102, 99, 101), TradeState(), loss_cut_at=PAST, **_LC)
+    assert step.state.working_stop is None
+
+
+def test_loss_cut_only_tightens_never_widens() -> None:
+    # A working stop already tighter than the loss-cut level (97 > 96) is left alone.
+    state = TradeState(working_stop=97.0)
+    step = _step(LONG, _c(99, 97.5, 98), state, loss_cut_at=PAST, **_LC)
+    assert step.state.working_stop == pytest.approx(97.0)
+
+
+def test_loss_cut_disabled_by_default_zero_mult() -> None:
+    step = _step(LONG, _c(99, 97, 98), TradeState(), loss_cut_at=PAST, atr=10.0)
+    assert step.state.working_stop is None  # loss_cut_atr_mult defaults to 0.0 → inert
+
+
 def test_breakeven_runner_survives_expiry() -> None:
     after_tp1 = _step(LONG, _c(111, 99, 109), TradeState()).state
     # at/after expiry but protected → keep running, do not close

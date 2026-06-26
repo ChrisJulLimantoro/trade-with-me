@@ -237,6 +237,8 @@ def step_trade(
     *,
     expires_at: datetime | None,
     scale_out_frac: float,
+    loss_cut_at: datetime | None = None,
+    loss_cut_atr_mult: float = 0.0,
     trail_atr_mult: float = 0.0,
     trail_mode: str = "close",
     atr: float | None = None,
@@ -417,6 +419,30 @@ def step_trade(
             arm_notes.append(
                 f"early_trail stop -> {ws:g} ({early_trail_atr_mult:g}x ATR, {trail_mode})"
             )
+
+    # Conditional loser-cut: give losers the protective ratchet winners already get. Once a
+    # still-red, never-armed trade has spent ``loss_cut_hold_frac`` of its hold window (the caller
+    # passes the resulting ``loss_cut_at`` timestamp), tighten its stop to ``loss_cut_atr_mult`` ATR
+    # from entry — only-tighten, so it can't widen risk, and it takes effect on the next bar's stop
+    # check exactly like the trail below. Skips protected/profitable trades (those already ride the
+    # winner-side machine). Fully causal (no future data); inert when the knobs are 0.
+    if (
+        loss_cut_at is not None
+        and ts >= loss_cut_at
+        and loss_cut_atr_mult
+        and atr
+        and not state.breakeven
+        and not state.trail_armed
+        and pnl(close) <= 0
+    ):
+        cur_ws = state.working_stop if state.working_stop is not None else full_stop
+        if direction == "long":
+            ws = max(cur_ws, entry - loss_cut_atr_mult * atr)
+        else:
+            ws = min(cur_ws, entry + loss_cut_atr_mult * atr)
+        if ws != cur_ws:
+            state = replace(state, working_stop=ws)
+            arm_notes.append(f"loss-cut stop -> {ws:g} ({loss_cut_atr_mult:g}x ATR)")
 
     # Time-stop: let breakeven-protected runners keep going, and never cut a trade that is
     # currently in profit; close only what is still flat/at risk and unprotected. When

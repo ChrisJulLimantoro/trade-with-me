@@ -188,6 +188,18 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
         },
         "exits": {
             "max_hold_bars": 8,            # ~2h on 15m; scalps don't marinate (>0 = time-stop ON)
+            # SPEC3-LOOP / Iter 3 (REVERTED — non-robust): conditional loser-cut. Mechanically it
+            # did exactly what it targets — on TRAIN it shrank avg_loss (BTC −7.1→−6.7%, ETH
+            # −10.8→−9.9%, SOL −11.7→−10.7%) and lifted payoff on all three (0.48→0.51, 0.54→0.59,
+            # 0.53→0.58) while leaving winners untouched. But it costs ~1-2pts win-rate (clips
+            # would-have-recovered trades) and is the familiar BTC↔ETH split: on the validation
+            # window (2025-09→2026-02, incl. the 2026 drawdown) it HELPED BTC (+$35→+$78, its design
+            # goal) and SOL (+$595→+$793) yet HURT ETH (+$831→+$451, −$380) — ETH even flipped
+            # TRAIN↑/VAL↓. Aggregate validation PnL fell (~−$139) and win-rate dropped on all three →
+            # non-degradation veto rejects it. Infra kept (default 0.0 in ExitConfig) and DISABLED,
+            # alongside adaptive_stop / vol_sizing; revisit only as a regime/symbol-gated lever.
+            "loss_cut_hold_frac": 0.0,
+            "loss_cut_atr_mult": 0.0,
             # Iter 13: TIGHTEN the runner trail 1.5 → 0.9 (honest-fills re-baseline). Under the
             # corrected resting-limit fills the avg winner collapsed to +0.27 ATR: a 1.5-ATR
             # chandelier never ratchets above the +0.2 lock floor until +1.7 ATR, so every
