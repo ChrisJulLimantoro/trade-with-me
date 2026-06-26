@@ -99,6 +99,10 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # Pull the take-profit in from 3.0→2.0 ATR so the scale-out-at-TP1 leg actually
             # banks a win (the 3-ATR target was tagged on ~3% of trades). With the 1.5-ATR
             # stop this is RR≈1.33, still clearing the scalper min_rr (1.0).
+            # SPEC3-LOOP / Iter 2 attempt 1 (REVERTED): 2.0 → 1.2 to fire the scale-out on more
+            # winners. Degraded TRAIN on ALL three coins (BTC −$45, ETH −$66, SOL −$129) with no
+            # win-rate gain — pulling TP1 in caps the genuine runners' first half (where the PnL
+            # concentrates) more than the extra scale-out banking adds. Reverted to 2.0.
             "reward_atr_mult": 2.0,
             "entry_pullback_atr_frac": 0.25,
         },
@@ -117,6 +121,12 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # next-best setups as ~+EV volume — crossing the 300-trade floor and adding PnL. This
             # is NOT the iter6.5 disaster (0.50 + refresh-6 under look-ahead = 22% win): the
             # quality bar moves only slightly and win-rate headroom (71% vs 60%) absorbs it.
+            # SPEC3-LOOP / Iter 2 attempt 2 (REVERTED — overfit): 0.70 → 0.75 raised TRAIN (ETH
+            # 71→74% fail→pass, BTC +$23, all win ≥73%) but a controlled A/B on the same validation
+            # window (2025-09→2026-02) showed it DEGRADED OOS on all three coins (BTC +$35→−$125,
+            # ETH $831→$506, SOL $595→$530). TRAIN↑ / VALIDATION↓ is the overfitting signature — the
+            # stricter floor memorizes 2025 entry quality that doesn't transfer to the 2026 regime.
+            # Non-degradation veto → rejected. Base floor stays 0.70.
             "signal_min_confidence": 0.70,
             # LOOP6 / Iter 6: volatility-conditional confidence floor on ABSOLUTE atr_pct. Iter 5
             # proved the chop floor fixes a bleeding window (BTC25h2 148→255, win 70→73) but

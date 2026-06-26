@@ -45,21 +45,34 @@ async def _ensure_data(
     """
     from sqlalchemy import text
 
+    from ats.engine.timeframes import timeframe_to_timedelta
     from ats.ingestion.backfill import run as ingest_backfill
     from ats.processing.features import backfill as feature_backfill
 
-    row = (
+    # Coverage must be checked *inside* [from_dt, to_dt], not by the global
+    # min/max span: prior backfills can leave an interior gap (e.g. features
+    # exist for 2025-01..09 and 2026-01..06 but not the window in between),
+    # and a global span check would falsely report "covered" while the replay
+    # then walks ~0 bars. Compare the in-window row count to the expected bar
+    # count for this timeframe instead.
+    tf_delta = timeframe_to_timedelta(timeframe)
+    expected_bars = int((to_dt - from_dt) / tf_delta) if tf_delta else 0
+    in_window = (
         await session.execute(
             text(
-                "SELECT min(open_time) AS mn, max(open_time) AS mx "
-                "FROM features WHERE symbol=:s AND timeframe=:tf"
+                "SELECT count(*) FROM features "
+                "WHERE symbol=:s AND timeframe=:tf "
+                "AND open_time >= :a AND open_time < :b"
             ),
-            {"s": symbol, "tf": timeframe},
+            {"s": symbol, "tf": timeframe, "a": from_dt, "b": to_dt},
         )
-    ).mappings().first()
-    mn, mx = (row["mn"], row["mx"]) if row else (None, None)
-    if mn is not None and mn <= from_dt and mx >= to_dt:
-        console.print(f"[dim]data covered for {symbol} {timeframe}; skipping backfill[/dim]")
+    ).scalar() or 0
+    # Allow a small shortfall (venue gaps / boundary bar) before re-backfilling.
+    if expected_bars > 0 and in_window >= 0.98 * expected_bars:
+        console.print(
+            f"[dim]data covered for {symbol} {timeframe} "
+            f"({in_window}/{expected_bars} bars); skipping backfill[/dim]"
+        )
         return
 
     console.print(
