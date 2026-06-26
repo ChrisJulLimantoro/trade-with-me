@@ -168,3 +168,66 @@ Beating the raised BTC bar by parameter tuning looks unlikely without overfittin
 losers), which is a larger change than a one-knob iteration. Options: (a) accept iteration 1 as
 the validated baseline and keep the raised bar as an aspirational target; (b) lower the BTC PnL
 bar to what OOS supports; or (c) invest in a structural feature, then resume the loop.
+
+---
+
+# LOOP7 — hybrid-engine branch · objective = maximize portfolio PnL (per-iteration log: `LOOP7.md`)
+
+Branch `f/hybrid-engine`. The engine differs from the branch the loop ran on above, so all numbers
+were re-baselined. **Mid-loop the objective was changed by the user from "pass a win-rate gate" to
+"maximize honest portfolio PnL (BTC+ETH+SOL), no lookahead/cheating."** Replays are free/deterministic
+(LLM_MOCK=false but the plan path is deterministic). Splits: TRAIN 2025-01-01→2025-09-01,
+VALIDATION 2025-09-01→2026-02-01, HOLDOUT 2026-02-01→2026-06-01.
+
+## Problems found
+
+1. **The `signal_min_confidence` gate (0.70) was badly miscalibrated** — it was the single biggest
+   PnL leak. It suppressed *good* ETH/SOL setups: as the floor drops, ETH win-rate *rises*
+   (69%→76%) and PnL climbs monotonically on TRAIN (0.70→$2154 … 0.55→$3352 … 0.40→$3762). A real
+   quality filter would have an interior optimum; this one didn't — it was just throttling volume.
+2. **A cross-symbol low-vol chop bleed** in the atr_pct band 0.0023–0.0030: net-negative on TRAIN
+   for both BTC (75t/69%/−$13) and ETH (part of a 15t/47%/−$62 bucket), while SOL never trades that
+   low. The existing chop floor cut off at 0.0023, letting the band escape.
+3. **BTC ↔ ETH/SOL knob opposition** (consistent with prior loops): BTC wants a *high* confidence
+   floor, ETH/SOL want *low*. Vol-conditional floor combos were tried to protect BTC, but they
+   clawed back more ETH/SOL volume than BTC's recovery was worth — the simplest global low floor won.
+4. Dead levers on this branch: looser trail (0.6→0.9) and farther target (reward 2.0→3.0) — both
+   neutral-to-negative. Winner-size is not the lever here; **volume is**.
+
+## Solutions shipped (2 knobs in the `scalper` profile)
+
+- **`chop_atr_pct_max` 0.0023 → 0.0030** (iter1): gate the cross-symbol chop bleed; SOL untouched.
+- **`signal_min_confidence` 0.70 → 0.55** (iter4): the dominant lever. 0.55 is the robust knee —
+  below it TRAIN keeps rising on noise but VALIDATION flattens and SOL starts bleeding OOS
+  ($639→$473 at 0.50), so 0.55 banks the validated edge without the overfit tail.
+
+Also added a test-only `ATS_PROFILE_OVERRIDE` env shim in `apply_profile()` (inert unless set) so
+knob sweeps don't need a file edit per run; shipped values are baked into the profile dict.
+
+## Results — original inherited config → finalized (portfolio PnL across BTC+ETH+SOL)
+
+| Split | Original (0.70 / 0.0023) | Final (0.55 / 0.0030) | Δ |
+| ----- | ------------------------ | --------------------- | - |
+| TRAIN | $2066 | $3352 | **+$1286 (+62%)** |
+| VALIDATION | $1520 | $1903 | **+$383 (+25%)** |
+| **HOLDOUT** (touched once) | **$387** | **$1228** | **+$842 (+218%, 3.2×)** |
+
+Final HOLDOUT detail (conf 0.55): BTC 226t/68%/$121.30 · ETH 271t/67%/$240.66 · SOL 255t/77%/$866.42.
+
+## Honest read of the generalization gap
+
+- The edge **generalizes cleanly in the profit direction** — the change improved *every* split,
+  including the genuinely-untouched 2026-H1 HOLDOUT (+$842, and BTC went from −$5 to +$121). This is
+  the opposite of the iter2-above overfit signature (where TRAIN↑ but VALIDATION↓).
+- Win rates are stable (~67–77%) across all confidence floors and all three splits, so the gain is
+  "more trades of the same honest quality," not a lookahead artifact (a lookahead bug would show
+  implausible 90%+ win rates). Per-trade fill logic (wick_limit resting maker fills) is unchanged.
+- PnL is still **regime-sensitive**: the 2026-H1 holdout ($1228) is below the 2025 TRAIN/VAL levels,
+  as expected for a high-win-rate book in a drawdown regime — but it is now solidly positive on all
+  three coins, where the original config was ~break-even ($387, BTC negative).
+
+## Not done (loop stopped here at user request after iter4)
+
+Untested levers under the new 3×-larger trade population: stop tightness (`min_stop_atr_mult`),
+arm/lock harvest floor, and per-symbol vol-conditional floors. The HOLDOUT was touched once with the
+finalized config and is not to be tuned against.
