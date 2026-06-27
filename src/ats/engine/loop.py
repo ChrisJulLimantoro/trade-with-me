@@ -208,7 +208,7 @@ async def _walk_replay(
             bars_since_plan = settings.plan.plan_refresh_bars
 
     await session.commit()
-    report.finalise()
+    report.finalise(starting_equity=settings.risk.paper_equity_usd)
     return report
 
 

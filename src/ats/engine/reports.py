@@ -90,8 +90,21 @@ class ReplayReport:
     sharpe_ratio: float | None = None  # avg_pnl / std(pnl), risk-free = 0, trade-level
     sortino_ratio: float | None = None  # avg_pnl / downside-std, risk-free = 0, trade-level
 
-    def finalise(self) -> None:
-        """Compute summary metrics from trade_outcomes. Call once after the loop."""
+    # --- equity-curve metrics (need a starting equity to populate) ---
+    starting_equity_usd: float | None = None  # book size the curve starts from
+    final_portfolio_value: float | None = None  # equity after the last closed trade
+    max_portfolio_value: float | None = None  # peak realized equity over the run
+    min_portfolio_value: float | None = None  # trough realized equity over the run
+    max_drawdown_pct: float | None = None  # largest peak→trough decline (% of peak)
+    max_drawdown_usd: float | None = None  # largest peak→trough decline ($)
+
+    def finalise(self, starting_equity: float = 0.0) -> None:
+        """Compute summary metrics from trade_outcomes. Call once after the loop.
+
+        ``starting_equity`` is the book size the equity curve starts from; when > 0
+        the portfolio-value / drawdown metrics are populated by walking realized
+        ``pnl_usd`` in close order (trade_outcomes is appended as trades close).
+        """
         if not self.trade_outcomes:
             return
         wins = [t for t in self.trade_outcomes if t.pnl_pct > 0]
@@ -117,9 +130,38 @@ class ReplayReport:
             self.volatility_pct = std * 100
             if std > 0:
                 self.sharpe_ratio = self.avg_pnl_pct / std
-            downside = [r for r in returns if r < 0]
-            if len(downside) >= 2:
-                d_var = sum(r ** 2 for r in downside) / (len(downside) - 1)
-                d_std = math.sqrt(d_var)
-                if d_std > 0:
-                    self.sortino_ratio = self.avg_pnl_pct / d_std
+            # Sortino: target downside deviation relative to MAR=0, summed over ALL
+            # returns (positive returns contribute 0) and divided by the same (n-1)
+            # base as the Sharpe denominator. This is the standard target-semideviation
+            # — it keeps Sortino directly comparable to Sharpe (same denominator, only
+            # the upside is zeroed out). The previous code divided the negatives'
+            # sum-of-squares by (count_of_negatives − 1), which is neither the standard
+            # downside deviation nor comparable to the Sharpe figure.
+            d_var = sum(min(r, 0.0) ** 2 for r in returns) / (n - 1)
+            d_std = math.sqrt(d_var)
+            if d_std > 0:
+                self.sortino_ratio = self.avg_pnl_pct / d_std
+
+        # Equity-curve metrics. Walk realized pnl_usd in close order from the book's
+        # starting equity; track peak/trough and the largest peak→trough drawdown.
+        if starting_equity > 0:
+            self.starting_equity_usd = starting_equity
+            equity = peak = starting_equity
+            hi = lo = starting_equity
+            max_dd_usd = 0.0
+            max_dd_frac = 0.0
+            for t in self.trade_outcomes:
+                equity += t.pnl_usd
+                hi = max(hi, equity)
+                lo = min(lo, equity)
+                peak = max(peak, equity)
+                drop = peak - equity
+                if drop > max_dd_usd:
+                    max_dd_usd = drop
+                if peak > 0 and drop / peak > max_dd_frac:
+                    max_dd_frac = drop / peak
+            self.final_portfolio_value = equity
+            self.max_portfolio_value = hi
+            self.min_portfolio_value = lo
+            self.max_drawdown_usd = max_dd_usd
+            self.max_drawdown_pct = max_dd_frac * 100

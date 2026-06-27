@@ -291,6 +291,16 @@ def replay(
                 f"margin_expectancy={rep.expectancy_pct * 100:+.3f}%"
                 + atr_str + vol_str + sharpe_str + sortino_str
             )
+            if rep.max_drawdown_pct is not None:
+                emit(
+                    f"  [bold]portfolio[/bold]  "
+                    f"start=${rep.starting_equity_usd:,.2f}  "
+                    f"final=${rep.final_portfolio_value:,.2f}  "
+                    f"max=${rep.max_portfolio_value:,.2f}  "
+                    f"min=${rep.min_portfolio_value:,.2f}  "
+                    f"max_drawdown={rep.max_drawdown_pct:.2f}% "
+                    f"(${rep.max_drawdown_usd:,.2f})"
+                )
             log.info(
                 "replay_summary",
                 symbol=symbol,
@@ -304,6 +314,12 @@ def replay(
                 sharpe_ratio=round(rep.sharpe_ratio, 4) if rep.sharpe_ratio is not None else None,
                 sortino_ratio=round(rep.sortino_ratio, 4) if rep.sortino_ratio is not None else None,
                 avg_stop_dist_atr=round(rep.avg_stop_dist_atr, 4) if rep.avg_stop_dist_atr is not None else None,
+                starting_equity_usd=round(rep.starting_equity_usd, 2) if rep.starting_equity_usd is not None else None,
+                final_portfolio_value=round(rep.final_portfolio_value, 2) if rep.final_portfolio_value is not None else None,
+                max_portfolio_value=round(rep.max_portfolio_value, 2) if rep.max_portfolio_value is not None else None,
+                min_portfolio_value=round(rep.min_portfolio_value, 2) if rep.min_portfolio_value is not None else None,
+                max_drawdown_pct=round(rep.max_drawdown_pct, 4) if rep.max_drawdown_pct is not None else None,
+                max_drawdown_usd=round(rep.max_drawdown_usd, 2) if rep.max_drawdown_usd is not None else None,
             )
             from rich.table import Table
 
