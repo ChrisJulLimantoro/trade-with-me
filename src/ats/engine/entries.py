@@ -56,6 +56,7 @@ async def execute_setup(
     report: TickReport,
     *,
     tf: str,
+    equity_usd: float | None = None,
 ) -> None:
     """Size and open a detected setup deterministically at ``entry_price``.
 
@@ -96,7 +97,7 @@ async def execute_setup(
         setup_d,
         price=entry_price,
         open_positions=open_positions,
-        equity_usd=settings.risk.paper_equity_usd,
+        equity_usd=equity_usd if equity_usd is not None else settings.risk.paper_equity_usd,
         risk_per_trade_pct=settings.risk.risk_per_trade_pct,
         max_leverage=settings.risk.max_leverage,
         min_rr=settings.risk.min_rr,
@@ -113,6 +114,8 @@ async def execute_setup(
         report.notes.append(f"setup {setup.setup_id} risk-rejected: {decision.reasons}")
         return
 
+    effective_equity = equity_usd if equity_usd is not None else settings.risk.paper_equity_usd
+    trace.outcome(f"sizing on equity=${effective_equity:.2f}")
     policy = exit_policy_for_regime(plan.regime_cell)
     trade_id = await open_paper_trade(
         session,

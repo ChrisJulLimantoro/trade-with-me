@@ -178,6 +178,7 @@ async def evaluate_now(
     now: datetime | None = None,
     fine_candles: list[dict[str, Any]] | None = None,
     run_id: str | None = None,
+    equity_usd: float | None = None,
 ) -> TickReport:
     """Run one full evaluation of the active plan against the current feature row.
 
@@ -255,7 +256,7 @@ async def evaluate_now(
             opened_before = report.opened
             await execute_setup(
                 session, plan, setup, setup_dict(setup), limit, feature_row, now,
-                open_positions, report, tf=tf,
+                open_positions, report, tf=tf, equity_usd=equity_usd,
             )
             if report.opened > opened_before:
                 log.info(
@@ -325,7 +326,7 @@ async def evaluate_now(
             opened_before = report.opened
             await execute_setup(
                 session, plan, setup, setup_d, ev.price, feature_row, now,
-                open_positions, report, tf=tf,
+                open_positions, report, tf=tf, equity_usd=equity_usd,
             )
             if report.opened > opened_before:
                 break

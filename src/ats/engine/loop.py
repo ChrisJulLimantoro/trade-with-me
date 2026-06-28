@@ -162,6 +162,7 @@ async def _walk_replay(
     run_id = run.run_id if run else None
     bars_since_plan = settings.plan.plan_refresh_bars  # force a plan on the first bar
     active_sticky: str | None = None
+    running_equity = settings.risk.paper_equity_usd
     observe_tf = settings.observer.observe_timeframe
     base_dt = timeframe_to_timedelta(tf)
     obs_dt = timeframe_to_timedelta(observe_tf) if observe_tf != tf else base_dt
@@ -193,8 +194,11 @@ async def _walk_replay(
         tick = await evaluate_now(
             session, client, symbol=symbol, tf=tf, feature_row=row, prev_row=prev,
             candle_closed=True, now=now, fine_candles=fine_candles, run_id=run_id,
+            equity_usd=running_equity,
         )
         _accumulate(report, tick)
+        for ct in tick.closed_trades:
+            running_equity += ct.pnl_usd
         active_sticky = _record_notes(report, tick, active_sticky)
         report.bars += 1
 
