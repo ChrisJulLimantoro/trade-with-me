@@ -265,6 +265,11 @@ async def build_envelope(
         d for d in ("long", "short")
         if regime_allows(regime_cell, d, htf_rsi_state=htf_rsi_state)
     ]
+    # Hard-gate-only direction set for the mean-reversion sub-strategy: it must respect the macro
+    # regime gate (no longs in a hard bear) but NOT the trend-strategy filters below
+    # (htf_trend_filter / sideways_block_*), which exist precisely to suppress the trend-pullback
+    # entries that have no edge in chop — exactly where MR DOES have an edge.
+    mr_allowed_directions = list(allowed_directions)
 
     # Higher-timeframe trend filter (#trend-align): DROP the direction that fights the 4h
     # trend, but never force the other side (forcing counter-regime shorts on 1h bounces
@@ -365,6 +370,8 @@ async def build_envelope(
         "one_position_per_symbol": True,
         # Directions the runtime regime filter will allow. Propose ONLY these.
         "allowed_directions": allowed_directions,
+        # Directions the mean-reversion sub-strategy may take (hard regime gate only).
+        "mr_allowed_directions": mr_allowed_directions,
     }
     if settings.plan.deterministic_direction_hint:
         risk_limits["preferred_direction"] = preferred

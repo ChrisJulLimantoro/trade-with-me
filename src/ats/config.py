@@ -187,6 +187,21 @@ class PlanConfig(BaseModel):
     # is the cross-symbol discrimination a single universal knob cannot give. 0.0 floor = disabled.
     chop_atr_pct_max: float = 0.0
     chop_min_confidence: float = 0.0
+    # --- Mean-reversion sub-strategy (LOOP6 holdout, default OFF) ---
+    # A regime-gated counter-trend proposer for low-vol chop, where the trend-pullback engine has
+    # no edge (it whipsaws). When ``mr_enabled`` and the bar is low-vol sideways (regime_cell
+    # "side-*" AND absolute ``atr_pct <= mr_atr_pct_max``), the proposer FADES the recent range
+    # instead of chasing continuation: buy the bottom / sell the top, targeting the range mid. The
+    # absolute-atr_pct gate confines it to a structurally low-vol symbol (BTC) and spares high-vol
+    # ones (ETH/SOL) — the same cross-symbol discrimination the chop floor uses. 0.0 = disabled.
+    mr_enabled: bool = False
+    mr_atr_pct_max: float = 0.0
+    mr_range_lookback: int = 20      # bars of CLOSED OHLC the range high/low is taken over
+    mr_edge_frac: float = 0.15       # trigger when close is within this fraction of a band edge
+    mr_rsi_os: float = 35.0          # long only if rsi_14 <= this (oversold confirm)
+    mr_rsi_ob: float = 65.0          # short only if rsi_14 >= this (overbought confirm)
+    mr_stop_buffer_atr: float = 0.5  # stop sits this many ATR beyond the faded band edge
+    mr_min_range_atr: float = 2.0    # skip ranges narrower than this (×ATR) — too thin to fade
     max_setups_per_plan: int = 2
     # How a detected setup turns into a fill:
     #  - "close": market-on-close. The decision bar closes inside the entry_zone → fill at that

@@ -17,7 +17,9 @@ from ats.config import settings
 from ats.llm.schemas import LlmResult, PlanOutput
 from ats.logging import get_logger
 from ats.orchestration.weights import WEIGHTS
+from ats.agents.base import f
 from ats.strategy.bridge import signal_to_plan
+from ats.synthesis.mean_reversion import propose_mean_reversion
 from ats.synthesis.synthesizer import Signal, synthesize
 
 log = get_logger(__name__)
@@ -54,6 +56,45 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
     risk_limits = envelope.get("risk_limits") or {}
     preferred = risk_limits.get("preferred_direction")
     allowed = risk_limits.get("allowed_directions")
+
+    # Mean-reversion router: in low-vol sideways chop (regime "side-*" AND absolute atr_pct at/below
+    # the gate) the trend-pullback engine has no edge, so try the counter-trend range-fade proposer
+    # first. The absolute-atr_pct gate confines it to a structurally low-vol symbol (BTC). On a
+    # qualifying signal (gated by the hard-regime-only mr_allowed_directions) return it; otherwise
+    # fall through to the trend synthesizer, which the chop floor already rejects on most such bars.
+    if settings.plan.mr_enabled:
+        regime_cell = (ai.regime or {}).get("regime_cell") or ""
+        atr_pct = f(features.get("atr_pct"))
+        if (
+            regime_cell.lower().startswith("side")
+            and atr_pct is not None
+            and atr_pct <= settings.plan.mr_atr_pct_max
+        ):
+            mr = propose_mean_reversion(
+                features,
+                ai.recent_ohlcv,
+                range_lookback=settings.plan.mr_range_lookback,
+                edge_frac=settings.plan.mr_edge_frac,
+                rsi_os=settings.plan.mr_rsi_os,
+                rsi_ob=settings.plan.mr_rsi_ob,
+                stop_buffer_atr=settings.plan.mr_stop_buffer_atr,
+                min_range_atr=settings.plan.mr_min_range_atr,
+                min_rr=settings.risk.min_rr,
+                fee_bps=settings.risk.fee_bps,
+                slippage_bps=settings.risk.slippage_bps,
+                pullback_atr_frac=settings.risk.entry_pullback_atr_frac,
+                log=log,
+            )
+            if mr is not None:
+                mr_allowed = risk_limits.get("mr_allowed_directions")
+                if mr_allowed is None or mr.direction in mr_allowed:
+                    return mr
+                log.info(
+                    "signal_rejected",
+                    reason="mr_regime_gate",
+                    direction=mr.direction,
+                    allowed_directions=mr_allowed,
+                )
 
     signal = synthesize(
         scores,

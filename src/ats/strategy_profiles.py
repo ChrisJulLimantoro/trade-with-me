@@ -185,6 +185,19 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # under a profitable book — subtractive regime blocks reshuffle the whole sequence.
             # Confirms: only UNIVERSAL per-trade levers are robust here. Flag stays OFF.
             "sideways_block_shorts": False,
+            # LOOP6 holdout: a counter-trend mean-reversion sub-strategy for the low-vol chop the
+            # trend engine can't trade (BTC 2026). It FADES the recent range (buy the bottom / sell
+            # the top → mid) where sideways_block_longs/htf_trend_filter suppress the trend entries.
+            # Gated on absolute atr_pct at the same band the chop floor uses, so it fires on BTC's
+            # choppiest bars and ~never on ETH/SOL. Tune mr_edge_frac/mr_min_range_atr on BTC 26h1.
+            "mr_enabled": True,
+            "mr_atr_pct_max": 0.0030,
+            "mr_range_lookback": 20,
+            "mr_edge_frac": 0.15,
+            "mr_rsi_os": 35.0,
+            "mr_rsi_ob": 65.0,
+            "mr_stop_buffer_atr": 0.5,
+            "mr_min_range_atr": 2.0,
         },
         "exits": {
             "max_hold_bars": 8,            # ~2h on 15m; scalps don't marinate (>0 = time-stop ON)
