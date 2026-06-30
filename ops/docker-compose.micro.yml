@@ -1,0 +1,70 @@
+# Lightweight Postgres for small/free-tier boxes (e.g. AWS t3.micro, 1 GB RAM).
+#
+# Differences vs docker-compose.yml:
+#   - uses the slim `timescale/timescaledb` image instead of the heavy `-ha` (Patroni/backup)
+#     build, cutting baseline RAM by a few hundred MB;
+#   - caps Postgres memory (shared_buffers / work_mem / max_connections) so it coexists with
+#     the Python engine on 1 GB;
+#   - restart: unless-stopped so the DB survives a reboot.
+#
+# The slim image stores data at /var/lib/postgresql/data (NOT the -ha path), so this file uses
+# its OWN volume name (`ats-pgdata-micro`) to avoid clashing with the -ha volume.
+#
+# Usage:  docker compose -f ops/docker-compose.micro.yml up -d
+# DATABASE_URL stays the same:  postgresql+asyncpg://ats:ats@localhost:5435/ats
+
+services:
+  db:
+    image: timescale/timescaledb:latest-pg16
+    environment:
+      POSTGRES_USER: ats
+      POSTGRES_PASSWORD: ats
+      POSTGRES_DB: ats
+    command: >
+      postgres
+      -c shared_buffers=128MB
+      -c effective_cache_size=384MB
+      -c work_mem=8MB
+      -c maintenance_work_mem=64MB
+      -c max_connections=20
+    ports:
+      - "5435:5432"
+    volumes:
+      - ats-pgdata-micro:/var/lib/postgresql/data
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql
+    restart: unless-stopped
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ats -d ats"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  bot:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ../.env                 # BINANCE_* keys, LLM_MOCK, etc.
+    environment:
+      # Inside the compose network the DB is reachable as db:5432 (overrides the host
+      # localhost:5435 value in .env — `environment` wins over `env_file`).
+      DATABASE_URL: postgresql+asyncpg://ats:ats@db:5432/ats
+      LOG_RENDER: json          # clean, parseable lines in the daily txt log
+      LOG_LEVEL: INFO
+      # Bot run parameters (consumed by ops/bot-entrypoint.sh):
+      SYMBOL: SOLUSDT
+      TIMEFRAME: 15m
+      PROFILE: scalper
+      EQUITY: "5000"
+      FEED: ws
+      RECONCILE: close
+    volumes:
+      - ../logs:/app/logs       # daily ats-YYYY-MM-DD.log + trace/order logs land on the host
+    restart: unless-stopped
+    stop_grace_period: 20s
+
+volumes:
+  ats-pgdata-micro:

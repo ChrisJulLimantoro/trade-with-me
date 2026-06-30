@@ -1,0 +1,12 @@
+# Keep the build context small + reproducible. Deps come from uv.lock, not the host venv.
+.venv/
+.git/
+logs/
+graphify-out/
+**/__pycache__/
+*.pyc
+.pytest_cache/
+.ruff_cache/
+data/
+*.log
+.env
