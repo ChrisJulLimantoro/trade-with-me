@@ -16,6 +16,7 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ats import trace
 from ats.db.models import PaperTrade
+from ats.execution.live import live_ctx
 from ats.execution.reconcile import ExitResult, PartialFill, TradeState
 from ats.logging import get_logger
 
@@ -59,14 +60,40 @@ async def open_paper_trade(
     notional_usd: float | None = None,
     liq_price: float | None = None,
     risk_usd: float | None = None,
-) -> uuid.UUID:
+) -> uuid.UUID | None:
     """Insert an open paper trade for a detected+confirmed+risk-approved setup.
 
     ``setup`` is a dict with setup_id, plan_id, symbol, direction, stop_loss, take_profit.
     ``size_pct`` is notional / equity; ``margin_usd`` is committed capital before
     leverage, and ``notional_usd`` is market exposure after leverage.
+
+    Returns the new trade_id, or ``None`` when live execution is on and the entry order was
+    rejected/too small — the caller must NOT open an internal trade for a failed live entry.
     """
     run = current_run.get()
+    # Mirror model: when live, place the real testnet entry order FIRST; abort (no internal
+    # trade) if it didn't fill. The simulated ``entry_price`` stays the analytics source of
+    # truth; the real fill is recorded in the order log via the client recorder.
+    venue = "paper"
+    entry_order_id: str | None = None
+    ctx = live_ctx.get()
+    if ctx is not None:
+        if not notional_usd or notional_usd <= 0:
+            log.warning("live_open_no_notional", symbol=setup["symbol"])
+            trace.outcome("SKIPPED: live entry has no notional to size an order")
+            return None
+        result = await ctx.open_position(
+            setup["symbol"],
+            setup["direction"],
+            notional_usd=float(notional_usd),
+            entry_price=entry_price,
+            leverage=leverage,
+        )
+        if result is None:
+            trace.outcome("SKIPPED: live testnet entry order rejected/too small")
+            return None
+        venue = "binance_testnet"
+        entry_order_id = result.order_id
     trade = PaperTrade(
         trade_id=uuid.uuid4(),
         setup_id=setup["setup_id"],
@@ -88,9 +115,24 @@ async def open_paper_trade(
         run_id=run.run_id if run else None,
         run_label=run.run_label if run else None,
         config_hash=run.config_hash if run else None,
+        venue=venue,
+        entry_order_id=entry_order_id,
     )
     session.add(trade)
     await session.flush()
+    # Engine-synced protection: drop a STOP_MARKET (SL) + TAKE_PROFIT_MARKET (TP) on the
+    # exchange so the position is never unprotected. The exit machine keeps managing it and
+    # will cancel/replace these as the stop moves / trade closes.
+    if ctx is not None and venue == "binance_testnet":
+        tps = setup.get("take_profit") or []
+        if tps:
+            await ctx.place_protection(
+                str(trade.trade_id),
+                setup["symbol"],
+                setup["direction"],
+                stop_loss=float(setup["stop_loss"]),
+                take_profit=float(tps[-1]),
+            )
     log.info(
         "paper_trade_opened",
         trade_id=str(trade.trade_id),
@@ -141,6 +183,18 @@ async def record_partial_exit(
         float(trade.notional_usd) if trade.notional_usd is not None else equity_usd * size_pct
     )
     leg_usd = round(notional_usd * partial.frac * partial.pnl_pct, 2)
+    # Mirror model: fire a reduce-only market order for the scaled-out fraction.
+    leg_order_id: str | None = None
+    ctx = live_ctx.get()
+    if ctx is not None and trade.venue == "binance_testnet":
+        result = await ctx.reduce_position(
+            trade.symbol,
+            trade.direction,
+            notional_usd=notional_usd,
+            entry_price=float(trade.entry_price),
+            frac=partial.frac,
+        )
+        leg_order_id = result.order_id if result is not None else None
     md = dict(trade.trade_metadata or {})
     md.update(state.to_metadata())
     legs = list(md.get("partials", []))
@@ -151,6 +205,7 @@ async def record_partial_exit(
             "frac": round(partial.frac, 4),
             "pnl_pct": round(partial.pnl_pct, 6),
             "pnl_usd": leg_usd,
+            "order_id": leg_order_id,
         }
     )
     md["partials"] = legs
@@ -176,8 +231,19 @@ async def update_trade_state(
     trade = await session.get(PaperTrade, trade_id)
     if trade is None:
         return
+    prev = (trade.trade_metadata or {}).get("stop_working")
     _merge_state(trade, state)
     await session.flush()
+    # Engine-synced: if the working stop moved (breakeven / trail), cancel + replace the
+    # exchange STOP_MARKET so the on-exchange protection tracks the engine's stop.
+    ctx = live_ctx.get()
+    if (
+        ctx is not None
+        and trade.venue == "binance_testnet"
+        and state.working_stop is not None
+        and state.working_stop != prev
+    ):
+        await ctx.replace_stop(str(trade_id), trade.symbol, trade.direction, state.working_stop)
 
 
 async def close_paper_trade(
@@ -209,6 +275,14 @@ async def close_paper_trade(
     pnl_usd, margin_pnl_pct = margin_close_values(
         notional_usd=notional_usd, margin_usd=margin_usd, notional_pnl_pct=exit_result.pnl_pct
     )
+    # Engine-synced close: cancel the resting SL/TP first (so they can't fire against the
+    # close), then market-close the FULL remaining testnet position (reduce-only).
+    ctx = live_ctx.get()
+    if ctx is not None and trade.venue == "binance_testnet":
+        await ctx.cancel_protection(str(trade_id), trade.symbol)
+        result = await ctx.close_position(trade.symbol, trade.direction)
+        if result is not None:
+            trade.exit_order_id = result.order_id
     trade.exit_price = exit_result.exit_price
     trade.exit_time = exit_result.exit_time
     trade.exit_reason = exit_result.exit_reason

@@ -1,0 +1,176 @@
+"""Tests for the Binance testnet live-execution layer (pure logic + CLI guards).
+
+No network: we exercise quantity rounding, side mapping, and the CLI safety guard. The
+actual order placement is a thin python-binance pass-through covered by the dry/round-trip
+manual verification in the plan.
+"""
+
+from __future__ import annotations
+
+import pytest
+import typer
+
+from ats.config import settings
+from ats.execution.binance_futures import BinanceFuturesTestnet, SymbolFilters
+from ats.execution.live import _side_for_open, _side_for_reduce
+
+
+@pytest.fixture(autouse=True)
+def _restore_settings():
+    """Guard tests mutate the global settings singleton; snapshot + restore so test
+    ordering is never affected (and the scalper profile applied here doesn't leak)."""
+    saved = {
+        "binance_testnet": settings.binance_testnet,
+        "binance_api_key": settings.binance_api_key,
+        "binance_api_secret": settings.binance_api_secret,
+        "llm_mock": settings.llm_mock,
+        "adjudication_enabled": settings.adjudication_enabled,
+        "observe_enabled": settings.observer.observe_enabled,
+        "memory_enabled": settings.memory_enabled,
+        "strategy_profile": settings.strategy_profile,
+    }
+    try:
+        yield
+    finally:
+        settings.binance_testnet = saved["binance_testnet"]
+        settings.binance_api_key = saved["binance_api_key"]
+        settings.binance_api_secret = saved["binance_api_secret"]
+        settings.llm_mock = saved["llm_mock"]
+        settings.adjudication_enabled = saved["adjudication_enabled"]
+        settings.observer.observe_enabled = saved["observe_enabled"]
+        settings.memory_enabled = saved["memory_enabled"]
+        settings.strategy_profile = saved["strategy_profile"]
+
+
+def _client_with_filters(**kw) -> BinanceFuturesTestnet:
+    c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
+    c._filters = {"SOLUSDT": SymbolFilters(**kw)}
+    return c
+
+
+def test_round_qty_floors_to_step():
+    c = _client_with_filters(
+        step_size=0.1, min_qty=0.1, tick_size=0.01, min_notional=5.0, qty_precision=1
+    )
+    assert c.round_qty("SOLUSDT", 1.27) == 1.2
+    assert c.round_qty("SOLUSDT", 2.0) == 2.0
+
+
+def test_round_qty_below_min_returns_zero():
+    c = _client_with_filters(
+        step_size=0.1, min_qty=1.0, tick_size=0.01, min_notional=5.0, qty_precision=1
+    )
+    assert c.round_qty("SOLUSDT", 0.5) == 0.0
+
+
+def test_round_qty_requires_loaded_filters():
+    c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
+    c._filters = {}
+    with pytest.raises(Exception):
+        c.round_qty("SOLUSDT", 1.0)
+
+
+def test_side_mapping():
+    assert _side_for_open("long") == "BUY"
+    assert _side_for_open("short") == "SELL"
+    assert _side_for_reduce("long") == "SELL"   # closing/reducing a long sells
+    assert _side_for_reduce("short") == "BUY"
+
+
+@pytest.mark.asyncio
+async def test_create_refuses_mainnet():
+    from ats.execution.binance_futures import OrderError
+
+    with pytest.raises(OrderError):
+        await BinanceFuturesTestnet.create("k", "s", testnet=False)
+
+
+def _reset_settings():
+    settings.binance_testnet = True
+    settings.binance_api_key = "k"
+    settings.binance_api_secret = "s"
+    settings.llm_mock = True
+    settings.adjudication_enabled = False
+    settings.observer.observe_enabled = False
+    settings.memory_enabled = False
+
+
+def test_guard_passes_with_safe_config():
+    from ats.cli_commands.engine import _guard_live
+
+    _reset_settings()
+    _guard_live("scalper")  # must not raise
+
+
+def test_guard_refuses_mainnet():
+    from ats.cli_commands.engine import _guard_live
+
+    _reset_settings()
+    settings.binance_testnet = False
+    with pytest.raises(typer.BadParameter):
+        _guard_live("scalper")
+
+
+def test_guard_refuses_missing_keys():
+    from ats.cli_commands.engine import _guard_live
+
+    _reset_settings()
+    settings.binance_api_key = None
+    with pytest.raises(typer.BadParameter):
+        _guard_live("scalper")
+
+
+def test_guard_refuses_llm_enabled():
+    from ats.cli_commands.engine import _guard_live
+
+    _reset_settings()
+    settings.llm_mock = False
+    with pytest.raises(typer.BadParameter):
+        _guard_live("scalper")
+
+
+class _FakeRaw:
+    """Captures kwargs passed to futures_create_algo_order."""
+
+    def __init__(self):
+        self.calls = []
+
+    async def futures_create_algo_order(self, **params):
+        self.calls.append(params)
+        return {"algoId": 999, "status": "NEW"}
+
+
+@pytest.mark.asyncio
+async def test_place_conditional_stop_market_closeposition():
+    c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
+    c._client = _FakeRaw()
+    c._recorder = None
+    algo_id = await c.place_conditional(
+        "SOLUSDT", "SELL", "STOP_MARKET", trigger_price=120.0, close_position=True
+    )
+    assert algo_id == "999"
+    sent = c._client.calls[0]
+    # Conditional algo schema: algoType CONDITIONAL, subtype in 'type', trigger in 'triggerPrice'.
+    assert sent["algoType"] == "CONDITIONAL"
+    assert sent["type"] == "STOP_MARKET"
+    assert sent["triggerPrice"] == 120.0
+    assert sent["closePosition"] == "true"
+    # closePosition is mutually exclusive with quantity/reduceOnly — neither must be sent.
+    assert "quantity" not in sent and "reduceOnly" not in sent
+
+
+@pytest.mark.asyncio
+async def test_place_conditional_trailing_uses_callback_and_quantity():
+    c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
+    c._client = _FakeRaw()
+    c._recorder = None
+    await c.place_conditional(
+        "SOLUSDT", "SELL", "TRAILING_STOP_MARKET",
+        callback_rate=1.5, activate_price=130.0, quantity=2.0, reduce_only=True,
+    )
+    sent = c._client.calls[0]
+    assert sent["type"] == "TRAILING_STOP_MARKET"
+    assert sent["callbackRate"] == 1.5
+    assert sent["activatePrice"] == 130.0
+    assert sent["quantity"] == 2.0
+    assert sent["reduceOnly"] == "true"

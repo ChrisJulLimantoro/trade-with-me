@@ -290,6 +290,11 @@ class PaperTrade(Base):
     run_id: Mapped[str | None] = mapped_column(String, nullable=True)
     run_label: Mapped[str | None] = mapped_column(String, nullable=True)
     config_hash: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Execution venue + exchange order ids. 'paper' (default) = simulated; 'binance_testnet' =
+    # real testnet fill. Order ids link the row to its exchange orders (see binance_futures).
+    venue: Mapped[str] = mapped_column(String, nullable=False, default="paper")
+    entry_order_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    exit_order_id: Mapped[str | None] = mapped_column(String, nullable=True)
     trade_metadata: Mapped[dict[str, object]] = mapped_column(
         "metadata", JSONB, nullable=False, default=dict
     )

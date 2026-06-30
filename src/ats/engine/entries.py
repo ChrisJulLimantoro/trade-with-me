@@ -130,6 +130,11 @@ async def execute_setup(
         liq_price=decision.liq_price,
         risk_usd=decision.risk_usd,
     )
+    if trade_id is None:
+        # Live execution on and the testnet entry order was rejected/too small: do not open
+        # an internal trade. open_paper_trade already traced the reason.
+        report.notes.append(f"setup {setup.setup_id} live entry order not filled")
+        return
     # Time-stop the OPEN trade from its own entry bar, not the setup's entry-window
     # expiry: a trade that triggers late in a plan's life still gets a full hold budget,
     # so a healthy, still-running position is no longer cut short by the plan clock.

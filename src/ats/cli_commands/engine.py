@@ -429,21 +429,99 @@ def invalidate_check(
     asyncio.run(_run())
 
 
+def _guard_live(profile: str) -> None:
+    """Apply the profile, then refuse to run live execution unless it is safe + deterministic.
+
+    Hard requirements: testnet-only, credentials present, and a pure-deterministic config
+    (no LLM network calls). The scalper profile already disables the LLM observer; this just
+    enforces it so a stray flag can't silently start paying for / depending on an LLM.
+    """
+    from ats.config import settings
+    from ats.strategy_profiles import apply_profile
+
+    try:
+        apply_profile(profile)
+    except (KeyError, AttributeError) as exc:
+        raise typer.BadParameter(str(exc)) from exc
+
+    if not settings.binance_testnet:
+        raise typer.BadParameter("Refusing live execution: BINANCE_TESTNET must be true (mainnet not supported).")
+    if not settings.binance_api_key or not settings.binance_api_secret:
+        raise typer.BadParameter("Live execution needs BINANCE_API_KEY and BINANCE_API_SECRET (testnet).")
+    llm_on = (
+        settings.adjudication_enabled
+        or settings.observer.observe_enabled
+        or settings.memory_enabled
+        or not settings.llm_mock
+    )
+    if llm_on:
+        raise typer.BadParameter(
+            "Live execution requires a deterministic, no-LLM config: set llm_mock=true and "
+            "adjudication_enabled/observe_enabled/memory_enabled=false (the scalper profile does this)."
+        )
+
+
 @app.command()
 def run(
     symbol: str = typer.Option("BTCUSDT", "--symbol", help="Symbol."),
     timeframe: str = typer.Option("15m", "--timeframe", help="Timeframe."),
-    interval: int = typer.Option(60, "--interval", help="Seconds between polls."),
+    interval: int = typer.Option(60, "--interval", help="Seconds between polls (poll feed)."),
     once: bool = typer.Option(False, "--once", help="Run a single iteration and exit."),
     refresh: bool = typer.Option(
         False, "--refresh", help="Backfill candles + recompute features before each tick."
     ),
+    profile: str = typer.Option("baseline", "--profile", help="Strategy profile: baseline | scalper."),
+    equity: float = typer.Option(
+        None,
+        "--equity",
+        help="Override sizing equity (USD) AFTER the profile. Set this to your testnet wallet "
+        "balance for live execution (the scalper profile otherwise hardcodes $1000).",
+    ),
+    feed: str = typer.Option(
+        "poll", "--feed", help="Data feed: 'poll' (REST every --interval) or 'ws' (event-driven on bar close)."
+    ),
+    live_execute: bool = typer.Option(
+        False,
+        "--live-execute",
+        help="Place REAL orders on Binance Futures TESTNET (mirror model). Default OFF (paper).",
+    ),
+    reconcile_on_start: str = typer.Option(
+        "close",
+        "--reconcile-on-start",
+        help="On start/reconnect, handle an orphan testnet position: close | adopt | warn.",
+    ),
 ) -> None:
-    """Live poll loop: (optionally refresh data,) then tick, repeating every --interval.
+    """Live loop: poll (REST) or ws (event-driven, bar-close-precise), then tick. Ctrl-C to stop.
 
-    Not tick-precise — spec 01 is REST-only. Ctrl-C to stop.
+    With --live-execute the engine places real orders on Binance Futures TESTNET, mirroring the
+    deterministic exit machine. Requires BINANCE_TESTNET=true, API keys, and a no-LLM config.
     """
     from ats.engine.loop import run_live
+
+    if feed not in ("poll", "ws"):
+        raise typer.BadParameter("--feed must be 'poll' or 'ws'.")
+    if reconcile_on_start not in ("close", "adopt", "warn"):
+        raise typer.BadParameter("--reconcile-on-start must be close | adopt | warn.")
+
+    needs_client = live_execute or feed == "ws"
+    if needs_client:
+        _guard_live(profile)
+    else:
+        from ats.strategy_profiles import apply_profile
+
+        try:
+            apply_profile(profile)
+        except (KeyError, AttributeError) as exc:
+            raise typer.BadParameter(str(exc)) from exc
+
+    # Equity override must run AFTER the profile (profiles set their own paper_equity_usd).
+    if equity is not None:
+        from ats.config import settings as _settings
+
+        if equity <= 0:
+            raise typer.BadParameter("--equity must be positive.")
+        _settings.risk.paper_equity_usd = equity
+        console.print(f"[dim]equity override: sizing on ${equity:g}[/dim]")
 
     client = get_client()
 
@@ -456,17 +534,80 @@ def run(
             await run_once(session, [symbol])
             await session.commit()
 
-    refresh_fn = _refresh if refresh else None
+    # ws always needs a populated DB before each tick; poll only when --refresh.
+    refresh_fn = _refresh if (refresh or feed == "ws") else None
 
     async def _run() -> None:
-        console.print(
-            f"[bold cyan]Live engine[/bold cyan] {symbol} {timeframe} "
-            f"(interval={interval}s, refresh={refresh}). Ctrl-C to stop."
-        )
-        await run_live(
-            SessionLocal, client, symbol=symbol, tf=timeframe,
-            interval=interval, once=once, refresh_fn=refresh_fn,
-        )
+        from pathlib import Path
+
+        from ats import trace
+        from ats.config import settings
+        from ats.execution.binance_futures import BinanceFuturesTestnet
+        from ats.execution.live import LiveContext, live_ctx
+
+        bf_client: BinanceFuturesTestnet | None = None
+        ctx: LiveContext | None = None
+        token = None
+        try:
+            if needs_client:
+                stamp = datetime.now().strftime("%Y%m%d-%H%M%S")
+                trace_path = f"logs/live_{symbol}_{timeframe}_{stamp}.log"
+                order_log = f"logs/live_orders_{symbol}_{timeframe}_{stamp}.jsonl"
+                Path(trace_path).parent.mkdir(parents=True, exist_ok=True)
+                trace.init(trace_path)
+                trace.header(
+                    f"LIVE  {symbol} {timeframe}  feed={feed}  profile={profile}  "
+                    f"live_execute={live_execute}  testnet={settings.binance_testnet}"
+                )
+                bf_client = await BinanceFuturesTestnet.create(
+                    settings.binance_api_key or "",
+                    settings.binance_api_secret or "",
+                    testnet=settings.binance_testnet,
+                    futures_url=settings.binance_futures_url,
+                )
+                ctx = LiveContext(bf_client, Path(order_log))
+                bf_client._recorder = ctx.record  # client records every exchange interaction
+                if live_execute:
+                    token = live_ctx.set(ctx)
+                    console.print(
+                        "[bold red]LIVE TESTNET EXECUTION ON — orders WILL be placed on testnet[/bold red]"
+                    )
+                console.print(f"[dim]trace -> {trace_path}  orders -> {order_log}[/dim]")
+
+            console.print(
+                f"[bold cyan]Live engine[/bold cyan] {symbol} {timeframe} "
+                f"feed={feed} profile={profile} live_execute={live_execute}. Ctrl-C to stop."
+            )
+
+            if feed == "ws":
+                from ats.execution.live_ws import run_ws
+
+                assert ctx is not None
+                # Non-executing ws must never flatten a position it didn't open.
+                mode = reconcile_on_start if live_execute else "warn"
+                await run_ws(
+                    SessionLocal, client, ctx, symbol=symbol, tf=timeframe,
+                    observe_tf=settings.observer.observe_timeframe,
+                    refresh_fn=_refresh, reconcile_mode=mode, once=once,
+                )
+            else:
+                if live_execute and ctx is not None:
+                    from ats.execution.live_tracker import reconcile_on_start as _reconcile
+
+                    async with SessionLocal() as session:
+                        await _reconcile(session, ctx, symbol, mode=reconcile_on_start)
+                        await session.commit()
+                await run_live(
+                    SessionLocal, client, symbol=symbol, tf=timeframe,
+                    interval=interval, once=once, refresh_fn=refresh_fn,
+                )
+        finally:
+            if token is not None:
+                live_ctx.reset(token)
+            if ctx is not None:
+                ctx.close()
+            if bf_client is not None:
+                await bf_client.close()
 
     try:
         asyncio.run(_run())

@@ -277,6 +277,19 @@ class Settings(BaseSettings):
     database_url: str = "postgresql+asyncpg://ats:ats@localhost:5432/ats"
     x_bearer_token: str | None = None
     log_level: str = "INFO"
+
+    # --- Binance Futures TESTNET execution (opt-in; see f/testnet-live-execution) ---
+    # Real order placement on Binance Futures TESTNET only. There is intentionally no mainnet
+    # path: ``binance_testnet`` must stay True for ``--live-execute`` to be allowed. Keys are
+    # blank by default so the paper-only system runs unchanged with no credentials.
+    binance_api_key: str | None = None
+    binance_api_secret: str | None = None
+    binance_testnet: bool = True
+    # Override the testnet REST base URL. python-binance's testnet defaults to
+    # https://testnet.binancefuture.com/fapi; set this to e.g. https://demo-fapi.binance.com
+    # if your demo account lives on the newer host. None = use the python-binance default.
+    binance_futures_url: str | None = None
+    live_execute: bool = False  # master off-switch; the CLI --live-execute flag overrides per-run
     log_render: Literal["rich", "json"] = "rich"
     seed: int = 42
 
