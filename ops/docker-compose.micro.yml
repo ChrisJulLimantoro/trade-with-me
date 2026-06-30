@@ -66,5 +66,23 @@ services:
     restart: unless-stopped
     stop_grace_period: 20s
 
+  dash:
+    build:
+      context: ..
+      dockerfile: Dockerfile
+    depends_on:
+      db:
+        condition: service_healthy
+    env_file:
+      - ../.env                 # BINANCE_FUTURES_URL (for live ticker), etc.
+    environment:
+      DATABASE_URL: postgresql+asyncpg://ats:ats@db:5432/ats
+      DASH_PORT: "8080"
+    # Override the bot entrypoint: this container just serves the read-only dashboard.
+    entrypoint: ["uv", "run", "python", "ops/dashboard.py"]
+    ports:
+      - "8080:8080"             # open this port to YOUR IP only in the EC2 security group
+    restart: unless-stopped
+
 volumes:
   ats-pgdata-micro:

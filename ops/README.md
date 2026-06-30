@@ -121,6 +121,17 @@ Cross-check positions/orders on <https://testnet.binancefuture.com>.
 
 ---
 
+## Dashboard
+
+A lightweight read-only web dashboard (`dash` service) starts with the same `up -d`. It shows
+open positions, realized + **live unrealized PnL**, win rate, and the last 50 closed trades,
+auto-refreshing every 10s. No extra dependencies (stdlib HTTP server + asyncpg).
+
+Open `http://<EC2_PUBLIC_IP>:8080`.
+
+> **Security:** the dashboard has no auth. Open port **8080** in the EC2 security group to **your
+> IP only**. (Or skip exposing it and use an SSH tunnel: `ssh -L 8080:localhost:8080 ubuntu@<IP>`.)
+
 ## Manage
 
 ```bash

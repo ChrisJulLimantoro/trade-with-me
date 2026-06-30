@@ -10,11 +10,11 @@ rejected instead of rewarded.
 - **Timeframe:** 15m · **Profile:** scalper
 - **Timeline split** (warm-up before each `--from` is auto-handled by `_ensure_data`):
 
-| Split                | Window                       | The loop may...                                        |
-| -------------------- | ---------------------------- | ------------------------------------------------------ |
-| **TRAIN**      | `2025-01-01 → 2025-09-01` | read these logs and tune against them                  |
-| **VALIDATION** | `2025-09-01 → 2026-02-01` | grade generalization —**never** diagnose off it |
-| **HOLDOUT**    | `2026-02-01 → 2026-06-01` | touch**exactly once**, at the very end           |
+| Split                | Window                         | The loop may...                                        |
+| -------------------- | ------------------------------ | ------------------------------------------------------ |
+| **TRAIN**      | `2025-01-01 → 2025-09-01`   | read these logs and tune against them                  |
+| **VALIDATION** | `2025-09-01 → 2026-02-01`   | grade generalization —**never** diagnose off it |
+| **HOLDOUT**    | `2026-02th-01 → 2026-06-01` | touch**exactly once**, at the very end           |
 
 `BTCUSDT` must always be backfilled even though all three coins trade — regimes are computed
 from BTC-1h only and shared globally, so ETH/SOL replays depend on it.
