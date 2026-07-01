@@ -25,9 +25,12 @@ mkdir -p "$LOG_DIR"
 
 echo "[entrypoint] $(date -u +%FT%TZ) migrate + warmup for ${SYMBOL} ${TIMEFRAME}"
 uv run ats db migrate
-# 14d warmup so higher-timeframe context (4h EMA50 needs ~8+ days) is populated — fixes the
-# htf_context_missing warnings. Upserts persist, so the per-tick 2d refresh never erases it.
-uv run ats ingest backfill --since 14d --symbols "$SYMBOL"
+# 180d warmup: fully warms the deep lookbacks — htf_trend's 4h ema_200 (~33d, the 0.25-weight
+# agent) and regime vol-percentile (up to 180d). Upserts persist, so the per-tick 2d refresh
+# never erases it. NOTE: 180d compute is RAM/CPU-heavy — on a 1 GB box ensure swap is on.
+# The window is idempotent (re-run each start); to avoid re-pulling on every restart, backfill
+# once manually and lower this if startup time matters.
+uv run ats ingest backfill --since 180d --symbols "$SYMBOL"
 uv run ats process run
 
 echo "[entrypoint] $(date -u +%FT%TZ) starting live engine (feed=${FEED} profile=${PROFILE} equity=${EQUITY})"
