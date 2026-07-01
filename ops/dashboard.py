@@ -23,6 +23,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 import asyncpg
 
 PORT = int(os.environ.get("DASH_PORT", "8080"))
+PLAN_LIMIT = int(os.environ.get("DASH_PLAN_LIMIT", "15"))  # how many recent plans to show
 # asyncpg wants a plain libpq DSN — strip SQLAlchemy's "+asyncpg" driver suffix.
 DSN = os.environ.get("DATABASE_URL", "postgresql://ats:ats@db:5432/ats").replace(
     "postgresql+asyncpg://", "postgresql://"
@@ -64,9 +65,30 @@ async def load_data() -> dict:
             "SELECT COUNT(*) n, COALESCE(SUM(pnl_usd),0) total, "
             "COUNT(*) FILTER (WHERE pnl_usd > 0) wins FROM paper_trades WHERE status='closed'"
         )
+        plan_rows = await conn.fetch(
+            "SELECT plan_id, symbol, created_at, as_of, market_bias, status, regime_cell, "
+            "rationale FROM plans ORDER BY created_at DESC LIMIT $1",
+            PLAN_LIMIT,
+        )
+        plan_ids = [r["plan_id"] for r in plan_rows]
+        setup_rows = (
+            await conn.fetch(
+                "SELECT plan_id, direction, status, entry_zone_low, entry_zone_high, "
+                "stop_loss, take_profit FROM setups WHERE plan_id = ANY($1::uuid[])",
+                plan_ids,
+            )
+            if plan_ids
+            else []
+        )
     finally:
         await conn.close()
-    return {"open": open_rows, "closed": closed_rows, "agg": agg}
+    return {
+        "open": open_rows,
+        "closed": closed_rows,
+        "agg": agg,
+        "plans": plan_rows,
+        "setups": setup_rows,
+    }
 
 
 def _row_unrealized(r, price: float | None) -> float | None:
@@ -135,6 +157,42 @@ def render(data: dict) -> str:
     if not closed_html:
         closed_html = "<tr><td colspan=7 class=dim>no closed trades yet</td></tr>"
 
+    # Recent plans (+ their setups). Group setups by plan_id.
+    setups_by_plan: dict = {}
+    for s in data.get("setups", []):
+        setups_by_plan.setdefault(s["plan_id"], []).append(s)
+
+    plan_html = ""
+    for p in data.get("plans", []):
+        setups = setups_by_plan.get(p["plan_id"], [])
+        when = p["as_of"].strftime("%m-%d %H:%M") if p["as_of"] else "—"
+        bias = p["market_bias"] or "—"
+        bias_cls = "pos" if bias == "bullish" else ("neg" if bias == "bearish" else "dim")
+        if setups:
+            s0 = setups[0]
+            d = s0["direction"]
+            zone = f"{_fnum(s0['entry_zone_low']):g}–{_fnum(s0['entry_zone_high']):g}"
+            tps = ", ".join(f"{_fnum(x):g}" for x in (s0["take_profit"] or []))
+            extra = f" (+{len(setups) - 1})" if len(setups) > 1 else ""
+            setup_cell = (
+                f"<span class={'pos' if d == 'long' else 'neg'}>{d}</span>{extra} "
+                f"{zone} · sl {_fnum(s0['stop_loss']):g} · tp {tps} "
+                f"<span class=dim>[{html.escape(s0['status'])}]</span>"
+            )
+        else:
+            setup_cell = "<span class=dim>stand-aside</span>"
+        rat = (p["rationale"] or "")[:90]
+        plan_html += (
+            f"<tr><td class=dim>{when}</td><td>{html.escape(p['symbol'])}</td>"
+            f"<td class={bias_cls}>{bias}</td>"
+            f"<td class=dim>{html.escape(p['regime_cell'] or '—')}</td>"
+            f"<td>{html.escape(p['status'])}</td>"
+            f"<td>{setup_cell}</td>"
+            f"<td class=dim>{html.escape(rat)}</td></tr>"
+        )
+    if not plan_html:
+        plan_html = "<tr><td colspan=7 class=dim>no plans yet</td></tr>"
+
     now = datetime.now(UTC).strftime("%Y-%m-%d %H:%M:%S UTC")
     return f"""<!doctype html><html><head><meta charset=utf-8>
 <meta http-equiv=refresh content=10>
@@ -162,6 +220,9 @@ def render(data: dict) -> str:
 <h2>OPEN POSITIONS</h2>
 <table><tr><th>symbol</th><th>dir</th><th>entry</th><th>last</th><th>stop</th><th>take-profit</th>
 <th>notional</th><th>uPnL</th><th>entry order</th></tr>{open_html}</table>
+<h2>RECENT PLANS (last {PLAN_LIMIT})</h2>
+<table><tr><th>bar (as_of)</th><th>symbol</th><th>bias</th><th>regime</th><th>status</th>
+<th>setup</th><th>rationale</th></tr>{plan_html}</table>
 <h2>RECENT CLOSED (last 50)</h2>
 <table><tr><th>exit</th><th>symbol</th><th>dir</th><th>entry → exit</th><th>reason</th>
 <th>PnL $</th><th>PnL %</th></tr>{closed_html}</table>
