@@ -25,7 +25,9 @@ mkdir -p "$LOG_DIR"
 
 echo "[entrypoint] $(date -u +%FT%TZ) migrate + warmup for ${SYMBOL} ${TIMEFRAME}"
 uv run ats db migrate
-uv run ats ingest backfill --since 7d --symbols "$SYMBOL"
+# 14d warmup so higher-timeframe context (4h EMA50 needs ~8+ days) is populated — fixes the
+# htf_context_missing warnings. Upserts persist, so the per-tick 2d refresh never erases it.
+uv run ats ingest backfill --since 14d --symbols "$SYMBOL"
 uv run ats process run
 
 echo "[entrypoint] $(date -u +%FT%TZ) starting live engine (feed=${FEED} profile=${PROFILE} equity=${EQUITY})"
