@@ -1,0 +1,2385 @@
+========================================================================================
+LIVE  SOLUSDT 15m  feed=ws  profile=scalper  live_execute=True  testnet=True
+========================================================================================
+
+PLAN CREATED  2026-06-30 14:15:00  plan=7e5cf8f0  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; bearish CVD divergence (0.50); liquidity, momentum, price_action dissent absorbed by alignment penalty; short confidence 0.59, rr 2.50
+  agent_scores: price_action=0.684645  htf_trend=0.603337  momentum=0.549594  cvd=0.5  liquidity=0.350205  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] 75ba6550  SHORT  size=0.02
+    entry_zone: 73.8795 -> 74.0986
+    take_profit: [73.0032, 72.3897]   stop_loss: 74.2301
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:30:00  plan=454b91af  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.603337  momentum=0.536865  liquidity=0.378598  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e4f2552d  SHORT  size=0.02
+    entry_zone: 73.8323 -> 74.0368
+    take_profit: [73.0142, 72.4416]   stop_loss: 74.1595
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:30:00  plan=cc98336d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 14:30:00  plan=ca220d6e  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, price_action dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: price_action=0.646514  htf_trend=0.603337  liquidity=0.370164  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f43cff53  SHORT  size=0.02
+    entry_zone: 73.376 -> 73.608
+    take_profit: [72.448, 71.7983]   stop_loss: 73.7472
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:30:00  plan=baacaf7a  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum, price_action dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: price_action=0.646514  htf_trend=0.603337  momentum=0.396159  liquidity=0.152254  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b26d7dd8  SHORT  size=0.02
+    entry_zone: 73.706 -> 73.938
+    take_profit: [72.778, 72.1283]   stop_loss: 74.0772
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:30:00  plan=5272df0f  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum, price_action dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: price_action=0.646514  htf_trend=0.603337  momentum=0.387019  liquidity=0.161128  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 5afea403  SHORT  size=0.02
+    entry_zone: 73.696 -> 73.928
+    take_profit: [72.768, 72.1183]   stop_loss: 74.0672
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:45:00  plan=1e4d0fcf  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.603337  liquidity=0.418739  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3701d124  SHORT  size=0.02
+    entry_zone: 73.1775 -> 73.4126
+    take_profit: [72.2372, 71.579]   stop_loss: 73.5537
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:45:00  plan=d8477820  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, price_action dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: price_action=0.607608  htf_trend=0.603337  liquidity=0.465089  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b67bbcf4  SHORT  size=0.02
+    entry_zone: 72.9334 -> 73.1803
+    take_profit: [71.946, 71.2547]   stop_loss: 73.3284
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:45:00  plan=53365050  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.603337  liquidity=0.446499  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 483e1bf0  SHORT  size=0.02
+    entry_zone: 73.0441 -> 73.2924
+    take_profit: [72.051, 71.3557]   stop_loss: 73.4414
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:00:00  plan=12155148  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 15:00:00  plan=0094d854  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.48314  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d5a86765  SHORT  size=0.02
+    entry_zone: 72.8144 -> 73.0632
+    take_profit: [71.8193, 71.1227]   stop_loss: 73.2124
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:00:00  plan=4819f39a  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.460202  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 38d64a33  SHORT  size=0.02
+    entry_zone: 72.9658 -> 73.2175
+    take_profit: [71.9593, 71.2547]   stop_loss: 73.3684
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:15:00  plan=13967907  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.438821  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 2109131e  SHORT  size=0.02
+    entry_zone: 73.077 -> 73.311
+    take_profit: [72.1409, 71.4857]   stop_loss: 73.4514
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:15:00  plan=ecc3f6e4  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.438821  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 8678ff71  SHORT  size=0.02
+    entry_zone: 73.077 -> 73.311
+    take_profit: [72.1409, 71.4857]   stop_loss: 73.4514
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:15:00  plan=ad6fd1ce  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.421651  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 505432ab  SHORT  size=0.02
+    entry_zone: 73.1749 -> 73.4246
+    take_profit: [72.1759, 71.4767]   stop_loss: 73.5744
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:15:00  plan=c5327584  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.47439  momentum=0.152753  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 96acfa08  SHORT  size=0.02
+    entry_zone: 73.4909 -> 73.7528
+    take_profit: [72.4434, 71.7102]   stop_loss: 73.9099
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:15:00  plan=86a3d63b  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.389393  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] c8810044  SHORT  size=0.02
+    entry_zone: 73.3311 -> 73.5933
+    take_profit: [72.2822, 71.5479]   stop_loss: 73.7507
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:30:00  plan=e37039c4  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity, price_action dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.363959  price_action=0.061242  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] c97da592  SHORT  size=0.02
+    entry_zone: 73.3525 -> 73.5974
+    take_profit: [72.3727, 71.6869]   stop_loss: 73.7444
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:30:00  plan=f3970248  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.481079  momentum=0.083415  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 685fe254  SHORT  size=0.02
+    entry_zone: 73.4684 -> 73.7251
+    take_profit: [72.4415, 71.7227]   stop_loss: 73.8791
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:30:00  plan=814d6d12  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.412029  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 2cbbc932  SHORT  size=0.02
+    entry_zone: 73.2003 -> 73.461
+    take_profit: [72.1577, 71.4279]   stop_loss: 73.6174
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:30:00  plan=915bc695  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.574666  liquidity=0.494377  momentum=0.062312  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d8352329  SHORT  size=0.02
+    entry_zone: 73.4203 -> 73.681
+    take_profit: [72.3777, 71.6479]   stop_loss: 73.8374
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:45:00  plan=65d277ee  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; bearish CVD divergence (0.50); liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.574666  cvd=0.5  liquidity=0.483222  momentum=0.083041  structure=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] cb194793  SHORT  size=0.02
+    entry_zone: 73.4621 -> 73.7063
+    take_profit: [72.4854, 71.8017]   stop_loss: 73.8528
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:45:00  plan=cb55451f  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; bearish CVD divergence (0.50); liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.574666  cvd=0.5  momentum=0.479294  liquidity=0.375757  structure=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 05dc78b6  SHORT  size=0.02
+    entry_zone: 73.8653 -> 74.1359
+    take_profit: [72.7829, 72.0252]   stop_loss: 74.2983
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:45:00  plan=8ca121c6  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; bearish CVD divergence (0.50); liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.574666  cvd=0.5  liquidity=0.454823  momentum=0.121984  structure=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 26c39442  SHORT  size=0.02
+    entry_zone: 73.5553 -> 73.8259
+    take_profit: [72.4729, 71.7152]   stop_loss: 73.9883
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 15:45:00  plan=cc1fa5cb  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.57; bearish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; short confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.574666  cvd=0.5  liquidity=0.405366  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] e1028345  SHORT  size=0.02
+    entry_zone: 73.2296 -> 73.5088
+    take_profit: [72.1129, 71.3312]   stop_loss: 73.6763
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 16:00:00  plan=94663589  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:00:00  plan=2dc8291d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:00:00  plan=725a2e17  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:00:00  plan=755651f5  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:00:00  plan=26a3c96d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:15:00  plan=e2e10ca2  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:15:00  plan=c31cb88b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:15:00  plan=bfb4f836  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:30:00  plan=50c9c81d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:30:00  plan=3ae629d4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:30:00  plan=e65fd6df  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:30:00  plan=8ba2d2b2  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:30:00  plan=54bbcdc8  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:45:00  plan=964080e8  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:45:00  plan=2d334dec  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 16:45:00  plan=a612c480  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:00:00  plan=ff42f9f1  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:00:00  plan=5005a09c  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:00:00  plan=f6b8feb4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:00:00  plan=45dd7d4f  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:15:00  plan=ac51af19  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:15:00  plan=695923d8  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:15:00  plan=4cea26fd  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:15:00  plan=893a2c4b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:30:00  plan=05c902f2  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:30:00  plan=bc48985a  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:30:00  plan=e74682c0  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:30:00  plan=f90e9421  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:45:00  plan=80de802a  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:45:00  plan=e97001f0  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 17:45:00  plan=130d5fa7  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:00:00  plan=f42fe521  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:00:00  plan=1131cd75  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:00:00  plan=319dd47a  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:00:00  plan=5fbcdee1  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:00:00  plan=2e3e21ed  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:15:00  plan=ea4de277  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:15:00  plan=a6482c0e  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:15:00  plan=c3811b8a  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:15:00  plan=39c09001  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:30:00  plan=365e9802  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:30:00  plan=0c627cf4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:30:00  plan=4ee49095  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:30:00  plan=b0bf0185  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:45:00  plan=608d8db3  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:45:00  plan=ad54b4bc  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:45:00  plan=d02fc719  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 18:45:00  plan=3d4f4a33  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:00:00  plan=55e9042f  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:00:00  plan=91103082  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:00:00  plan=4dcc2ed6  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:00:00  plan=a09b3b91  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:15:00  plan=060a8b78  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:15:00  plan=be0112a4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:15:00  plan=7b4417d1  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:15:00  plan=56517b14  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:30:00  plan=d681d3a6  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:30:00  plan=561e0ae2  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.60; momentum: rsi 60, macd_hist +0.06659; cvd, liquidity dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.601228  momentum=0.596785  cvd=0.5  liquidity=0.236119  structure=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] b90983c6  LONG  size=0.02
+    entry_zone: 73.4384 -> 73.6661
+    take_profit: [74.577, 75.2146]   stop_loss: 73.3018
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 19:30:00  plan=baf6ff15  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.60; momentum: rsi 58, macd_hist +0.06212; cvd, liquidity dissent absorbed by alignment penalty; long confidence 0.58, rr 2.50
+  agent_scores: htf_trend=0.601228  momentum=0.534643  cvd=0.5  liquidity=0.171412  structure=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 68bb6d99  LONG  size=0.02
+    entry_zone: 73.3598 -> 73.5933
+    take_profit: [74.527, 75.1806]   stop_loss: 73.2198
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 19:30:00  plan=e6ebc2d8  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 60, macd_hist +0.06786; htf_trend score 0.60; cvd dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: momentum=0.612899  htf_trend=0.601228  cvd=0.5  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 7fc5e32c  LONG  size=0.02
+    entry_zone: 73.4498 -> 73.6833
+    take_profit: [74.617, 75.2706]   stop_loss: 73.3098
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 19:45:00  plan=883457d8  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 60, macd_hist +0.07161; htf_trend score 0.60; fresh FVG, 0.53 ATR; long confidence 0.58, rr 2.50
+  agent_scores: momentum=0.604121  htf_trend=0.601228  price_action=0.528795  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] cee7bd79  LONG  size=0.02
+    entry_zone: 73.4638 -> 73.6813
+    take_profit: [74.5512, 75.1601]   stop_loss: 73.3333
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 19:45:00  plan=bef1a837  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:45:00  plan=7b7d63a9  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 19:45:00  plan=ffb00b52  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.60; momentum: rsi 58, macd_hist +0.06651; liquidity dissent absorbed by alignment penalty; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.601228  momentum=0.500035  liquidity=0.172516  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] fd635f58  LONG  size=0.02
+    entry_zone: 73.3683 -> 73.5961
+    take_profit: [74.5074, 75.1453]   stop_loss: 73.2316
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:00:00  plan=b49ac724  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 57, macd_hist +0.06152; liquidity dissent absorbed by alignment penalty; long confidence 0.59, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.481128  liquidity=0.16568  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 527c939a  LONG  size=0.02
+    entry_zone: 73.3789 -> 73.593
+    take_profit: [74.4492, 75.0486]   stop_loss: 73.2505
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:00:00  plan=9694dd35  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 60, macd_hist +0.06918; long confidence 0.63, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.605154  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 8c088392  LONG  size=0.02
+    entry_zone: 73.4866 -> 73.7089
+    take_profit: [74.598, 75.2203]   stop_loss: 73.3532
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:00:00  plan=a1266f90  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 60, macd_hist +0.06918; long confidence 0.63, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.605154  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b059fede  LONG  size=0.02
+    entry_zone: 73.4866 -> 73.7089
+    take_profit: [74.598, 75.2203]   stop_loss: 73.3532
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:15:00  plan=b3b93624  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 60, macd_hist +0.06831; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.624679  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 0d7e74d3  LONG  size=0.02
+    entry_zone: 73.5304 -> 73.7368
+    take_profit: [74.5624, 75.1403]   stop_loss: 73.4066
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:15:00  plan=08a2848f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 60, macd_hist +0.06867; long confidence 0.63, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.619513  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] eeb577f0  LONG  size=0.02
+    entry_zone: 73.5299 -> 73.7366
+    take_profit: [74.5636, 75.1425]   stop_loss: 73.4058
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:15:00  plan=ccf48090  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 57, macd_hist +0.06101; liquidity dissent absorbed by alignment penalty; long confidence 0.58, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.456692  liquidity=0.185573  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 72844ffb  LONG  size=0.02
+    entry_zone: 73.4018 -> 73.6139
+    take_profit: [74.4624, 75.0563]   stop_loss: 73.2746
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:15:00  plan=cf6b45e7  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 20:15:00  plan=37012d40  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 56, macd_hist +0.05782; liquidity dissent absorbed by alignment penalty; long confidence 0.55, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.389449  liquidity=0.135824  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] cc8e2e9b  LONG  size=0.02
+    entry_zone: 73.3438 -> 73.5613
+    take_profit: [74.4311, 75.04]   stop_loss: 73.2133
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:30:00  plan=7cf0ddd9  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 20:30:00  plan=d563ad63  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 20:30:00  plan=25f1379d  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.64; momentum: rsi 56, macd_hist +0.04708; liquidity dissent absorbed by alignment penalty; long confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.642064  momentum=0.40802  liquidity=0.156443  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] cfc325b5  LONG  size=0.02
+    entry_zone: 73.3742 -> 73.5847
+    take_profit: [74.4268, 75.0162]   stop_loss: 73.2479
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 20:30:00  plan=2ff091de  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 20:45:00  plan=293a249e  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 20:45:00  plan=4f1ae24e  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 20:45:00  plan=a02e84f3  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:00:00  plan=dd91204a  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:00:00  plan=3962111b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:00:00  plan=83a745f0  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:00:00  plan=7395d9cb  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:00:00  plan=ab1bbd04  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; momentum dissent absorbed by alignment penalty; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.623002  momentum=0.244044  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 50d5d323  LONG  size=0.02
+    entry_zone: 72.9621 -> 73.1807
+    take_profit: [74.0551, 74.6672]   stop_loss: 72.8309
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 21:15:00  plan=13b8050c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; bullish CVD divergence (0.50); momentum, price_action dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.623002  price_action=0.612555  cvd=0.5  momentum=0.25219  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0
+  setup[1] d1466c2a  LONG  size=0.02
+    entry_zone: 72.9839 -> 73.188
+    take_profit: [74.0042, 74.5756]   stop_loss: 72.8615
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 21:15:00  plan=f4871bea  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; bullish CVD divergence (0.50); momentum, price_action dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.623002  cvd=0.5  price_action=0.336551  momentum=0.228178  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0
+  setup[1] 9d6e522b  LONG  size=0.02
+    entry_zone: 72.998 -> 73.206
+    take_profit: [74.038, 74.6203]   stop_loss: 72.8732
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 21:15:00  plan=25f7cb71  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; bullish CVD divergence (0.50); momentum, price_action dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.623002  cvd=0.5  price_action=0.333687  momentum=0.327793  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0
+  setup[1] a0e30bf8  LONG  size=0.02
+    entry_zone: 72.9053 -> 73.1151
+    take_profit: [73.9542, 74.5416]   stop_loss: 72.7795
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 21:15:00  plan=8b0e77c3  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; bullish CVD divergence (0.50); momentum, price_action dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.623002  cvd=0.5  price_action=0.332554  momentum=0.27597  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0
+  setup[1] 27c75d86  LONG  size=0.02
+    entry_zone: 72.9543 -> 73.1648
+    take_profit: [74.0067, 74.5961]   stop_loss: 72.828
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 21:30:00  plan=72a693a4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:30:00  plan=f0f8697f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.623002  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3459d485  LONG  size=0.02
+    entry_zone: 73.1561 -> 73.3587
+    take_profit: [74.1691, 74.7364]   stop_loss: 73.0345
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 21:30:00  plan=8bab4804  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:30:00  plan=720cf434  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:45:00  plan=90faf5c3  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:45:00  plan=5b757e50  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:45:00  plan=b2845225  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 21:45:00  plan=da28a4cd  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.62; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.623002  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 4c8d21bb  LONG  size=0.02
+    entry_zone: 73.1656 -> 73.3619
+    take_profit: [74.147, 74.6966]   stop_loss: 73.0478
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 22:00:00  plan=01ae06d8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.57; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.566514  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b412ded3  LONG  size=0.02
+    entry_zone: 73.1634 -> 73.3478
+    take_profit: [74.0854, 74.6016]   stop_loss: 73.0528
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 22:00:00  plan=6dd2b3e3  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.57; liquidity dissent absorbed by alignment penalty; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.566514  liquidity=0.131851  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3462ffca  LONG  size=0.02
+    entry_zone: 73.3332 -> 73.5244
+    take_profit: [74.2891, 74.8244]   stop_loss: 73.2185
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 22:00:00  plan=7f9dfeed  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.57; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.566514  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a8885552  LONG  size=0.02
+    entry_zone: 73.3032 -> 73.4944
+    take_profit: [74.2591, 74.7944]   stop_loss: 73.1885
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 22:15:00  plan=8dc6f2cf  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.57; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.566514  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 1cde1405  LONG  size=0.02
+    entry_zone: 73.3327 -> 73.5109
+    take_profit: [74.2238, 74.7229]   stop_loss: 73.2257
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 22:15:00  plan=644221f8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.57; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.566514  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] c26be89b  LONG  size=0.02
+    entry_zone: 73.3232 -> 73.5011
+    take_profit: [74.2126, 74.7106]   stop_loss: 73.2165
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-06-30 22:15:00  plan=29be6925  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:15:00  plan=2c2be8e3  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:15:00  plan=65c6c51d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:30:00  plan=b5dac250  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:30:00  plan=a5c21564  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:30:00  plan=e3cc8f97  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:45:00  plan=bebe3a0b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:45:00  plan=10319370  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:45:00  plan=2741dbe0  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:45:00  plan=e1c5c02f  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 22:45:00  plan=4e49a23d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:00:00  plan=0c53ba78  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:00:00  plan=a25a1a76  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:00:00  plan=fccc6274  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:00:00  plan=601db676  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:15:00  plan=5f36b9ac  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:15:00  plan=88c7350e  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:15:00  plan=50cc9a6f  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:15:00  plan=732e5798  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:30:00  plan=2f4dce85  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:30:00  plan=e5f29bfe  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:30:00  plan=a80a2a3b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:30:00  plan=735d40c3  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:45:00  plan=ca380aa3  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:45:00  plan=01c21c29  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:45:00  plan=4856359c  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 23:45:00  plan=206b5961  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:00:00  plan=21c33b27  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:00:00  plan=0a7f9e27  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:00:00  plan=2ff5deb4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:00:00  plan=e4c48794  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:15:00  plan=5ac4b471  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:15:00  plan=dccb2704  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:15:00  plan=796733c2  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:15:00  plan=277b2faf  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:30:00  plan=75f053f0  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:30:00  plan=bd26544b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:30:00  plan=c2cf6895  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:30:00  plan=67406fdb  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:45:00  plan=5132eb47  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:45:00  plan=f7b23ef5  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 00:45:00  plan=5281a341  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 01:00:00  plan=86c8028b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 01:00:00  plan=1c191e6c  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 01:00:00  plan=c2c806c5  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.67; momentum dissent absorbed by alignment penalty; long confidence 0.57, rr 2.50
+  agent_scores: htf_trend=0.605597  liquidity=0.403047  momentum=0.276606  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] c93f3b86  LONG  size=0.02
+    entry_zone: 73.1244 -> 73.2815
+    take_profit: [73.9098, 74.3496]   stop_loss: 73.0301
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:00:00  plan=052fca05  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 01:00:00  plan=cc822c0c  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 01:15:00  plan=dd5ea94c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.76; momentum dissent absorbed by alignment penalty; long confidence 0.58, rr 2.50
+  agent_scores: momentum=0.752118  htf_trend=0.605597  liquidity=0.457369  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 1581dce5  LONG  size=0.02
+    entry_zone: 72.6223 -> 72.8074
+    take_profit: [73.5479, 74.0663]   stop_loss: 72.5112
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:15:00  plan=e137636e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.78; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.58, rr 2.50
+  agent_scores: price_action=0.871362  htf_trend=0.605597  liquidity=0.470575  momentum=0.466427  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b5600675  LONG  size=0.02
+    entry_zone: 72.8087 -> 73.0096
+    take_profit: [73.8129, 74.3753]   stop_loss: 72.6882
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:15:00  plan=081309ea  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.75; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.58, rr 2.50
+  agent_scores: htf_trend=0.605597  liquidity=0.451452  momentum=0.41657  price_action=0.166007  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 077ffcb1  LONG  size=0.02
+    entry_zone: 72.8337 -> 73.0446
+    take_profit: [73.8879, 74.4783]   stop_loss: 72.7072
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:15:00  plan=4eb64316  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.60; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.605597  liquidity=0.358322  momentum=0.280174  price_action=0.166007  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 6c60a981  LONG  size=0.02
+    entry_zone: 72.9537 -> 73.1646
+    take_profit: [74.0079, 74.5983]   stop_loss: 72.8272
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:30:00  plan=859c97f9  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.72; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.58, rr 2.50
+  agent_scores: htf_trend=0.605597  liquidity=0.433971  momentum=0.35479  price_action=0.17716  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 550e4be6  LONG  size=0.02
+    entry_zone: 72.9037 -> 73.1012
+    take_profit: [73.8915, 74.4446]   stop_loss: 72.7851
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:30:00  plan=a856d767  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; liquidity proxy imbalance +0.58; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.56, rr 2.50
+  agent_scores: htf_trend=0.605597  liquidity=0.347751  momentum=0.254698  price_action=0.170979  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d84da8f0  LONG  size=0.02
+    entry_zone: 72.9829 -> 73.1876
+    take_profit: [74.0065, 74.5796]   stop_loss: 72.8601
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:30:00  plan=2c75225b  bias=bullish  regime=-  setups=1
+  rationale: breakout 0.22 ATR beyond range, vol_zscore 1.24; htf_trend score 0.61; momentum: rsi 59, macd_hist +0.002381; cvd, liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: structure=0.633005  htf_trend=0.605597  momentum=0.545108  cvd=0.5  liquidity=0.456927  price_action=0.151898  funding=0  cross_venue=0  basis=0
+  setup[1] 8e032b78  LONG  size=0.02
+    entry_zone: 73.6644 -> 73.8948
+    take_profit: [74.8165, 75.4616]   stop_loss: 73.5261
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:30:00  plan=69717ed0  bias=bullish  regime=-  setups=1
+  rationale: breakout 0.55 ATR beyond range, vol_zscore 2.80; momentum: rsi 61, macd_hist +0.01259; htf_trend score 0.61; cvd, price_action dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: structure=0.84885  momentum=0.649924  htf_trend=0.605597  liquidity=0.6  cvd=0.5  price_action=0.147109  funding=0  cross_venue=0  basis=0
+  setup[1] 5bc00c87  LONG  size=0.02
+    entry_zone: 73.8131 -> 74.051
+    take_profit: [75.0027, 75.6689]   stop_loss: 73.6704
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:45:00  plan=d4054c6e  bias=bullish  regime=-  setups=1
+  rationale: fresh FVG, 1.46 ATR; momentum: rsi 61, macd_hist +0.04761; htf_trend score 0.61; entry refined to FVG zone [73.47, 74.12]; cvd dissent absorbed by alignment penalty
+  agent_scores: price_action=1  momentum=0.648746  htf_trend=0.605597  liquidity=0.6  cvd=0.5  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] 0f020318  LONG  size=0.02
+    entry_zone: 73.47 -> 74.12
+    take_profit: [75.0123, 75.6369]   stop_loss: 73.7631
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:45:00  plan=f0d3c8b7  bias=bullish  regime=-  setups=1
+  rationale: fresh FVG, 0.83 ATR; htf_trend score 0.61; momentum: rsi 56, macd_hist +0.03166; entry refined to FVG zone [73.47, 73.86]; cvd, liquidity dissent absorbed by alignment penalty
+  agent_scores: price_action=0.826537  htf_trend=0.605597  cvd=0.5  momentum=0.409189  liquidity=0.308625  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] 26d8a152  LONG  size=0.02
+    entry_zone: 73.47 -> 73.86
+    take_profit: [74.8037, 75.4643]   stop_loss: 73.4825
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:45:00  plan=7cae6c68  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; fresh FVG, 0.61 ATR; momentum: rsi 58, macd_hist +0.03868; entry refined to FVG zone [73.47, 73.76]; cvd, liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.605597  price_action=0.605439  momentum=0.509318  cvd=0.5  liquidity=0.454664  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] bcf9cd3b  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.718, 75.3886]   stop_loss: 73.3768
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 01:45:00  plan=11005406  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.61; fresh FVG, 0.61 ATR; momentum: rsi 56, macd_hist +0.0323; entry refined to FVG zone [73.47, 73.76]; cvd, liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.605597  price_action=0.605439  cvd=0.5  momentum=0.417816  liquidity=0.212904  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] f299f54f  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.718, 75.3886]   stop_loss: 73.3768
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:00:00  plan=5a3135be  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; fresh FVG, 0.65 ATR; momentum: rsi 57, macd_hist +0.04365; entry refined to FVG zone [73.47, 73.76]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.676711  price_action=0.649924  momentum=0.433499  liquidity=0.229566  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] fceb3937  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.6524, 75.2771]   stop_loss: 73.403
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:00:00  plan=d792cfa4  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; fresh FVG, 0.63 ATR; momentum: rsi 57, macd_hist +0.0462; entry refined to FVG zone [73.47, 73.76]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.676711  price_action=0.634684  momentum=0.462374  liquidity=0.439487  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 0cc80969  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.6738, 75.3135]   stop_loss: 73.3945
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:00:00  plan=6d18bc8f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; fresh FVG, 0.62 ATR; momentum: rsi 56, macd_hist +0.04301; entry refined to FVG zone [73.47, 73.76]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.676711  price_action=0.619197  momentum=0.42285  liquidity=0.215684  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e0b0d0c9  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.6967, 75.3524]   stop_loss: 73.3853
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:00:00  plan=2324e0c1  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; fresh FVG, 0.60 ATR; momentum: rsi 59, macd_hist +0.05705; entry refined to FVG zone [73.47, 73.76]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.676711  price_action=0.603549  momentum=0.578115  liquidity=0.412512  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 64b86e51  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.721, 75.3937]   stop_loss: 73.3756
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:00:00  plan=7bed2350  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; fresh FVG, 0.60 ATR; momentum: rsi 59, macd_hist +0.05577; entry refined to FVG zone [73.47, 73.76]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.676711  price_action=0.603549  momentum=0.564978  liquidity=0.405589  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 63551766  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.721, 75.3937]   stop_loss: 73.3756
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:15:00  plan=4eaf9acb  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; fresh FVG, 0.62 ATR; momentum: rsi 60, macd_hist +0.07065; entry refined to FVG zone [73.47, 73.76]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.676711  price_action=0.6183  momentum=0.605162  liquidity=0.42387  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b5ed3a98  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.6981, 75.3547]   stop_loss: 73.3848
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:15:00  plan=5739e52a  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 63, macd_hist +0.08597; htf_trend score 0.68; fresh FVG, 0.61 ATR; entry refined to FVG zone [73.47, 73.76]; long confidence 0.67, rr 2.50
+  agent_scores: momentum=0.757766  htf_trend=0.676711  price_action=0.606297  liquidity=0.6  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 8ecbee44  LONG  size=0.02
+    entry_zone: 73.47 -> 73.76
+    take_profit: [74.7166, 75.3863]   stop_loss: 73.3773
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:15:00  plan=781e6a12  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 63, macd_hist +0.0898; htf_trend score 0.68; liquidity proxy imbalance +1.00; long confidence 0.67, rr 2.50
+  agent_scores: momentum=0.792241  htf_trend=0.676711  liquidity=0.6  price_action=0.598256  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e7ac8e1c  LONG  size=0.02
+    entry_zone: 74.0964 -> 74.3388
+    take_profit: [75.3083, 75.9869]   stop_loss: 73.951
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:30:00  plan=c24fca73  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 64, macd_hist +0.1069; htf_trend score 0.68; liquidity proxy imbalance +1.00; long confidence 0.65, rr 2.50
+  agent_scores: momentum=0.820002  htf_trend=0.676711  liquidity=0.6  price_action=0.486445  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f8ca1de9  LONG  size=0.02
+    entry_zone: 74.1508 -> 74.3769
+    take_profit: [75.2815, 75.9146]   stop_loss: 74.0151
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:30:00  plan=d09077a0  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 66, macd_hist +0.1184; htf_trend score 0.68; liquidity proxy imbalance +1.00; long confidence 0.61, rr 2.50
+  agent_scores: momentum=0.8922  htf_trend=0.676711  liquidity=0.6  price_action=0.335749  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] cbe2701a  LONG  size=0.02
+    entry_zone: 74.3126 -> 74.5509
+    take_profit: [75.504, 76.1711]   stop_loss: 74.1696
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:30:00  plan=84448060  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 67, macd_hist +0.1299; breakout 0.55 ATR beyond range, vol_zscore 1.12; htf_trend score 0.68; long confidence 0.63, rr 2.50
+  agent_scores: momentum=0.912749  structure=0.723524  htf_trend=0.676711  liquidity=0.6  price_action=0.325503  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d8c4d91d  LONG  size=0.02
+    entry_zone: 74.4813 -> 74.7271
+    take_profit: [75.7102, 76.3984]   stop_loss: 74.3339
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:45:00  plan=f342ad4e  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 68, macd_hist +0.1596; htf_trend score 0.68; liquidity proxy imbalance +1.00; long confidence 0.72, rr 2.50
+  agent_scores: momentum=0.936501  htf_trend=0.676711  liquidity=0.6  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f2d08af5  LONG  size=0.03
+    entry_zone: 74.6261 -> 74.8554
+    take_profit: [75.7723, 76.4142]   stop_loss: 74.4886
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:45:00  plan=b9e2ceb1  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 68, macd_hist +0.1596; htf_trend score 0.68; liquidity proxy imbalance +1.00; long confidence 0.72, rr 2.50
+  agent_scores: momentum=0.936501  htf_trend=0.676711  liquidity=0.6  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b031787d  LONG  size=0.03
+    entry_zone: 74.6261 -> 74.8554
+    take_profit: [75.7723, 76.4142]   stop_loss: 74.4886
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 02:45:00  plan=b12ecaa1  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 02:45:00  plan=2d0f571a  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 03:00:00  plan=b41429c7  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 65, macd_hist +0.1452; htf_trend score 0.89; liquidity proxy imbalance +1.00; long confidence 0.62, rr 2.50
+  agent_scores: momentum=0.891731  htf_trend=0.886147  liquidity=0.6  price_action=0.175957  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 9631f20d  LONG  size=0.02
+    entry_zone: 74.469 -> 74.6963
+    take_profit: [75.6056, 76.2422]   stop_loss: 74.3326
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:00:00  plan=c7730383  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 65, macd_hist +0.1439; liquidity proxy imbalance +1.00; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.880909  liquidity=0.6  price_action=0.175957  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d538a958  LONG  size=0.02
+    entry_zone: 74.449 -> 74.6763
+    take_profit: [75.5856, 76.2222]   stop_loss: 74.3126
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:00:00  plan=303f0c20  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 61, macd_hist +0.1286; liquidity proxy imbalance +1.00; long confidence 0.59, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.671343  liquidity=0.6  price_action=0.170078  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 060c1425  LONG  size=0.02
+    entry_zone: 74.1972 -> 74.4324
+    take_profit: [75.3731, 76.0317]   stop_loss: 74.0561
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:00:00  plan=0e1a9bf4  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 63, macd_hist +0.1375; liquidity proxy imbalance +1.00; long confidence 0.61, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.798734  liquidity=0.6  price_action=0.168543  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b683ad04  LONG  size=0.02
+    entry_zone: 74.334 -> 74.5713
+    take_profit: [75.5206, 76.1852]   stop_loss: 74.1916
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:00:00  plan=4e0af4fc  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 62, macd_hist +0.1337; liquidity proxy imbalance +1.00; long confidence 0.80, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.742732  liquidity=0.6  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 98266c5a  LONG  size=0.04
+    entry_zone: 74.274 -> 74.5113
+    take_profit: [75.4606, 76.1252]   stop_loss: 74.1316
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:15:00  plan=98286b1e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 62, macd_hist +0.1186; liquidity dissent absorbed by alignment penalty; long confidence 0.84, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.749445  liquidity=0.283033  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] c7a1ffe9  LONG  size=0.04
+    entry_zone: 74.3094 -> 74.5298
+    take_profit: [75.4113, 76.0284]   stop_loss: 74.1772
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:15:00  plan=4824092a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 58, macd_hist +0.1026; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.73, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.516107  liquidity=0.174754  price_action=0.04361  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 82887112  LONG  size=0.03
+    entry_zone: 74.046 -> 74.2753
+    take_profit: [75.1926, 75.8346]   stop_loss: 73.9085
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:15:00  plan=95e71d5c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 59, macd_hist +0.1065; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.76, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.568196  liquidity=0.200066  price_action=0.043073  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 8b824d2e  LONG  size=0.03
+    entry_zone: 74.1018 -> 74.3339
+    take_profit: [75.2626, 75.9126]   stop_loss: 73.9625
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:15:00  plan=7a9656f1  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 60, macd_hist +0.1103; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.78, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.622543  liquidity=0.225482  price_action=0.043073  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 602a9d0d  LONG  size=0.03
+    entry_zone: 74.1618 -> 74.3939
+    take_profit: [75.3226, 75.9726]   stop_loss: 74.0225
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:30:00  plan=69dec0d8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 60, macd_hist +0.09018; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.79, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.629069  liquidity=0.24588  price_action=0.046006  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 6cd2d1d0  LONG  size=0.03
+    entry_zone: 74.224 -> 74.4413
+    take_profit: [75.3108, 75.9194]   stop_loss: 74.0935
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:30:00  plan=33c24f0f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 60, macd_hist +0.08826; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.594654  liquidity=0.231972  price_action=0.045043  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 5853a516  LONG  size=0.03
+    entry_zone: 74.187 -> 74.409
+    take_profit: [75.297, 75.9186]   stop_loss: 74.0538
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:30:00  plan=d35c60c5  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 65, macd_hist +0.1189; htf_trend score 0.89; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.89, rr 2.50
+  agent_scores: momentum=0.886805  htf_trend=0.886147  liquidity=0.416335  price_action=0.040839  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 12d2d7d6  LONG  size=0.04
+    entry_zone: 74.6327 -> 74.8776
+    take_profit: [75.857, 76.5426]   stop_loss: 74.4858
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:30:00  plan=703b6dd6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 63, macd_hist +0.1055; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.85, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.784548  liquidity=0.335565  price_action=0.040839  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 8b06ed2a  LONG  size=0.04
+    entry_zone: 74.4227 -> 74.6676
+    take_profit: [75.647, 76.3326]   stop_loss: 74.2758
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:45:00  plan=6ec4f70e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.89; momentum: rsi 63, macd_hist +0.09386; liquidity dissent absorbed by alignment penalty; long confidence 0.78, rr 2.50
+  agent_scores: htf_trend=0.886147  momentum=0.617987  liquidity=0.170388  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 5781cb3d  LONG  size=0.03
+    entry_zone: 74.4384 -> 74.6661
+    take_profit: [75.5771, 76.2147]   stop_loss: 74.3018
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:45:00  plan=81800b20  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 68, macd_hist +0.1223; htf_trend score 0.89; liquidity proxy imbalance +1.00; long confidence 0.66, rr 2.50
+  agent_scores: momentum=0.909168  htf_trend=0.886147  liquidity=0.6  price_action=0.276583  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 7a3d04e1  LONG  size=0.02
+    entry_zone: 74.8404 -> 75.0935
+    take_profit: [76.1058, 76.8145]   stop_loss: 74.6885
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 03:45:00  plan=1e0693f8  bias=bullish  regime=-  setups=1
+  rationale: momentum: rsi 70, macd_hist +0.1446; htf_trend score 0.89; breakout 0.70 ATR beyond range, vol_zscore 1.02; long confidence 0.68, rr 2.50
+  agent_scores: momentum=0.94559  htf_trend=0.886147  structure=0.761335  liquidity=0.6  price_action=0.2716  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b52dd0d5  LONG  size=0.02
+    entry_zone: 75.1834 -> 75.4411
+    take_profit: [76.4721, 77.1937]   stop_loss: 75.0288
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:00:00  plan=d0fcdf06  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 69, macd_hist +0.1461; liquidity proxy imbalance +1.00; long confidence 0.90, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.939382  liquidity=0.6  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e73a9181  LONG  size=0.05
+    entry_zone: 75.0785 -> 75.3195
+    take_profit: [76.2835, 76.9583]   stop_loss: 74.9339
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:00:00  plan=0fbd9256  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 70, macd_hist +0.1506; liquidity proxy imbalance +1.00; long confidence 0.78, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.946436  liquidity=0.6  price_action=0.472961  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 0afae65c  LONG  size=0.03
+    entry_zone: 75.1453 -> 75.3884
+    take_profit: [76.361, 77.0418]   stop_loss: 74.9994
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:00:00  plan=26a4e38a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 70, macd_hist +0.15; liquidity proxy imbalance +1.00; long confidence 0.66, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.94433  liquidity=0.6  price_action=0.201492  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 98ad9d3d  LONG  size=0.02
+    entry_zone: 75.1278 -> 75.3759
+    take_profit: [76.3685, 77.0633]   stop_loss: 74.9789
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:00:00  plan=9b0f7959  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 70, macd_hist +0.1468; liquidity proxy imbalance +1.00; long confidence 0.66, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.938177  liquidity=0.6  price_action=0.198352  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 2fcc23f3  LONG  size=0.02
+    entry_zone: 75.0719 -> 75.324
+    take_profit: [76.3323, 77.0381]   stop_loss: 74.9206
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:15:00  plan=52dc8d6a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 68, macd_hist +0.1325; fresh FVG, 0.21 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.917595  liquidity=0.422422  price_action=0.213284  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e7279ce6  LONG  size=0.02
+    entry_zone: 74.9984 -> 75.2328
+    take_profit: [76.1705, 76.8269]   stop_loss: 74.8577
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:15:00  plan=85c12879  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 67, macd_hist +0.1312; fresh FVG, 0.21 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.91407  liquidity=0.416474  price_action=0.21296  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 15df4af1  LONG  size=0.02
+    entry_zone: 74.9778 -> 75.2126
+    take_profit: [76.1518, 76.8092]   stop_loss: 74.8369
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:15:00  plan=a8c5109f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 67, macd_hist +0.1312; fresh FVG, 0.21 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.913099  liquidity=0.415666  price_action=0.20883  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 696fca12  LONG  size=0.02
+    entry_zone: 74.9709 -> 75.2103
+    take_profit: [76.168, 76.8384]   stop_loss: 74.8272
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:15:00  plan=0069ffe6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 66, macd_hist +0.1261; liquidity dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.894983  liquidity=0.390963  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 4812332a  LONG  size=0.05
+    entry_zone: 74.8866 -> 75.1289
+    take_profit: [76.098, 76.7764]   stop_loss: 74.7412
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:15:00  plan=88e96326  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 68, macd_hist +0.1357; fresh FVG, 0.21 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.921868  liquidity=0.435196  price_action=0.206368  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] bbf02e1a  LONG  size=0.02
+    entry_zone: 75.0366 -> 75.2789
+    take_profit: [76.248, 76.9264]   stop_loss: 74.8912
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:30:00  plan=52a81671  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 68, macd_hist +0.1226; fresh FVG, 0.22 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.920518  liquidity=0.438606  price_action=0.22189  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b5960591  LONG  size=0.02
+    entry_zone: 75.062 -> 75.2873
+    take_profit: [76.1887, 76.8196]   stop_loss: 74.9268
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:30:00  plan=cc8a94cb  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 69, macd_hist +0.1296; fresh FVG, 0.21 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.930468  liquidity=0.464787  price_action=0.206812  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 10db7866  LONG  size=0.02
+    entry_zone: 75.1474 -> 75.3891
+    take_profit: [76.3562, 77.0331]   stop_loss: 75.0023
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:30:00  plan=cb4be58f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 68, macd_hist +0.122; fresh FVG, 0.21 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.915858  liquidity=0.432499  price_action=0.206812  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 98a4c50e  LONG  size=0.02
+    entry_zone: 75.0274 -> 75.2691
+    take_profit: [76.2362, 76.9131]   stop_loss: 74.8823
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:45:00  plan=b513b09c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 70, macd_hist +0.1212; fresh FVG, 0.24 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.66, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.935321  liquidity=0.481671  price_action=0.244603  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f89c925b  LONG  size=0.02
+    entry_zone: 75.2227 -> 75.4476
+    take_profit: [76.347, 76.9766]   stop_loss: 75.0878
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:45:00  plan=d457cb76  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 69, macd_hist +0.1205; liquidity dissent absorbed by alignment penalty; long confidence 0.98, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.932824  liquidity=0.479129  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a16e33bb  LONG  size=0.05
+    entry_zone: 75.2127 -> 75.4376
+    take_profit: [76.337, 76.9666]   stop_loss: 75.0778
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:45:00  plan=12c95ca6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 71, macd_hist +0.1301; liquidity proxy imbalance +1.00; long confidence 0.66, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.949582  liquidity=0.6  price_action=0.190738  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 06a9c0c8  LONG  size=0.02
+    entry_zone: 75.3461 -> 75.582
+    take_profit: [76.5257, 77.1863]   stop_loss: 75.2046
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 04:45:00  plan=b26c7834  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 70, macd_hist +0.125; fresh FVG, 0.19 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.63, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.940261  liquidity=0.4936  price_action=0.190738  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a1710fae  LONG  size=0.02
+    entry_zone: 75.2661 -> 75.502
+    take_profit: [76.4457, 77.1063]   stop_loss: 75.1246
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:00:00  plan=bb23e71e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 69, macd_hist +0.1005; fresh FVG, 0.14 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.906205  liquidity=0.475093  price_action=0.1361  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] aa607e7d  LONG  size=0.02
+    entry_zone: 75.1994 -> 75.4198
+    take_profit: [76.3015, 76.9187]   stop_loss: 75.0671
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:00:00  plan=174be730  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 69, macd_hist +0.1002; fresh FVG, 0.14 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.901048  liquidity=0.472306  price_action=0.135661  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] df9d0da0  LONG  size=0.02
+    entry_zone: 75.1883 -> 75.4094
+    take_profit: [76.294, 76.9132]   stop_loss: 75.0556
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:00:00  plan=d12ac560  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 70, macd_hist +0.1047; fresh FVG, 0.13 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.925264  liquidity=0.489417  price_action=0.13393  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3df33c65  LONG  size=0.02
+    entry_zone: 75.254 -> 75.478
+    take_profit: [76.374, 77.0012]   stop_loss: 75.1196
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:00:00  plan=d35d8353  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 66, macd_hist +0.09257; fresh FVG, 0.13 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.59, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.766437  liquidity=0.436914  price_action=0.128403  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] ef351451  LONG  size=0.02
+    entry_zone: 75.0495 -> 75.2832
+    take_profit: [76.2177, 76.8719]   stop_loss: 74.9094
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:00:00  plan=7beb2338  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 68, macd_hist +0.09704; liquidity dissent absorbed by alignment penalty; long confidence 0.95, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.853047  liquidity=0.45613  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d1448604  LONG  size=0.05
+    entry_zone: 75.1195 -> 75.3532
+    take_profit: [76.2877, 76.9419]   stop_loss: 74.9794
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:15:00  plan=b17c115c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 67, macd_hist +0.07285; liquidity dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.884741  liquidity=0.457138  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] fe3832b7  LONG  size=0.05
+    entry_zone: 75.134 -> 75.3513
+    take_profit: [76.2206, 76.829]   stop_loss: 75.0037
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:15:00  plan=a7c55451  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 68, macd_hist +0.07668; fresh FVG, 0.13 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.60, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.897654  liquidity=0.47193  price_action=0.134731  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b2b428ad  LONG  size=0.02
+    entry_zone: 75.186 -> 75.4087
+    take_profit: [76.2993, 76.9228]   stop_loss: 75.0524
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:15:00  plan=2f3be0c8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 65, macd_hist +0.06519; fresh FVG, 0.13 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.59, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.76072  liquidity=0.42026  price_action=0.130341  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e559a6b5  LONG  size=0.02
+    entry_zone: 74.9948 -> 75.2249
+    take_profit: [76.1456, 76.79]   stop_loss: 74.8567
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:15:00  plan=2f4bcad5  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 05:30:00  plan=3f11975d  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 60, macd_hist +0.01831; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.73, rr 2.50
+  agent_scores: htf_trend=1  price_action=0.502797  momentum=0.437175  liquidity=0.353714  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 29dd50ec  LONG  size=0.03
+    entry_zone: 74.8018 -> 75.0206
+    take_profit: [75.8957, 76.5083]   stop_loss: 74.6706
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:30:00  plan=f30eccaf  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 62, macd_hist +0.02533; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.78, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.524862  liquidity=0.390506  price_action=0.224153  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] afa8693a  LONG  size=0.03
+    entry_zone: 74.9054 -> 75.1285
+    take_profit: [76.0207, 76.6453]   stop_loss: 74.7716
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:30:00  plan=68cec2e9  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 62, macd_hist +0.02405; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.50987  liquidity=0.383897  price_action=0.223438  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 18f62122  LONG  size=0.03
+    entry_zone: 74.8843 -> 75.1081
+    take_profit: [76.0032, 76.6298]   stop_loss: 74.7501
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:30:00  plan=22c2ed28  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 63, macd_hist +0.03107; liquidity dissent absorbed by alignment penalty; long confidence 0.83, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.608559  liquidity=0.418114  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 09806036  LONG  size=0.04
+    entry_zone: 74.9917 -> 75.2172
+    take_profit: [76.1195, 76.751]   stop_loss: 74.8563
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:45:00  plan=9166d82d  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 63, macd_hist +0.01384; liquidity dissent absorbed by alignment penalty; long confidence 0.82, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.600385  liquidity=0.432793  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e5cfa24b  LONG  size=0.04
+    entry_zone: 75.0531 -> 75.2644
+    take_profit: [76.1093, 76.7008]   stop_loss: 74.9264
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:45:00  plan=f7b97cc8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 59, macd_hist +0.0004339; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.70, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.389948  liquidity=0.364299  price_action=0.11448  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 1af59344  LONG  size=0.02
+    entry_zone: 74.8324 -> 75.0508
+    take_profit: [75.9243, 76.5358]   stop_loss: 74.7014
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 05:45:00  plan=6bed580d  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 1.00; momentum: rsi 60, macd_hist +0.001072; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.70, rr 2.50
+  agent_scores: htf_trend=1  momentum=0.400338  liquidity=0.367678  price_action=0.114107  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f4439d0b  LONG  size=0.03
+    entry_zone: 74.8414 -> 75.0605
+    take_profit: [75.9368, 76.5503]   stop_loss: 74.7099
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:00:00  plan=f9f147e7  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; cvd, liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  cvd=0.5  liquidity=0.243211  price_action=0.122669  structure=0  momentum=0  funding=0  cross_venue=0  basis=0
+  setup[1] 472fdf3c  LONG  size=0.05
+    entry_zone: 74.9143 -> 75.1181
+    take_profit: [75.9333, 76.5039]   stop_loss: 74.792
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:00:00  plan=353ac20e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; cvd, liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  cvd=0.5  liquidity=0.243211  price_action=0.122669  structure=0  momentum=0  funding=0  cross_venue=0  basis=0
+  setup[1] 25e6f4ea  LONG  size=0.05
+    entry_zone: 74.9143 -> 75.1181
+    take_profit: [75.9333, 76.5039]   stop_loss: 74.792
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:00:00  plan=65178150  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; cvd, liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  cvd=0.5  liquidity=0.320668  price_action=0.118115  structure=0  momentum=0  funding=0  cross_venue=0  basis=0
+  setup[1] 82e3ab39  LONG  size=0.05
+    entry_zone: 74.7225 -> 74.9342
+    take_profit: [75.7808, 76.3734]   stop_loss: 74.5955
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:00:00  plan=61192f48  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; cvd, liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  cvd=0.5  liquidity=0.263497  price_action=0.115771  structure=0  momentum=0  funding=0  cross_venue=0  basis=0
+  setup[1] a2c8ae9c  LONG  size=0.05
+    entry_zone: 74.5861 -> 74.802
+    take_profit: [75.6658, 76.2704]   stop_loss: 74.4565
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:00:00  plan=91053ea5  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; cvd, liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  cvd=0.5  liquidity=0.310419  price_action=0.11558  structure=0  momentum=0  funding=0  cross_venue=0  basis=0
+  setup[1] 658a6ed6  LONG  size=0.05
+    entry_zone: 74.6555 -> 74.8718
+    take_profit: [75.7371, 76.3427]   stop_loss: 74.5258
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:15:00  plan=3f57c866  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  price_action=0.323049  liquidity=0.318738  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 9be34561  LONG  size=0.05
+    entry_zone: 74.6782 -> 74.8794
+    take_profit: [75.6842, 76.2476]   stop_loss: 74.5575
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:15:00  plan=26f18fc3  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  liquidity=0.210239  price_action=0.143496  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 89b71407  LONG  size=0.05
+    entry_zone: 74.5164 -> 74.7255
+    take_profit: [75.5617, 76.1471]   stop_loss: 74.391
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:15:00  plan=2d953903  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  price_action=0.136501  structure=0  momentum=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 11a5f88d  LONG  size=0.05
+    entry_zone: 74.3603 -> 74.5801
+    take_profit: [75.4592, 76.0746]   stop_loss: 74.2285
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:15:00  plan=cca4b0a5  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  price_action=0.136501  liquidity=0.129041  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 468f8e53  LONG  size=0.05
+    entry_zone: 74.3903 -> 74.6101
+    take_profit: [75.4892, 76.1046]   stop_loss: 74.2585
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:30:00  plan=44455bc6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  liquidity=0.130639  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 6a1de694  LONG  size=0.05
+    entry_zone: 74.4133 -> 74.6178
+    take_profit: [75.4355, 76.008]   stop_loss: 74.2907
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:30:00  plan=9e787843  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  momentum=0.360355  price_action=0.299132  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d36e5889  LONG  size=0.05
+    entry_zone: 74.0741 -> 74.2914
+    take_profit: [75.1605, 75.769]   stop_loss: 73.9437
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:30:00  plan=c92041dc  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  momentum=0.552654  liquidity=0.410162  price_action=0.277259  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 8ca462d1  LONG  size=0.05
+    entry_zone: 73.7683 -> 74.0028
+    take_profit: [74.9405, 75.597]   stop_loss: 73.6277
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:30:00  plan=471adb27  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  momentum=0.479588  liquidity=0.446772  price_action=0.277259  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a8933628  LONG  size=0.05
+    entry_zone: 73.8783 -> 74.1128
+    take_profit: [75.0505, 75.707]   stop_loss: 73.7377
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:45:00  plan=a2e9eb72  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  price_action=0.662815  momentum=0.50927  liquidity=0.444158  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] cd1e16bf  LONG  size=0.05
+    entry_zone: 73.8819 -> 74.1006
+    take_profit: [74.9757, 75.5882]   stop_loss: 73.7506
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:45:00  plan=92d15f1b  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  price_action=0.636824  momentum=0.563608  liquidity=0.414977  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] dd688879  LONG  size=0.05
+    entry_zone: 73.7885 -> 74.0162
+    take_profit: [74.9269, 75.5645]   stop_loss: 73.6518
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:45:00  plan=b21ceb31  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  momentum=0.491879  price_action=0.455434  liquidity=0.447726  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e3e9303b  LONG  size=0.05
+    entry_zone: 73.8842 -> 74.1147
+    take_profit: [75.0369, 75.6825]   stop_loss: 73.7458
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 06:45:00  plan=c1ff23bc  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.96; liquidity, momentum, price_action dissent absorbed by alignment penalty; long confidence 0.96, rr 2.50
+  agent_scores: htf_trend=0.95578  momentum=0.472855  price_action=0.455434  liquidity=0.454049  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 7b44339c  LONG  size=0.05
+    entry_zone: 73.9042 -> 74.1347
+    take_profit: [75.0569, 75.7025]   stop_loss: 73.7658
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:00:00  plan=a3ddda11  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; liquidity, momentum dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  momentum=0.402772  liquidity=0.300207  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a656bcff  LONG  size=0.02
+    entry_zone: 74.0051 -> 74.2217
+    take_profit: [75.088, 75.6945]   stop_loss: 73.8752
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:00:00  plan=fa6e2291  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  momentum=0.499656  price_action=0.476941  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 42a3150c  LONG  size=0.02
+    entry_zone: 73.8898 -> 74.1099
+    take_profit: [74.9905, 75.607]   stop_loss: 73.7577
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:00:00  plan=70078e3c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  momentum=0.483073  price_action=0.466349  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] eaf682fa  LONG  size=0.02
+    entry_zone: 73.9023 -> 74.1274
+    take_profit: [75.028, 75.6585]   stop_loss: 73.7672
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:00:00  plan=ac460517  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 07:15:00  plan=b883cc52  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 07:15:00  plan=d31fbec6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; momentum dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  momentum=0.3155  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] aa72c863  LONG  size=0.02
+    entry_zone: 74.0932 -> 74.3111
+    take_profit: [75.1826, 75.7926]   stop_loss: 73.9625
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:15:00  plan=b354bd17  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; price_action dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  price_action=0.455785  structure=0  momentum=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 456d9a8f  LONG  size=0.02
+    entry_zone: 74.3344 -> 74.5648
+    take_profit: [75.4863, 76.1313]   stop_loss: 74.1962
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:15:00  plan=e66cf3e3  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; momentum, price_action dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  price_action=0.455785  momentum=0.200257  structure=0  funding=0  liquidity=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e27bfd99  LONG  size=0.02
+    entry_zone: 74.1944 -> 74.4248
+    take_profit: [75.3463, 75.9913]   stop_loss: 74.0562
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:30:00  plan=8dc7db29  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; momentum dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  momentum=0.226027  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] b4d029fc  LONG  size=0.02
+    entry_zone: 74.1875 -> 74.4025
+    take_profit: [75.2625, 75.8644]   stop_loss: 74.0585
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:30:00  plan=2804851e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 39b442e5  LONG  size=0.02
+    entry_zone: 74.2852 -> 74.5084
+    take_profit: [75.4012, 76.0262]   stop_loss: 74.1513
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:30:00  plan=c11a40e9  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; momentum dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  momentum=0.143085  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e6b1d972  LONG  size=0.02
+    entry_zone: 74.2525 -> 74.4775
+    take_profit: [75.3775, 76.0074]   stop_loss: 74.1175
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:30:00  plan=b4aa6cfc  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.6765  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d8b59b20  LONG  size=0.02
+    entry_zone: 74.3234 -> 74.5545
+    take_profit: [75.4787, 76.1257]   stop_loss: 74.1848
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:45:00  plan=8c1b7f5a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; bullish CVD divergence (0.50); long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=0.6765  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 6fcaf588  LONG  size=0.02
+    entry_zone: 74.3371 -> 74.5524
+    take_profit: [75.4134, 76.0162]   stop_loss: 74.2079
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:45:00  plan=3ce6625b  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=0.6765  cvd=0.5  liquidity=0.239251  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] e0494385  LONG  size=0.02
+    entry_zone: 74.541 -> 74.767
+    take_profit: [75.6709, 76.3037]   stop_loss: 74.4054
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:45:00  plan=89a70a1b  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=0.6765  cvd=0.5  liquidity=0.142539  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] be5d479d  LONG  size=0.02
+    entry_zone: 74.4 -> 74.6267
+    take_profit: [75.5334, 76.1682]   stop_loss: 74.2639
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 07:45:00  plan=af849733  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.68; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=0.6765  cvd=0.5  liquidity=0.205098  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 50c0e5b8  LONG  size=0.02
+    entry_zone: 74.49 -> 74.7167
+    take_profit: [75.6234, 76.2582]   stop_loss: 74.3539
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:00:00  plan=c620ccd7  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.166257  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 32139471  LONG  size=0.03
+    entry_zone: 74.451 -> 74.6637
+    take_profit: [75.5143, 76.1097]   stop_loss: 74.3234
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:00:00  plan=04729bc7  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.247228  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 5305b477  LONG  size=0.03
+    entry_zone: 74.556 -> 74.7787
+    take_profit: [75.6693, 76.2927]   stop_loss: 74.4224
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:00:00  plan=3eef548a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.246016  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 811d0c7c  LONG  size=0.03
+    entry_zone: 74.5512 -> 74.7771
+    take_profit: [75.6805, 76.3129]   stop_loss: 74.4157
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:15:00  plan=20eadd26  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.188464  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] b5e36e95  LONG  size=0.03
+    entry_zone: 74.4849 -> 74.695
+    take_profit: [75.5353, 76.1235]   stop_loss: 74.3588
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:15:00  plan=849e5849  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.188464  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] e6939c8a  LONG  size=0.03
+    entry_zone: 74.4849 -> 74.695
+    take_profit: [75.5353, 76.1235]   stop_loss: 74.3588
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:15:00  plan=23ecd37d  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.143858  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 214df55e  LONG  size=0.03
+    entry_zone: 74.4147 -> 74.6316
+    take_profit: [75.4991, 76.1063]   stop_loss: 74.2846
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:15:00  plan=879cd989  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); momentum dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  momentum=0.086968  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 87f142e3  LONG  size=0.03
+    entry_zone: 74.1934 -> 74.4178
+    take_profit: [75.3153, 75.9435]   stop_loss: 74.0588
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:15:00  plan=3d5be308  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); momentum dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  momentum=0.048483  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] c94d7cca  LONG  size=0.03
+    entry_zone: 74.2734 -> 74.4978
+    take_profit: [75.3953, 76.0235]   stop_loss: 74.1388
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:30:00  plan=374fc024  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 6d605ac3  LONG  size=0.03
+    entry_zone: 74.3453 -> 74.5551
+    take_profit: [75.3942, 75.9816]   stop_loss: 74.2195
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:30:00  plan=e041385e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] dcc3af8c  LONG  size=0.03
+    entry_zone: 74.3398 -> 74.5599
+    take_profit: [75.4405, 76.0568]   stop_loss: 74.2077
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:30:00  plan=a3fcb48b  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 54678b65  LONG  size=0.03
+    entry_zone: 74.3198 -> 74.5399
+    take_profit: [75.4205, 76.0368]   stop_loss: 74.1877
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:30:00  plan=f0e09266  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  liquidity=0.212816  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] ed58b840  LONG  size=0.03
+    entry_zone: 74.5044 -> 74.7281
+    take_profit: [75.623, 76.2493]   stop_loss: 74.3702
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:45:00  plan=40c5ec3a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; liquidity dissent absorbed by alignment penalty; long confidence 0.82, rr 2.50
+  agent_scores: htf_trend=0.81639  liquidity=0.195801  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 78f6df5d  LONG  size=0.04
+    entry_zone: 74.4957 -> 74.7052
+    take_profit: [75.5433, 76.1299]   stop_loss: 74.37
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:45:00  plan=df440e74  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; bullish CVD divergence (0.50); long confidence 0.75, rr 2.50
+  agent_scores: htf_trend=0.81639  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 1f218077  LONG  size=0.03
+    entry_zone: 74.3498 -> 74.5633
+    take_profit: [75.417, 76.0147]   stop_loss: 74.2218
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:45:00  plan=f28c5124  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; liquidity dissent absorbed by alignment penalty; long confidence 0.82, rr 2.50
+  agent_scores: htf_trend=0.81639  liquidity=0.201352  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] ce099f03  LONG  size=0.04
+    entry_zone: 74.4972 -> 74.7124
+    take_profit: [75.5733, 76.1759]   stop_loss: 74.368
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 08:45:00  plan=fb651748  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.82; liquidity dissent absorbed by alignment penalty; long confidence 0.82, rr 2.50
+  agent_scores: htf_trend=0.81639  liquidity=0.436026  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f1852562  LONG  size=0.04
+    entry_zone: 75.0429 -> 75.281
+    take_profit: [76.2333, 76.8999]   stop_loss: 74.9
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:00:00  plan=c173579f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.70 ATR; momentum: rsi 58, macd_hist +0.004793; entry refined to FVG zone [74.85, 75.17]; liquidity dissent absorbed by alignment penalty
+  agent_scores: htf_trend=0.976006  price_action=0.69564  momentum=0.478142  liquidity=0.315104  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 96ffd243  LONG  size=0.03
+    entry_zone: 74.85 -> 75.17
+    take_profit: [76.09, 76.734]   stop_loss: 74.802
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:00:00  plan=1aa61cfe  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.52 ATR; momentum: rsi 58, macd_hist +0.006069; liquidity dissent absorbed by alignment penalty; long confidence 0.70, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.515329  momentum=0.497913  liquidity=0.322853  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 6f66a77a  LONG  size=0.02
+    entry_zone: 74.8507 -> 75.0836
+    take_profit: [76.015, 76.667]   stop_loss: 74.711
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:00:00  plan=8946d4d0  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; momentum: rsi 59, macd_hist +0.009898; fresh FVG, 0.52 ATR; liquidity dissent absorbed by alignment penalty; long confidence 0.72, rr 2.50
+  agent_scores: htf_trend=0.976006  momentum=0.558855  price_action=0.515329  liquidity=0.346265  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] fef4f55b  LONG  size=0.03
+    entry_zone: 74.9107 -> 75.1436
+    take_profit: [76.075, 76.727]   stop_loss: 74.771
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:00:00  plan=33abcf56  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.52 ATR; momentum: rsi 57, macd_hist +0.0009635; liquidity dissent absorbed by alignment penalty; long confidence 0.67, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.515329  momentum=0.420147  liquidity=0.289969  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3abb3134  LONG  size=0.02
+    entry_zone: 74.7707 -> 75.0036
+    take_profit: [75.935, 76.587]   stop_loss: 74.631
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:15:00  plan=e0a8510e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.55 ATR; momentum: rsi 57, macd_hist +0.007677; liquidity dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.554054  momentum=0.423237  liquidity=0.206491  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d356374b  LONG  size=0.02
+    entry_zone: 74.7951 -> 75.0117
+    take_profit: [75.878, 76.4845]   stop_loss: 74.6652
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:15:00  plan=82c94662  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.53 ATR; momentum: rsi 58, macd_hist +0.01214; liquidity dissent absorbed by alignment penalty; long confidence 0.70, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.532118  momentum=0.47932  liquidity=0.243259  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 81a32086  LONG  size=0.02
+    entry_zone: 74.8517 -> 75.0772
+    take_profit: [75.9793, 76.6107]   stop_loss: 74.7164
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:15:00  plan=9651c039  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.53 ATR; momentum: rsi 57, macd_hist +0.007038; liquidity dissent absorbed by alignment penalty; long confidence 0.67, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.527937  momentum=0.412883  liquidity=0.198831  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 42de30fe  LONG  size=0.02
+    entry_zone: 74.7691 -> 74.9964
+    take_profit: [75.9055, 76.542]   stop_loss: 74.6327
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:15:00  plan=39ac2b84  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.53 ATR; momentum: rsi 57, macd_hist +0.008953; liquidity dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.525461  momentum=0.441032  liquidity=0.215231  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 25f54e2b  LONG  size=0.02
+    entry_zone: 74.7974 -> 75.0258
+    take_profit: [75.9393, 76.5787]   stop_loss: 74.6604
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:30:00  plan=c8d35059  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.56 ATR; momentum: rsi 56, macd_hist +0.009217; liquidity dissent absorbed by alignment penalty; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.56022  momentum=0.399484  liquidity=0.19554  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 1dd686ef  LONG  size=0.02
+    entry_zone: 74.7787 -> 74.9929
+    take_profit: [75.8497, 76.4495]   stop_loss: 74.6502
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:30:00  plan=687e72f6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.54 ATR; momentum: rsi 59, macd_hist +0.01879; liquidity dissent absorbed by alignment penalty; long confidence 0.72, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.542141  momentum=0.531064  liquidity=0.276906  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d714fb66  LONG  size=0.03
+    entry_zone: 74.918 -> 75.1393
+    take_profit: [76.0247, 76.6445]   stop_loss: 74.7852
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:30:00  plan=3b370a4c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.54 ATR; momentum: rsi 58, macd_hist +0.01624; liquidity dissent absorbed by alignment penalty; long confidence 0.71, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.542141  momentum=0.499725  liquidity=0.255296  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f9191034  LONG  size=0.03
+    entry_zone: 74.878 -> 75.0993
+    take_profit: [75.9847, 76.6045]   stop_loss: 74.7452
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:30:00  plan=6a687856  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; fresh FVG, 0.54 ATR; momentum: rsi 57, macd_hist +0.01305; liquidity dissent absorbed by alignment penalty; long confidence 0.69, rr 2.50
+  agent_scores: htf_trend=0.976006  price_action=0.542141  momentum=0.459298  liquidity=0.227854  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a38b2c77  LONG  size=0.02
+    entry_zone: 74.828 -> 75.0493
+    take_profit: [75.9347, 76.5545]   stop_loss: 74.6952
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:45:00  plan=f37a8839  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; momentum: rsi 57, macd_hist +0.01358; liquidity dissent absorbed by alignment penalty; long confidence 0.73, rr 2.50
+  agent_scores: htf_trend=0.976006  momentum=0.460117  liquidity=0.231665  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 040c9bf1  LONG  size=0.03
+    entry_zone: 74.8512 -> 75.0571
+    take_profit: [75.8806, 76.4571]   stop_loss: 74.7276
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:45:00  plan=d51862a7  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; momentum: rsi 57, macd_hist +0.01358; liquidity dissent absorbed by alignment penalty; long confidence 0.73, rr 2.50
+  agent_scores: htf_trend=0.976006  momentum=0.459777  liquidity=0.229346  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3e1e2498  LONG  size=0.03
+    entry_zone: 74.8372 -> 75.0524
+    take_profit: [75.9131, 76.5156]   stop_loss: 74.7081
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:45:00  plan=1f6fd16c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; momentum: rsi 61, macd_hist +0.02762; liquidity dissent absorbed by alignment penalty; long confidence 0.83, rr 2.50
+  agent_scores: htf_trend=0.976006  momentum=0.638974  liquidity=0.345965  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a37c7e9d  LONG  size=0.04
+    entry_zone: 75.0508 -> 75.2703
+    take_profit: [76.1481, 76.7626]   stop_loss: 74.9191
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 09:45:00  plan=1096f85f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.98; momentum: rsi 61, macd_hist +0.02953; liquidity dissent absorbed by alignment penalty; long confidence 0.85, rr 2.50
+  agent_scores: htf_trend=0.976006  momentum=0.660942  liquidity=0.358933  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 00eef525  LONG  size=0.04
+    entry_zone: 75.0733 -> 75.2978
+    take_profit: [76.1956, 76.8241]   stop_loss: 74.9386
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:00:00  plan=ecb3ef0e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 61, macd_hist +0.03562; liquidity dissent absorbed by alignment penalty; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.531441  liquidity=0.355835  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 91876441  LONG  size=0.03
+    entry_zone: 75.0757 -> 75.2852
+    take_profit: [76.1233, 76.7099]   stop_loss: 74.95
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:00:00  plan=2e16b86f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 62, macd_hist +0.03945; liquidity dissent absorbed by alignment penalty; long confidence 0.83, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.646704  liquidity=0.382108  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 94aee29c  LONG  size=0.04
+    entry_zone: 75.1224 -> 75.3408
+    take_profit: [76.2145, 76.8261]   stop_loss: 74.9913
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:00:00  plan=9ff836b6  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 62, macd_hist +0.04009; liquidity dissent absorbed by alignment penalty; long confidence 0.83, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.662815  liquidity=0.386381  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] e21dd9cf  LONG  size=0.04
+    entry_zone: 75.1302 -> 75.3501
+    take_profit: [76.2295, 76.8451]   stop_loss: 74.9983
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:00:00  plan=51f56545  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 58, macd_hist +0.02796; liquidity dissent absorbed by alignment penalty; long confidence 0.66, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.344378  liquidity=0.288122  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d0adc2af  LONG  size=0.02
+    entry_zone: 74.9402 -> 75.1601
+    take_profit: [76.0395, 76.6551]   stop_loss: 74.8083
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:15:00  plan=e7eeb3e8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 58, macd_hist +0.02275; long confidence 0.73, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.470177  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 4fa62381  LONG  size=0.03
+    entry_zone: 74.9416 -> 75.1472
+    take_profit: [75.9695, 76.5452]   stop_loss: 74.8183
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:15:00  plan=69d3b63d  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 61, macd_hist +0.03424; long confidence 0.82, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.630898  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f6acb7d7  LONG  size=0.04
+    entry_zone: 75.1093 -> 75.3231
+    take_profit: [76.1783, 76.7769]   stop_loss: 74.981
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:15:00  plan=c88f85b4  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 58, macd_hist +0.02339; long confidence 0.74, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.482805  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 0ec7da49  LONG  size=0.03
+    entry_zone: 74.9366 -> 75.1522
+    take_profit: [76.0145, 76.6182]   stop_loss: 74.8073
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:15:00  plan=97b03d56  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 59, macd_hist +0.02722; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.541148  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a0adb9a0  LONG  size=0.03
+    entry_zone: 74.9939 -> 75.2113
+    take_profit: [76.0808, 76.6894]   stop_loss: 74.8635
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:30:00  plan=df94298a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 59, macd_hist +0.02342; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.540347  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] bd0b8868  LONG  size=0.03
+    entry_zone: 75.0167 -> 75.2189
+    take_profit: [76.0277, 76.5939]   stop_loss: 74.8954
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:30:00  plan=487b574c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; momentum: rsi 57, macd_hist +0.01704; long confidence 0.69, rr 2.50
+  agent_scores: htf_trend=0.951442  momentum=0.404184  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 32ebb33e  LONG  size=0.02
+    entry_zone: 74.9081 -> 75.116
+    take_profit: [75.9477, 76.5299]   stop_loss: 74.7834
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:30:00  plan=b02810b4  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 10:30:00  plan=a689012d  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-07-01 10:45:00  plan=7337da83  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; liquidity, price_action dissent absorbed by alignment penalty; long confidence 0.95, rr 2.50
+  agent_scores: htf_trend=0.951442  liquidity=0.267118  price_action=0.248635  structure=0  momentum=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 4f4a48fd  LONG  size=0.05
+    entry_zone: 74.6984 -> 74.8995
+    take_profit: [75.7038, 76.2669]   stop_loss: 74.5777
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:45:00  plan=e0e0f6a8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; liquidity proxy imbalance +0.25; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=0.951442  liquidity=0.147908  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 070dda8c  LONG  size=0.02
+    entry_zone: 74.8414 -> 75.0471
+    take_profit: [75.8701, 76.4462]   stop_loss: 74.7179
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:45:00  plan=d7b14d5a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; liquidity proxy imbalance +0.35; long confidence 0.68, rr 2.50
+  agent_scores: htf_trend=0.951442  liquidity=0.208961  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] a63b3030  LONG  size=0.02
+    entry_zone: 74.7692 -> 74.9764
+    take_profit: [75.8051, 76.3852]   stop_loss: 74.6449
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 10:45:00  plan=64015834  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.95; liquidity dissent absorbed by alignment penalty; long confidence 0.95, rr 2.50
+  agent_scores: htf_trend=0.951442  liquidity=0.221906  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] ecb983eb  LONG  size=0.05
+    entry_zone: 74.636 -> 74.8453
+    take_profit: [75.6826, 76.2687]   stop_loss: 74.5104
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:00:00  plan=2cbbb594  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; liquidity dissent absorbed by alignment penalty; long confidence 0.81, rr 2.50
+  agent_scores: htf_trend=0.813078  liquidity=0.262346  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 827ead1b  LONG  size=0.04
+    entry_zone: 74.6963 -> 74.8921
+    take_profit: [75.6753, 76.2235]   stop_loss: 74.5788
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:00:00  plan=d557df68  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; liquidity, momentum dissent absorbed by alignment penalty; long confidence 0.81, rr 2.50
+  agent_scores: htf_trend=0.813078  liquidity=0.149687  momentum=0.148077  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 1a48419a  LONG  size=0.04
+    entry_zone: 74.5486 -> 74.7562
+    take_profit: [75.5865, 76.1677]   stop_loss: 74.4241
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:00:00  plan=32657359  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); momentum dissent absorbed by alignment penalty; long confidence 0.74, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  momentum=0.218857  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 767a7245  LONG  size=0.03
+    entry_zone: 74.4786 -> 74.6862
+    take_profit: [75.5165, 76.0977]   stop_loss: 74.3541
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:00:00  plan=eb35eb8b  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; liquidity proxy imbalance +0.30; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.813078  liquidity=0.181115  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 142a0e3c  LONG  size=0.02
+    entry_zone: 74.7922 -> 75.0041
+    take_profit: [75.8515, 76.4447]   stop_loss: 74.6651
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:15:00  plan=f993e2da  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); liquidity proxy imbalance +0.30; long confidence 0.63, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  liquidity=0.177416  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 47605ce9  LONG  size=0.02
+    entry_zone: 74.8238 -> 75.0213
+    take_profit: [75.8111, 76.3639]   stop_loss: 74.7054
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:15:00  plan=02b31d23  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); liquidity proxy imbalance +0.23; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  liquidity=0.139088  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 293064e0  LONG  size=0.02
+    entry_zone: 74.852 -> 75.0573
+    take_profit: [75.8786, 76.4534]   stop_loss: 74.7289
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:15:00  plan=e1dd01a5  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); liquidity proxy imbalance +0.39; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  liquidity=0.234555  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] a459adc4  LONG  size=0.02
+    entry_zone: 74.7383 -> 74.9461
+    take_profit: [75.7773, 76.3591]   stop_loss: 74.6136
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:15:00  plan=6318ce83  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); liquidity dissent absorbed by alignment penalty; long confidence 0.74, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  liquidity=0.262844  structure=0  momentum=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 93b04369  LONG  size=0.03
+    entry_zone: 74.6883 -> 74.8961
+    take_profit: [75.7273, 76.3091]   stop_loss: 74.5636
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:30:00  plan=39fec7cc  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); long confidence 0.74, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 6a5467b0  LONG  size=0.03
+    entry_zone: 74.6679 -> 74.8626
+    take_profit: [75.6416, 76.1869]   stop_loss: 74.551
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:30:00  plan=4bc23dbd  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); liquidity proxy imbalance +0.24; momentum dissent absorbed by alignment penalty; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  momentum=0.205821  liquidity=0.141553  structure=0  funding=0  price_action=0  cross_venue=0  basis=0
+  setup[1] 568432ec  LONG  size=0.02
+    entry_zone: 74.5245 -> 74.7282
+    take_profit: [75.5429, 76.1131]   stop_loss: 74.4023
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:30:00  plan=b1b400f3  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); momentum dissent absorbed by alignment penalty; long confidence 0.74, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  momentum=0.174635  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] aaa65d03  LONG  size=0.03
+    entry_zone: 74.5545 -> 74.7582
+    take_profit: [75.5729, 76.1431]   stop_loss: 74.4323
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:30:00  plan=4ab27b5a  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; bullish CVD divergence (0.50); long confidence 0.74, rr 2.50
+  agent_scores: htf_trend=0.813078  cvd=0.5  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0
+  setup[1] c981a305  LONG  size=0.03
+    entry_zone: 74.6245 -> 74.8282
+    take_profit: [75.6429, 76.2131]   stop_loss: 74.5023
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:45:00  plan=3942770e  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; long confidence 0.81, rr 2.50
+  agent_scores: htf_trend=0.813078  structure=0  momentum=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 22bf8263  LONG  size=0.04
+    entry_zone: 74.6552 -> 74.8451
+    take_profit: [75.6044, 76.136]   stop_loss: 74.5413
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:45:00  plan=56a02ca7  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; liquidity proxy imbalance +0.20; momentum dissent absorbed by alignment penalty; long confidence 0.59, rr 2.50
+  agent_scores: htf_trend=0.813078  momentum=0.193265  liquidity=0.121952  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 258b4161  LONG  size=0.02
+    entry_zone: 74.5561 -> 74.752
+    take_profit: [75.5357, 76.0842]   stop_loss: 74.4386
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:45:00  plan=d0db4b0c  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; liquidity proxy imbalance +0.33; momentum dissent absorbed by alignment penalty; long confidence 0.63, rr 2.50
+  agent_scores: htf_trend=0.813078  momentum=0.280677  liquidity=0.197473  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 9f2d9758  LONG  size=0.02
+    entry_zone: 74.4719 -> 74.6706
+    take_profit: [75.4657, 76.0222]   stop_loss: 74.3526
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 11:45:00  plan=8b6ea2d2  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.81; liquidity proxy imbalance +0.27; momentum dissent absorbed by alignment penalty; long confidence 0.61, rr 2.50
+  agent_scores: htf_trend=0.813078  momentum=0.237238  liquidity=0.160245  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 905dd3be  LONG  size=0.02
+    entry_zone: 74.5054 -> 74.7085
+    take_profit: [75.5207, 76.0892]   stop_loss: 74.3836
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:00:00  plan=7471e1f5  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; momentum dissent absorbed by alignment penalty; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.166387  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] be0005b0  LONG  size=0.03
+    entry_zone: 74.5734 -> 74.7645
+    take_profit: [75.5287, 76.0636]   stop_loss: 74.4588
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:00:00  plan=eb1c7943  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; liquidity proxy imbalance +0.47; momentum dissent absorbed by alignment penalty; long confidence 0.64, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.393765  liquidity=0.284809  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 6cda1deb  LONG  size=0.02
+    entry_zone: 74.3711 -> 74.5704
+    take_profit: [75.3674, 75.9254]   stop_loss: 74.2515
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:00:00  plan=5497d099  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; liquidity proxy imbalance +0.39; momentum dissent absorbed by alignment penalty; long confidence 0.62, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.329489  liquidity=0.231702  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] c49ebe5b  LONG  size=0.02
+    entry_zone: 74.4231 -> 74.6277
+    take_profit: [75.4462, 76.0191]   stop_loss: 74.3003
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:15:00  plan=f3d21474  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; liquidity proxy imbalance +0.33; momentum dissent absorbed by alignment penalty; long confidence 0.61, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.594296  liquidity=0.195703  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 3d955b07  LONG  size=0.02
+    entry_zone: 74.166 -> 74.362
+    take_profit: [75.146, 75.6948]   stop_loss: 74.0484
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:15:00  plan=851857b8  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; liquidity proxy imbalance +0.33; momentum dissent absorbed by alignment penalty; long confidence 0.61, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.594296  liquidity=0.195703  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 38844d18  LONG  size=0.02
+    entry_zone: 74.166 -> 74.362
+    take_profit: [75.146, 75.6948]   stop_loss: 74.0484
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:15:00  plan=b90fb16f  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; momentum dissent absorbed by alignment penalty; long confidence 0.77, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.430969  structure=0  funding=0  liquidity=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 409b4e5b  LONG  size=0.03
+    entry_zone: 74.2874 -> 74.4891
+    take_profit: [75.296, 75.8608]   stop_loss: 74.1664
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)
+
+PLAN CREATED  2026-07-01 12:15:00  plan=244bdf31  bias=bullish  regime=-  setups=1
+  rationale: htf_trend score 0.77; liquidity proxy imbalance +0.51; momentum dissent absorbed by alignment penalty; long confidence 0.65, rr 2.50
+  agent_scores: htf_trend=0.765214  momentum=0.372877  liquidity=0.308129  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 7115c0f8  LONG  size=0.02
+    entry_zone: 74.3364 -> 74.5388
+    take_profit: [75.3485, 75.9153]   stop_loss: 74.2149
+    soft:  rsi_14 > 48 (w0.6); macd_hist > 0 (w0.4)
+    invalidation: [soft] rsi_14 < 40 (on_close)

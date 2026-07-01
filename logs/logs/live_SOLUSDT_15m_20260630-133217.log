@@ -1,0 +1,111 @@
+========================================================================================
+LIVE  SOLUSDT 15m  feed=ws  profile=scalper  live_execute=True  testnet=True
+========================================================================================
+
+PLAN CREATED  2026-06-30 13:30:00  plan=5edb9276  bias=bearish  regime=-  setups=1
+  rationale: momentum: rsi 28, macd_hist -0.1066; liquidity dissent absorbed by alignment penalty; short confidence 0.96, rr 2.50
+  agent_scores: momentum=0.957529  liquidity=0.550011  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0  htf_trend=0
+  setup[1] 860fbac9  SHORT  size=0.05
+    entry_zone: 72.2433 -> 72.4299
+    take_profit: [71.4969, 70.9744]   stop_loss: 72.5419
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 13:30:00  plan=fdc4411f  bias=bearish  regime=-  setups=1
+  rationale: momentum: rsi 28, macd_hist -0.1085; liquidity dissent absorbed by alignment penalty; short confidence 0.96, rr 2.50
+  agent_scores: momentum=0.961154  liquidity=0.552663  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0  htf_trend=0
+  setup[1] 795650c2  SHORT  size=0.05
+    entry_zone: 72.214 -> 72.4021
+    take_profit: [71.4619, 70.9354]   stop_loss: 72.5149
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 13:30:00  plan=e711680c  bias=bearish  regime=-  setups=1
+  rationale: momentum: rsi 32, macd_hist -0.08806; liquidity dissent absorbed by alignment penalty; short confidence 0.91, rr 2.50
+  agent_scores: momentum=0.913458  liquidity=0.519038  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0  htf_trend=0
+  setup[1] 8d1d408d  SHORT  size=0.05
+    entry_zone: 72.534 -> 72.7221
+    take_profit: [71.7819, 71.2554]   stop_loss: 72.8349
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 13:45:00  plan=591b3fac  bias=bearish  regime=-  setups=1
+  rationale: momentum: rsi 32, macd_hist -0.06936; liquidity dissent absorbed by alignment penalty; short confidence 0.87, rr 2.50
+  agent_scores: momentum=0.869645  liquidity=0.52238  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0  htf_trend=0
+  setup[1] ddf63377  SHORT  size=0.04
+    entry_zone: 72.5077 -> 72.683
+    take_profit: [71.8064, 71.3155]   stop_loss: 72.7882
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 13:45:00  plan=89eedf2c  bias=bearish  regime=-  setups=1
+  rationale: momentum: rsi 31, macd_hist -0.07191; liquidity dissent absorbed by alignment penalty; short confidence 0.90, rr 2.50
+  agent_scores: momentum=0.898716  liquidity=0.526415  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0  htf_trend=0
+  setup[1] dd977644  SHORT  size=0.04
+    entry_zone: 72.4718 -> 72.6553
+    take_profit: [71.7376, 71.2237]   stop_loss: 72.7654
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 13:45:00  plan=31efe88e  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 14:00:00  plan=28dbad9e  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 14:00:00  plan=cff0509b  bias=neutral  regime=-  setups=0
+  rationale: Deterministic synthesizer found no qualifying signal.
+
+PLAN CREATED  2026-06-30 14:00:00  plan=7a06a3a4  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.603337  liquidity=0.472538  momentum=0.230148  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 0a3aadda  SHORT  size=0.02
+    entry_zone: 73.4972 -> 73.7116
+    take_profit: [72.6396, 72.0392]   stop_loss: 73.8403
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:00:00  plan=7ea961c4  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.603337  liquidity=0.465664  momentum=0.246468  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] d4171d11  SHORT  size=0.02
+    entry_zone: 73.5172 -> 73.7316
+    take_profit: [72.6596, 72.0592]   stop_loss: 73.8603
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:00:00  plan=c9df3962  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: htf_trend=0.603337  liquidity=0.488799  momentum=0.188422  structure=0  funding=0  price_action=0  cross_venue=0  basis=0  cvd=0
+  setup[1] 9baef320  SHORT  size=0.02
+    entry_zone: 73.4472 -> 73.6616
+    take_profit: [72.5896, 71.9892]   stop_loss: 73.7903
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:15:00  plan=f3d1b6ff  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; bearish CVD divergence (0.50); liquidity, momentum, price_action dissent absorbed by alignment penalty; short confidence 0.59, rr 2.50
+  agent_scores: price_action=1  htf_trend=0.603337  cvd=0.5  liquidity=0.478352  momentum=0.24955  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] 3918d851  SHORT  size=0.02
+    entry_zone: 73.4804 -> 73.6813
+    take_profit: [72.6769, 72.1145]   stop_loss: 73.8018
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:15:00  plan=81ab5c7a  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; liquidity, momentum, price_action dissent absorbed by alignment penalty; short confidence 0.60, rr 2.50
+  agent_scores: price_action=0.748978  htf_trend=0.603337  liquidity=0.502614  momentum=0.174895  structure=0  funding=0  cross_venue=0  basis=0  cvd=0
+  setup[1] f8239e33  SHORT  size=0.02
+    entry_zone: 73.4035 -> 73.6104
+    take_profit: [72.5757, 71.9962]   stop_loss: 73.7346
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
+
+PLAN CREATED  2026-06-30 14:15:00  plan=d6da8ccd  bias=bearish  regime=-  setups=1
+  rationale: htf_trend score 0.60; bearish CVD divergence (0.50); liquidity, momentum, price_action dissent absorbed by alignment penalty; short confidence 0.59, rr 2.50
+  agent_scores: price_action=0.68801  htf_trend=0.603337  cvd=0.5  momentum=0.43481  liquidity=0.137256  structure=0  funding=0  cross_venue=0  basis=0
+  setup[1] 21fd6511  SHORT  size=0.02
+    entry_zone: 73.719 -> 73.937
+    take_profit: [72.8469, 72.2365]   stop_loss: 74.0678
+    soft:  rsi_14 < 52 (w0.6); macd_hist < 0 (w0.4)
+    invalidation: [soft] rsi_14 > 60 (on_close)
