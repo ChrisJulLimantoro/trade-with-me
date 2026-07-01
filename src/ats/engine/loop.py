@@ -235,9 +235,15 @@ async def run_tick(
     prev_ts = prev_q.scalar()
     prev = await state.latest_feature_row(session, symbol, tf, as_of=prev_ts) if prev_ts else None
 
+    # Live is stateless per tick (no loop-carried counter), so the refresh cadence rides on
+    # the active plan's own ``expires_at`` (= created + plan_refresh_bars). Passing 0 keeps the
+    # bars_since_plan term of the staleness check permanently false, so a plan is only refreshed
+    # when it actually expires (or is superseded on close / regime change) — NOT every bar. The
+    # old ``plan_refresh_bars`` here made the term always true, re-planning every bar and
+    # orphaning wick_limit setups armed on the prior bar before they could fill.
     await _ensure_plan(
         session, client, symbol=symbol, tf=tf, now=now,
-        bars_since_plan=settings.plan.plan_refresh_bars,
+        bars_since_plan=0,
     )
     tick = await evaluate_now(
         session, client, symbol=symbol, tf=tf, feature_row=latest, prev_row=prev,
