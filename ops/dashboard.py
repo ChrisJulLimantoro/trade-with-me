@@ -12,7 +12,7 @@ against what the exchange actually did. The live panel is skipped if API keys ar
 
 Run:  uv run python ops/dashboard.py   (the compose `dash` service does this)
 Env:  DATABASE_URL (required), BINANCE_FUTURES_URL (optional), DASH_PORT (default 8080),
-      BINANCE_API_KEY / BINANCE_API_SECRET (optional — enable the live account panel).
+      DASH_BIND (default 127.0.0.1; set 0.0.0.0 in Docker), BINANCE_API_KEY / BINANCE_API_SECRET
 """
 
 from __future__ import annotations
@@ -50,6 +50,7 @@ def _load_dotenv(path: Path) -> None:
 _load_dotenv(_REPO_ROOT / ".env")
 
 PORT = int(os.environ.get("DASH_PORT", "8080"))
+BIND = os.environ.get("DASH_BIND", "0.0.0.0")  # use 0.0.0.0 in Docker so port publish works
 PLAN_LIMIT = int(os.environ.get("DASH_PLAN_LIMIT", "15"))  # how many recent plans to show
 # asyncpg wants a plain libpq DSN — strip SQLAlchemy's "+asyncpg" driver suffix.
 DSN = os.environ.get("DATABASE_URL", "postgresql://ats:ats@db:5432/ats").replace(
@@ -453,5 +454,5 @@ class Handler(BaseHTTPRequestHandler):
 
 
 if __name__ == "__main__":
-    print(f"[dashboard] serving on :{PORT}  (DSN host={DSN.split('@')[-1]})", flush=True)
-    ThreadingHTTPServer(("127.0.0.1", PORT), Handler).serve_forever()
+    print(f"[dashboard] serving on {BIND}:{PORT}  (DSN host={DSN.split('@')[-1]})", flush=True)
+    ThreadingHTTPServer((BIND, PORT), Handler).serve_forever()
