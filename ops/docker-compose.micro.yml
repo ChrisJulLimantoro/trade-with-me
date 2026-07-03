@@ -78,6 +78,8 @@ services:
     environment:
       DATABASE_URL: postgresql+asyncpg://ats:ats@db:5432/ats
       DASH_PORT: "8080"
+    volumes:
+      - ../logs:/app/logs:ro    # read-only: the dashboard tails the bot's daily ats-*.log
     # Override the bot entrypoint: this container just serves the read-only dashboard.
     entrypoint: ["uv", "run", "python", "ops/dashboard.py"]
     ports:
