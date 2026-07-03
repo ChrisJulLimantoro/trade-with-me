@@ -132,6 +132,23 @@ class BinanceFuturesTestnet:
         rounded = round(steps * f.step_size, f.qty_precision)
         return rounded if rounded >= f.min_qty else 0.0
 
+    def round_price(self, symbol: str, price: float) -> float:
+        """Snap ``price`` to the symbol's tickSize (NEAREST tick).
+
+        Conditional orders (STOP_MARKET / TAKE_PROFIT_MARKET trigger, trailing activation) are
+        rejected with ``-1111 Precision is over the maximum`` if the price carries more decimals
+        than the tick allows. A stop/TP trigger should land on the closest valid tick, so we round
+        to nearest rather than floor (unlike ``round_qty``, which must floor to stay affordable).
+        """
+        f = self._filters.get(symbol)
+        if f is None:
+            raise OrderError(f"filters not loaded for {symbol}; call load_filters first")
+        if f.tick_size <= 0:
+            return price
+        # Decimal places implied by the tick (e.g. 0.01 -> 2, 0.5 -> 1, 1 -> 0).
+        precision = max(0, -int(math.floor(math.log10(f.tick_size))))
+        return round(round(price / f.tick_size) * f.tick_size, precision)
+
     # --- account state (tracker / reconcile) ------------------------------------------
 
     async def set_leverage(self, symbol: str, leverage: int) -> None:
@@ -241,7 +258,7 @@ class BinanceFuturesTestnet:
             "workingType": working_type,
         }
         if trigger_price is not None:
-            params["triggerPrice"] = trigger_price
+            params["triggerPrice"] = self.round_price(symbol, trigger_price)
         if close_position:
             params["closePosition"] = "true"
         else:
@@ -252,7 +269,7 @@ class BinanceFuturesTestnet:
         if callback_rate is not None:
             params["callbackRate"] = callback_rate
         if activate_price is not None:
-            params["activatePrice"] = activate_price
+            params["activatePrice"] = self.round_price(symbol, activate_price)
         self._record("protect", {"request": params, "status": "submitting"})
         try:
             resp = await self._client.futures_create_algo_order(**params)

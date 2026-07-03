@@ -140,11 +140,22 @@ class _FakeRaw:
         return {"algoId": 999, "status": "NEW"}
 
 
-@pytest.mark.asyncio
-async def test_place_conditional_stop_market_closeposition():
+def _algo_client() -> BinanceFuturesTestnet:
+    """A client wired for conditional-order tests: fake raw client + loaded 0.01-tick filters."""
     c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
     c._client = _FakeRaw()
     c._recorder = None
+    c._filters = {
+        "SOLUSDT": SymbolFilters(
+            step_size=0.001, min_qty=0.001, tick_size=0.01, min_notional=5.0, qty_precision=3
+        )
+    }
+    return c
+
+
+@pytest.mark.asyncio
+async def test_place_conditional_stop_market_closeposition():
+    c = _algo_client()
     algo_id = await c.place_conditional(
         "SOLUSDT", "SELL", "STOP_MARKET", trigger_price=120.0, close_position=True
     )
@@ -161,9 +172,7 @@ async def test_place_conditional_stop_market_closeposition():
 
 @pytest.mark.asyncio
 async def test_place_conditional_trailing_uses_callback_and_quantity():
-    c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
-    c._client = _FakeRaw()
-    c._recorder = None
+    c = _algo_client()
     await c.place_conditional(
         "SOLUSDT", "SELL", "TRAILING_STOP_MARKET",
         callback_rate=1.5, activate_price=130.0, quantity=2.0, reduce_only=True,
@@ -174,3 +183,75 @@ async def test_place_conditional_trailing_uses_callback_and_quantity():
     assert sent["activatePrice"] == 130.0
     assert sent["quantity"] == 2.0
     assert sent["reduceOnly"] == "true"
+
+
+def test_round_price_snaps_to_tick():
+    # 0.01 tick: an 8-decimal trigger (as sent to Binance in the live-bleed bug) rounds to 2 dp.
+    c = _client_with_filters(
+        step_size=0.001, min_qty=0.001, tick_size=0.01, min_notional=5.0, qty_precision=3
+    )
+    assert c.round_price("SOLUSDT", 80.79546042) == 80.80
+    assert c.round_price("SOLUSDT", 81.12755593) == 81.13
+    # Coarser 0.1 tick: precision derives from the tick, rounds to nearest.
+    c2 = _client_with_filters(
+        step_size=0.1, min_qty=0.1, tick_size=0.1, min_notional=5.0, qty_precision=1
+    )
+    assert c2.round_price("SOLUSDT", 80.744) == 80.7
+    assert c2.round_price("SOLUSDT", 80.751) == 80.8
+
+
+def test_round_price_requires_loaded_filters():
+    c = BinanceFuturesTestnet.__new__(BinanceFuturesTestnet)
+    c._filters = {}
+    with pytest.raises(Exception):
+        c.round_price("SOLUSDT", 80.0)
+
+
+@pytest.mark.asyncio
+async def test_place_conditional_rounds_trigger_price():
+    # The core fix: an over-precise trigger must reach the exchange snapped to the tick, not raw.
+    c = _algo_client()
+    await c.place_conditional(
+        "SOLUSDT", "SELL", "STOP_MARKET", trigger_price=80.79546042, close_position=True
+    )
+    assert c._client.calls[0]["triggerPrice"] == 80.80
+
+
+class _RetryProtClient:
+    """Fake exchange client: first place_conditional raises, the rest succeed."""
+
+    def __init__(self) -> None:
+        self.place_calls = 0
+        self.cancelled: list[str] = []
+        self.closed = False
+
+    async def place_conditional(self, symbol, side, order_type, **kw):
+        self.place_calls += 1
+        if self.place_calls == 1:
+            from ats.execution.binance_futures import OrderError
+
+            raise OrderError("transient -1111")
+        return f"algo{self.place_calls}"
+
+    async def cancel_conditional(self, symbol, algo_id):
+        self.cancelled.append(algo_id)
+
+    async def position_risk(self, symbol):  # only reached if we (wrongly) flatten
+        self.closed = True
+        return None
+
+
+@pytest.mark.asyncio
+async def test_place_protection_retries_before_flattening():
+    from ats.execution.live import LiveContext
+
+    ctx = LiveContext.__new__(LiveContext)
+    ctx._client = _RetryProtClient()
+    ctx._protection = {}
+    await ctx.place_protection(
+        "t1", "SOLUSDT", "long", stop_loss=80.0, take_profit=82.0
+    )
+    # First attempt failed (SL), retry placed SL+TP successfully → 3 calls total, no flatten.
+    assert ctx._client.place_calls == 3
+    assert ctx._client.closed is False
+    assert "t1" in ctx._protection

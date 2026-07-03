@@ -774,7 +774,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L1",
       "id": "tests_test_engine_isolation_py",
-      "community": 0,
+      "community": 82,
       "norm_label": "test_engine_isolation.py"
     },
     {
@@ -783,7 +783,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L22",
       "id": "tests_test_engine_isolation_fakesession",
-      "community": 0,
+      "community": 82,
       "norm_label": "_fakesession"
     },
     {
@@ -792,7 +792,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L23",
       "id": "tests_test_engine_isolation_fakesession_add",
-      "community": 0,
+      "community": 82,
       "norm_label": ".add()"
     },
     {
@@ -801,7 +801,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L26",
       "id": "tests_test_engine_isolation_fakesession_flush",
-      "community": 0,
+      "community": 82,
       "norm_label": ".flush()"
     },
     {
@@ -810,7 +810,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L30",
       "id": "tests_test_engine_isolation_trade",
-      "community": 0,
+      "community": 82,
       "norm_label": "_trade()"
     },
     {
@@ -828,7 +828,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L62",
       "id": "tests_test_engine_isolation_test_reflector_role_is_narrower_than_full_client",
-      "community": 0,
+      "community": 82,
       "norm_label": "test_reflector_role_is_narrower_than_full_client()"
     },
     {
@@ -837,7 +837,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L77",
       "id": "tests_test_engine_isolation_test_close_trade_records_outcome_and_reflects",
-      "community": 0,
+      "community": 82,
       "norm_label": "test_close_trade_records_outcome_and_reflects()"
     },
     {
@@ -846,7 +846,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L120",
       "id": "tests_test_engine_isolation_test_close_trade_skips_reflection_when_memory_disabled",
-      "community": 0,
+      "community": 82,
       "norm_label": "test_close_trade_skips_reflection_when_memory_disabled()"
     },
     {
@@ -855,7 +855,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L144",
       "id": "tests_test_engine_isolation_test_handle_invalidation_hard_kills_plan_and_closes_trade",
-      "community": 0,
+      "community": 82,
       "norm_label": "test_handle_invalidation_hard_kills_plan_and_closes_trade()"
     },
     {
@@ -864,7 +864,7 @@
       "source_file": "tests/test_engine_isolation.py",
       "source_location": "L1",
       "id": "tests_test_engine_isolation_rationale_1",
-      "community": 0,
+      "community": 82,
       "norm_label": "isolation tests enabled by the part 3 solid split.  before the split these paths"
     },
     {
@@ -1170,7 +1170,7 @@
       "source_file": "tests/test_episodic_memory.py",
       "source_location": "L36",
       "id": "tests_test_episodic_memory_test_fingerprint_handles_missing_features",
-      "community": 82,
+      "community": 33,
       "norm_label": "test_fingerprint_handles_missing_features()"
     },
     {
@@ -1395,7 +1395,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L55",
       "id": "tests_test_planner_context_test_exhaustion_context_marks_oversold_bear_squeeze_risk",
-      "community": 22,
+      "community": 52,
       "norm_label": "test_exhaustion_context_marks_oversold_bear_squeeze_risk()"
     },
     {
@@ -1404,7 +1404,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L72",
       "id": "tests_test_planner_context_test_exhaustion_context_marks_overbought_long_squeeze_risk",
-      "community": 22,
+      "community": 52,
       "norm_label": "test_exhaustion_context_marks_overbought_long_squeeze_risk()"
     },
     {
@@ -1413,7 +1413,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L89",
       "id": "tests_test_planner_context_test_exhaustion_context_neutral_when_not_extended",
-      "community": 22,
+      "community": 52,
       "norm_label": "test_exhaustion_context_neutral_when_not_extended()"
     },
     {
@@ -1440,7 +1440,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L133",
       "id": "tests_test_planner_context_rows",
-      "community": 82,
+      "community": 80,
       "norm_label": "_rows"
     },
     {
@@ -1449,7 +1449,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L134",
       "id": "tests_test_planner_context_rows_init",
-      "community": 82,
+      "community": 80,
       "norm_label": ".__init__()"
     },
     {
@@ -1458,7 +1458,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L137",
       "id": "tests_test_planner_context_rows_mappings",
-      "community": 82,
+      "community": 80,
       "norm_label": ".mappings()"
     },
     {
@@ -1467,7 +1467,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L140",
       "id": "tests_test_planner_context_rows_all",
-      "community": 82,
+      "community": 80,
       "norm_label": ".all()"
     },
     {
@@ -1494,7 +1494,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L148",
       "id": "tests_test_planner_context_session_execute",
-      "community": 82,
+      "community": 80,
       "norm_label": ".execute()"
     },
     {
@@ -1539,7 +1539,7 @@
       "source_file": "tests/test_planner_context.py",
       "source_location": "L247",
       "id": "tests_test_planner_context_test_build_envelope_includes_planner_context_and_prior_lessons",
-      "community": 65,
+      "community": 188,
       "norm_label": "test_build_envelope_includes_planner_context_and_prior_lessons()"
     },
     {
@@ -2704,10 +2704,19 @@
       "norm_label": ".futures_create_algo_order()"
     },
     {
+      "label": "_algo_client()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L143",
+      "id": "tests_test_live_execution_algo_client",
+      "community": 105,
+      "norm_label": "_algo_client()"
+    },
+    {
       "label": "test_place_conditional_stop_market_closeposition()",
       "file_type": "code",
       "source_file": "tests/test_live_execution.py",
-      "source_location": "L144",
+      "source_location": "L157",
       "id": "tests_test_live_execution_test_place_conditional_stop_market_closeposition",
       "community": 105,
       "norm_label": "test_place_conditional_stop_market_closeposition()"
@@ -2716,10 +2725,91 @@
       "label": "test_place_conditional_trailing_uses_callback_and_quantity()",
       "file_type": "code",
       "source_file": "tests/test_live_execution.py",
-      "source_location": "L163",
+      "source_location": "L174",
       "id": "tests_test_live_execution_test_place_conditional_trailing_uses_callback_and_quantity",
       "community": 105,
       "norm_label": "test_place_conditional_trailing_uses_callback_and_quantity()"
+    },
+    {
+      "label": "test_round_price_snaps_to_tick()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L188",
+      "id": "tests_test_live_execution_test_round_price_snaps_to_tick",
+      "community": 54,
+      "norm_label": "test_round_price_snaps_to_tick()"
+    },
+    {
+      "label": "test_round_price_requires_loaded_filters()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L203",
+      "id": "tests_test_live_execution_test_round_price_requires_loaded_filters",
+      "community": 54,
+      "norm_label": "test_round_price_requires_loaded_filters()"
+    },
+    {
+      "label": "test_place_conditional_rounds_trigger_price()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L211",
+      "id": "tests_test_live_execution_test_place_conditional_rounds_trigger_price",
+      "community": 105,
+      "norm_label": "test_place_conditional_rounds_trigger_price()"
+    },
+    {
+      "label": "_RetryProtClient",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L220",
+      "id": "tests_test_live_execution_retryprotclient",
+      "community": 115,
+      "norm_label": "_retryprotclient"
+    },
+    {
+      "label": ".__init__()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L223",
+      "id": "tests_test_live_execution_retryprotclient_init",
+      "community": 115,
+      "norm_label": ".__init__()"
+    },
+    {
+      "label": ".place_conditional()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L228",
+      "id": "tests_test_live_execution_retryprotclient_place_conditional",
+      "community": 105,
+      "norm_label": ".place_conditional()"
+    },
+    {
+      "label": ".cancel_conditional()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L236",
+      "id": "tests_test_live_execution_retryprotclient_cancel_conditional",
+      "community": 115,
+      "norm_label": ".cancel_conditional()"
+    },
+    {
+      "label": ".position_risk()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L239",
+      "id": "tests_test_live_execution_retryprotclient_position_risk",
+      "community": 115,
+      "norm_label": ".position_risk()"
+    },
+    {
+      "label": "test_place_protection_retries_before_flattening()",
+      "file_type": "code",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L245",
+      "id": "tests_test_live_execution_test_place_protection_retries_before_flattening",
+      "community": 115,
+      "norm_label": "test_place_protection_retries_before_flattening()"
     },
     {
       "label": "Tests for the Binance testnet live-execution layer (pure logic + CLI guards).  N",
@@ -2747,6 +2837,24 @@
       "id": "tests_test_live_execution_rationale_133",
       "community": 105,
       "norm_label": "captures kwargs passed to futures_create_algo_order."
+    },
+    {
+      "label": "A client wired for conditional-order tests: fake raw client + loaded 0.01-tick f",
+      "file_type": "rationale",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L144",
+      "id": "tests_test_live_execution_rationale_144",
+      "community": 105,
+      "norm_label": "a client wired for conditional-order tests: fake raw client + loaded 0.01-tick f"
+    },
+    {
+      "label": "Fake exchange client: first place_conditional raises, the rest succeed.",
+      "file_type": "rationale",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L221",
+      "id": "tests_test_live_execution_rationale_221",
+      "community": 115,
+      "norm_label": "fake exchange client: first place_conditional raises, the rest succeed."
     },
     {
       "label": "test_cvd.py",
@@ -2862,7 +2970,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L1",
       "id": "tests_test_detector_entries_py",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_detector_entries.py"
     },
     {
@@ -2871,7 +2979,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L21",
       "id": "tests_test_detector_entries_fakesession",
-      "community": 0,
+      "community": 74,
       "norm_label": "fakesession"
     },
     {
@@ -2880,7 +2988,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L22",
       "id": "tests_test_detector_entries_fakesession_init",
-      "community": 0,
+      "community": 74,
       "norm_label": ".__init__()"
     },
     {
@@ -2889,7 +2997,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L26",
       "id": "tests_test_detector_entries_fakesession_add",
-      "community": 0,
+      "community": 74,
       "norm_label": ".add()"
     },
     {
@@ -2898,7 +3006,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L29",
       "id": "tests_test_detector_entries_fakesession_flush",
-      "community": 0,
+      "community": 74,
       "norm_label": ".flush()"
     },
     {
@@ -2907,7 +3015,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L32",
       "id": "tests_test_detector_entries_fakesession_get",
-      "community": 0,
+      "community": 74,
       "norm_label": ".get()"
     },
     {
@@ -2916,7 +3024,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L36",
       "id": "tests_test_detector_entries_observeclient",
-      "community": 0,
+      "community": 74,
       "norm_label": "observeclient"
     },
     {
@@ -2925,7 +3033,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L37",
       "id": "tests_test_detector_entries_observeclient_init",
-      "community": 0,
+      "community": 74,
       "norm_label": ".__init__()"
     },
     {
@@ -2943,7 +3051,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L50",
       "id": "tests_test_detector_entries_setup",
-      "community": 0,
+      "community": 74,
       "norm_label": "_setup()"
     },
     {
@@ -2952,7 +3060,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L77",
       "id": "tests_test_detector_entries_patch_detector",
-      "community": 0,
+      "community": 74,
       "norm_label": "_patch_detector()"
     },
     {
@@ -2961,7 +3069,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L140",
       "id": "tests_test_detector_entries_test_wick_setup_arms_without_filling_on_the_signal_bar",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_wick_setup_arms_without_filling_on_the_signal_bar()"
     },
     {
@@ -2970,7 +3078,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L168",
       "id": "tests_test_detector_entries_test_armed_setup_fills_on_a_later_touch_at_limit_price",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_armed_setup_fills_on_a_later_touch_at_limit_price()"
     },
     {
@@ -2979,7 +3087,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L200",
       "id": "tests_test_detector_entries_test_stops_evaluating_setups_after_one_opens",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_stops_evaluating_setups_after_one_opens()"
     },
     {
@@ -2988,7 +3096,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L227",
       "id": "tests_test_detector_entries_test_sideways_trade_persists_range_exit_metadata",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_sideways_trade_persists_range_exit_metadata()"
     },
     {
@@ -2997,7 +3105,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L270",
       "id": "tests_test_detector_entries_test_trending_trade_persists_trend_exit_metadata",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_trending_trade_persists_trend_exit_metadata()"
     },
     {
@@ -3006,7 +3114,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L312",
       "id": "tests_test_detector_entries_test_sideways_exit_policy_passes_range_knobs_to_step_trade",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_sideways_exit_policy_passes_range_knobs_to_step_trade()"
     },
     {
@@ -3015,7 +3123,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L361",
       "id": "tests_test_detector_entries_test_trend_exit_policy_passes_global_knobs_to_step_trade",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_trend_exit_policy_passes_global_knobs_to_step_trade()"
     },
     {
@@ -3024,7 +3132,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L407",
       "id": "tests_test_detector_entries_test_observer_envelope_includes_hold_and_stagnation_context",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_observer_envelope_includes_hold_and_stagnation_context()"
     },
     {
@@ -3033,7 +3141,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L487",
       "id": "tests_test_detector_entries_test_observer_context_marks_failed_short_as_broken",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_observer_context_marks_failed_short_as_broken()"
     },
     {
@@ -3042,7 +3150,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L554",
       "id": "tests_test_detector_entries_test_entry_confirmation_blocks_unconfirmed_setup",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_entry_confirmation_blocks_unconfirmed_setup()"
     },
     {
@@ -3051,7 +3159,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L579",
       "id": "tests_test_detector_entries_test_entry_confirmation_allows_confirmed_setup",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_entry_confirmation_allows_confirmed_setup()"
     },
     {
@@ -3060,7 +3168,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L607",
       "id": "tests_test_detector_entries_test_observer_call_due_consults_on_decaying_or_broken",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_observer_call_due_consults_on_decaying_or_broken()"
     },
     {
@@ -3069,7 +3177,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L612",
       "id": "tests_test_detector_entries_test_observer_call_due_consults_when_stale",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_observer_call_due_consults_when_stale()"
     },
     {
@@ -3078,7 +3186,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L616",
       "id": "tests_test_detector_entries_test_observer_call_due_skips_healthy_off_cadence",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_observer_call_due_skips_healthy_off_cadence()"
     },
     {
@@ -3087,7 +3195,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L621",
       "id": "tests_test_detector_entries_test_observer_call_due_fires_on_fallback_cadence",
-      "community": 0,
+      "community": 74,
       "norm_label": "test_observer_call_due_fires_on_fallback_cadence()"
     },
     {
@@ -3096,7 +3204,7 @@
       "source_file": "tests/test_detector_entries.py",
       "source_location": "L1",
       "id": "tests_test_detector_entries_rationale_1",
-      "community": 0,
+      "community": 74,
       "norm_label": "detector entry-loop tests."
     },
     {
@@ -3510,7 +3618,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L1",
       "id": "tests_test_htf_context_py",
-      "community": 6,
+      "community": 110,
       "norm_label": "test_htf_context.py"
     },
     {
@@ -3519,7 +3627,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L25",
       "id": "tests_test_htf_context_patch_state",
-      "community": 6,
+      "community": 110,
       "norm_label": "_patch_state()"
     },
     {
@@ -3528,7 +3636,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L62",
       "id": "tests_test_htf_context_test_htf_block_present_for_each_context_tf",
-      "community": 6,
+      "community": 110,
       "norm_label": "test_htf_block_present_for_each_context_tf()"
     },
     {
@@ -3537,7 +3645,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L69",
       "id": "tests_test_htf_context_test_htf_bar_is_already_closed_no_lookahead",
-      "community": 6,
+      "community": 110,
       "norm_label": "test_htf_bar_is_already_closed_no_lookahead()"
     },
     {
@@ -3546,7 +3654,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L84",
       "id": "tests_test_htf_context_test_base_tf_excluded_from_context",
-      "community": 6,
+      "community": 110,
       "norm_label": "test_base_tf_excluded_from_context()"
     },
     {
@@ -3555,7 +3663,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L92",
       "id": "tests_test_htf_context_test_missing_htf_features_skipped_not_fatal",
-      "community": 6,
+      "community": 110,
       "norm_label": "test_missing_htf_features_skipped_not_fatal()"
     },
     {
@@ -3564,7 +3672,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L1",
       "id": "tests_test_htf_context_rationale_1",
-      "community": 6,
+      "community": 110,
       "norm_label": "higher-timeframe context in build_envelope: the look-ahead guard.  a slower-char"
     },
     {
@@ -3573,7 +3681,7 @@
       "source_file": "tests/test_htf_context.py",
       "source_location": "L26",
       "id": "tests_test_htf_context_rationale_26",
-      "community": 6,
+      "community": 110,
       "norm_label": "stub the db readers with an in-memory candle store keyed by timeframe.      each"
     },
     {
@@ -5530,6 +5638,32 @@
       "norm_label": "pretooluse"
     },
     {
+      "label": "backfill.sh",
+      "file_type": "code",
+      "source_file": "ops/backfill.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "file"
+      },
+      "id": "ops_backfill_sh",
+      "community": 189,
+      "norm_label": "backfill.sh"
+    },
+    {
+      "label": "backfill.sh script",
+      "file_type": "code",
+      "source_file": "ops/backfill.sh",
+      "source_location": "L1",
+      "metadata": {
+        "language": "bash",
+        "kind": "bash_entrypoint"
+      },
+      "id": "users_nicost_development_trade_with_me_ops_backfill_sh__entry",
+      "community": 189,
+      "norm_label": "backfill.sh script"
+    },
+    {
       "label": "bot-entrypoint.sh",
       "file_type": "code",
       "source_file": "ops/bot-entrypoint.sh",
@@ -5568,7 +5702,7 @@
       "label": "_fnum()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L33",
+      "source_location": "L34",
       "id": "ops_dashboard_fnum",
       "community": 76,
       "norm_label": "_fnum()"
@@ -5577,7 +5711,7 @@
       "label": "fetch_price()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L40",
+      "source_location": "L41",
       "id": "ops_dashboard_fetch_price",
       "community": 76,
       "norm_label": "fetch_price()"
@@ -5586,7 +5720,7 @@
       "label": "load_data()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L50",
+      "source_location": "L51",
       "id": "ops_dashboard_load_data",
       "community": 76,
       "norm_label": "load_data()"
@@ -5595,7 +5729,7 @@
       "label": "_row_unrealized()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L72",
+      "source_location": "L94",
       "id": "ops_dashboard_row_unrealized",
       "community": 76,
       "norm_label": "_row_unrealized()"
@@ -5604,7 +5738,7 @@
       "label": "render()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L85",
+      "source_location": "L107",
       "id": "ops_dashboard_render",
       "community": 76,
       "norm_label": "render()"
@@ -5613,7 +5747,7 @@
       "label": "Handler",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L172",
+      "source_location": "L233",
       "id": "ops_dashboard_handler",
       "community": 76,
       "norm_label": "handler"
@@ -5631,7 +5765,7 @@
       "label": ".do_GET()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L173",
+      "source_location": "L234",
       "id": "ops_dashboard_handler_do_get",
       "community": 76,
       "norm_label": ".do_get()"
@@ -5640,7 +5774,7 @@
       "label": ".log_message()",
       "file_type": "code",
       "source_file": "ops/dashboard.py",
-      "source_location": "L188",
+      "source_location": "L249",
       "id": "ops_dashboard_handler_log_message",
       "community": 76,
       "norm_label": ".log_message()"
@@ -5649,8 +5783,8 @@
       "label": "Last price for one symbol from the public futures ticker (stdlib, ~1 cheap GET).",
       "file_type": "rationale",
       "source_file": "ops/dashboard.py",
-      "source_location": "L41",
-      "id": "ops_dashboard_rationale_41",
+      "source_location": "L42",
+      "id": "ops_dashboard_rationale_42",
       "community": 76,
       "norm_label": "last price for one symbol from the public futures ticker (stdlib, ~1 cheap get)."
     },
@@ -7109,7 +7243,7 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L1",
       "id": "src_ats_llm_mock_data_py",
-      "community": 19,
+      "community": 187,
       "norm_label": "mock_data.py"
     },
     {
@@ -7118,7 +7252,7 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L26",
       "id": "llm_mock_data_canned_adjudication",
-      "community": 19,
+      "community": 187,
       "norm_label": "canned_adjudication()"
     },
     {
@@ -7145,7 +7279,7 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L1",
       "id": "llm_mock_data_rationale_1",
-      "community": 19,
+      "community": 187,
       "norm_label": "deterministic mock llm outputs.  the mock turns a structured envelope into a val"
     },
     {
@@ -7154,7 +7288,7 @@
       "source_file": "src/ats/llm/mock_data.py",
       "source_location": "L27",
       "id": "llm_mock_data_rationale_27",
-      "community": 19,
+      "community": 187,
       "norm_label": "the control-group judgement: no adjustment, no veto (``confidence_delta = 0``)."
     },
     {
@@ -7271,7 +7405,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L107",
       "id": "llm_schemas_invalidationrule",
-      "community": 74,
+      "community": 68,
       "norm_label": "invalidationrule"
     },
     {
@@ -7505,7 +7639,7 @@
       "source_file": "src/ats/llm/schemas.py",
       "source_location": "L108",
       "id": "llm_schemas_rationale_108",
-      "community": 74,
+      "community": 68,
       "norm_label": "a condition that, when true, degrades or kills a plan/setup.      ``on_close`` r"
     },
     {
@@ -8432,7 +8566,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L1",
       "id": "src_ats_learning_retrieval_py",
-      "community": 80,
+      "community": 65,
       "norm_label": "retrieval.py"
     },
     {
@@ -8441,7 +8575,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L13",
       "id": "learning_retrieval_avg",
-      "community": 80,
+      "community": 65,
       "norm_label": "_avg()"
     },
     {
@@ -8459,7 +8593,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L74",
       "id": "learning_retrieval_retrieve_memory_summary",
-      "community": 80,
+      "community": 65,
       "norm_label": "retrieve_memory_summary()"
     },
     {
@@ -8468,7 +8602,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L1",
       "id": "learning_retrieval_rationale_1",
-      "community": 80,
+      "community": 65,
       "norm_label": "retrieve the most-similar prior learnings for a setup (cosine over the fingerpri"
     },
     {
@@ -8486,7 +8620,7 @@
       "source_file": "src/ats/learning/retrieval.py",
       "source_location": "L81",
       "id": "learning_retrieval_rationale_81",
-      "community": 80,
+      "community": 65,
       "norm_label": "aggregate nearby learning rows into a compact planner-facing memory signal."
     },
     {
@@ -9755,7 +9889,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L219",
       "id": "planning_create_plan_build_envelope",
-      "community": 65,
+      "community": 188,
       "norm_label": "build_envelope()"
     },
     {
@@ -9854,7 +9988,7 @@
       "source_file": "src/ats/planning/create_plan.py",
       "source_location": "L228",
       "id": "planning_create_plan_rationale_228",
-      "community": 65,
+      "community": 188,
       "norm_label": "assemble the json-only context passed to create_plan."
     },
     {
@@ -10835,7 +10969,7 @@
       "source_file": "src/ats/synthesis/sl_tp.py",
       "source_location": "L37",
       "id": "synthesis_sl_tp_adaptive_stop_mult",
-      "community": 2,
+      "community": 77,
       "norm_label": "adaptive_stop_mult()"
     },
     {
@@ -10880,7 +11014,7 @@
       "source_file": "src/ats/synthesis/sl_tp.py",
       "source_location": "L40",
       "id": "synthesis_sl_tp_rationale_40",
-      "community": 2,
+      "community": 77,
       "norm_label": "volatility-adaptive stop multiple from absolute volatility (``atr_pct`` = atr/pr"
     },
     {
@@ -10925,7 +11059,7 @@
       "source_file": "src/ats/synthesis/synthesizer.py",
       "source_location": "L20",
       "id": "synthesis_synthesizer_signal",
-      "community": 69,
+      "community": 2,
       "norm_label": "signal"
     },
     {
@@ -11244,10 +11378,19 @@
       "norm_label": ".round_qty()"
     },
     {
+      "label": ".round_price()",
+      "file_type": "code",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L135",
+      "id": "execution_binance_futures_binancefuturestestnet_round_price",
+      "community": 61,
+      "norm_label": ".round_price()"
+    },
+    {
       "label": ".set_leverage()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L137",
+      "source_location": "L154",
       "id": "execution_binance_futures_binancefuturestestnet_set_leverage",
       "community": 61,
       "norm_label": ".set_leverage()"
@@ -11256,7 +11399,7 @@
       "label": ".position_risk()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L146",
+      "source_location": "L163",
       "id": "execution_binance_futures_binancefuturestestnet_position_risk",
       "community": 61,
       "norm_label": ".position_risk()"
@@ -11265,7 +11408,7 @@
       "label": ".open_orders()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L154",
+      "source_location": "L171",
       "id": "execution_binance_futures_binancefuturestestnet_open_orders",
       "community": 61,
       "norm_label": ".open_orders()"
@@ -11274,7 +11417,7 @@
       "label": ".market_order()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L159",
+      "source_location": "L176",
       "id": "execution_binance_futures_binancefuturestestnet_market_order",
       "community": 60,
       "norm_label": ".market_order()"
@@ -11283,7 +11426,7 @@
       "label": ".place_conditional()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L217",
+      "source_location": "L234",
       "id": "execution_binance_futures_binancefuturestestnet_place_conditional",
       "community": 61,
       "norm_label": ".place_conditional()"
@@ -11292,7 +11435,7 @@
       "label": ".cancel_conditional()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L270",
+      "source_location": "L287",
       "id": "execution_binance_futures_binancefuturestestnet_cancel_conditional",
       "community": 61,
       "norm_label": ".cancel_conditional()"
@@ -11301,7 +11444,7 @@
       "label": ".open_algo_orders()",
       "file_type": "code",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L280",
+      "source_location": "L297",
       "id": "execution_binance_futures_binancefuturestestnet_open_algo_orders",
       "community": 61,
       "norm_label": ".open_algo_orders()"
@@ -11379,11 +11522,20 @@
       "norm_label": "round ``qty`` down to the symbol's stepsize. returns 0.0 if below minqty."
     },
     {
+      "label": "Snap ``price`` to the symbol's tickSize (NEAREST tick).          Conditional ord",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L136",
+      "id": "execution_binance_futures_rationale_136",
+      "community": 61,
+      "norm_label": "snap ``price`` to the symbol's ticksize (nearest tick).          conditional ord"
+    },
+    {
       "label": "Return the open position for ``symbol`` (positionAmt != 0), else None.",
       "file_type": "rationale",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L147",
-      "id": "execution_binance_futures_rationale_147",
+      "source_location": "L164",
+      "id": "execution_binance_futures_rationale_164",
       "community": 61,
       "norm_label": "return the open position for ``symbol`` (positionamt != 0), else none."
     },
@@ -11391,8 +11543,8 @@
       "label": "Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill.",
       "file_type": "rationale",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L162",
-      "id": "execution_binance_futures_rationale_162",
+      "source_location": "L179",
+      "id": "execution_binance_futures_rationale_179",
       "community": 60,
       "norm_label": "place a market order. ``side`` is 'buy'/'sell'. returns the normalized fill."
     },
@@ -11400,8 +11552,8 @@
       "label": "Place a CONDITIONAL algo order (STOP_MARKET / TAKE_PROFIT_MARKET / TRAILING_STOP",
       "file_type": "rationale",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L231",
-      "id": "execution_binance_futures_rationale_231",
+      "source_location": "L248",
+      "id": "execution_binance_futures_rationale_248",
       "community": 61,
       "norm_label": "place a conditional algo order (stop_market / take_profit_market / trailing_stop"
     },
@@ -11409,8 +11561,8 @@
       "label": "Cancel a single conditional algo order. Non-fatal: a gone order is logged, not r",
       "file_type": "rationale",
       "source_file": "src/ats/execution/binance_futures.py",
-      "source_location": "L271",
-      "id": "execution_binance_futures_rationale_271",
+      "source_location": "L288",
+      "id": "execution_binance_futures_rationale_288",
       "community": 61,
       "norm_label": "cancel a single conditional algo order. non-fatal: a gone order is logged, not r"
     },
@@ -11535,7 +11687,7 @@
       "label": ".replace_stop()",
       "file_type": "code",
       "source_file": "src/ats/execution/live.py",
-      "source_location": "L132",
+      "source_location": "L145",
       "id": "execution_live_livecontext_replace_stop",
       "community": 25,
       "norm_label": ".replace_stop()"
@@ -11544,7 +11696,7 @@
       "label": ".cancel_protection()",
       "file_type": "code",
       "source_file": "src/ats/execution/live.py",
-      "source_location": "L151",
+      "source_location": "L164",
       "id": "execution_live_livecontext_cancel_protection",
       "community": 25,
       "norm_label": ".cancel_protection()"
@@ -11553,7 +11705,7 @@
       "label": ".close_position()",
       "file_type": "code",
       "source_file": "src/ats/execution/live.py",
-      "source_location": "L161",
+      "source_location": "L174",
       "id": "execution_live_livecontext_close_position",
       "community": 25,
       "norm_label": ".close_position()"
@@ -11607,8 +11759,8 @@
       "label": "Cancel the existing SL and place a new STOP_MARKET at ``new_stop`` (trail / brea",
       "file_type": "rationale",
       "source_file": "src/ats/execution/live.py",
-      "source_location": "L135",
-      "id": "execution_live_rationale_135",
+      "source_location": "L148",
+      "id": "execution_live_rationale_148",
       "community": 25,
       "norm_label": "cancel the existing sl and place a new stop_market at ``new_stop`` (trail / brea"
     },
@@ -11616,8 +11768,8 @@
       "label": "Cancel any remaining SL/TP for a trade (on close).",
       "file_type": "rationale",
       "source_file": "src/ats/execution/live.py",
-      "source_location": "L152",
-      "id": "execution_live_rationale_152",
+      "source_location": "L165",
+      "id": "execution_live_rationale_165",
       "community": 25,
       "norm_label": "cancel any remaining sl/tp for a trade (on close)."
     },
@@ -11625,8 +11777,8 @@
       "label": "Close the FULL remaining exchange position (reduce-only), querying live size.",
       "file_type": "rationale",
       "source_file": "src/ats/execution/live.py",
-      "source_location": "L162",
-      "id": "execution_live_rationale_162",
+      "source_location": "L175",
+      "id": "execution_live_rationale_175",
       "community": 25,
       "norm_label": "close the full remaining exchange position (reduce-only), querying live size."
     },
@@ -11645,7 +11797,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L18",
       "id": "execution_reconcile_exitresult",
-      "community": 77,
+      "community": 36,
       "norm_label": "exitresult"
     },
     {
@@ -11663,7 +11815,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L32",
       "id": "execution_reconcile_net_of_costs",
-      "community": 36,
+      "community": 106,
       "norm_label": "net_of_costs()"
     },
     {
@@ -11762,7 +11914,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L221",
       "id": "execution_reconcile_barstep",
-      "community": 0,
+      "community": 36,
       "norm_label": "barstep"
     },
     {
@@ -11798,7 +11950,7 @@
       "source_file": "src/ats/execution/reconcile.py",
       "source_location": "L33",
       "id": "execution_reconcile_rationale_33",
-      "community": 36,
+      "community": 106,
       "norm_label": "position-weighted pnl for a leg of size ``frac`` after round-trip trading costs."
     },
     {
@@ -11906,7 +12058,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L50",
       "id": "execution_executor_open_paper_trade",
-      "community": 19,
+      "community": 77,
       "norm_label": "open_paper_trade()"
     },
     {
@@ -11924,7 +12076,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L168",
       "id": "execution_executor_record_partial_exit",
-      "community": 106,
+      "community": 37,
       "norm_label": "record_partial_exit()"
     },
     {
@@ -11942,7 +12094,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L249",
       "id": "execution_executor_close_paper_trade",
-      "community": 77,
+      "community": 75,
       "norm_label": "close_paper_trade()"
     },
     {
@@ -11978,7 +12130,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L64",
       "id": "execution_executor_rationale_64",
-      "community": 19,
+      "community": 77,
       "norm_label": "insert an open paper trade for a detected+confirmed+risk-approved setup.      ``"
     },
     {
@@ -11996,7 +12148,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L177",
       "id": "execution_executor_rationale_177",
-      "community": 106,
+      "community": 37,
       "norm_label": "bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open."
     },
     {
@@ -12014,7 +12166,7 @@
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L257",
       "id": "execution_executor_rationale_257",
-      "community": 77,
+      "community": 75,
       "norm_label": "mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the"
     },
     {
@@ -12023,7 +12175,7 @@
       "source_file": "src/ats/execution/live_tracker.py",
       "source_location": "L1",
       "id": "src_ats_execution_live_tracker_py",
-      "community": 55,
+      "community": 25,
       "norm_label": "live_tracker.py"
     },
     {
@@ -12032,7 +12184,7 @@
       "source_file": "src/ats/execution/live_tracker.py",
       "source_location": "L29",
       "id": "execution_live_tracker_reconcile_on_start",
-      "community": 55,
+      "community": 25,
       "norm_label": "reconcile_on_start()"
     },
     {
@@ -12050,7 +12202,7 @@
       "source_file": "src/ats/execution/live_tracker.py",
       "source_location": "L1",
       "id": "execution_live_tracker_rationale_1",
-      "community": 55,
+      "community": 25,
       "norm_label": "live position/order tracker \u2014 keeps internal state honest against the exchange."
     },
     {
@@ -12059,7 +12211,7 @@
       "source_file": "src/ats/execution/live_tracker.py",
       "source_location": "L36",
       "id": "execution_live_tracker_rationale_36",
-      "community": 55,
+      "community": 25,
       "norm_label": "reconcile internal open trades vs the live testnet position for ``symbol``."
     },
     {
@@ -12464,7 +12616,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L1",
       "id": "src_ats_engine_timeframes_py",
-      "community": 6,
+      "community": 110,
       "norm_label": "timeframes.py"
     },
     {
@@ -12473,7 +12625,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L11",
       "id": "engine_timeframes_timeframe_to_timedelta",
-      "community": 6,
+      "community": 110,
       "norm_label": "timeframe_to_timedelta()"
     },
     {
@@ -12482,7 +12634,7 @@
       "source_file": "src/ats/engine/timeframes.py",
       "source_location": "L1",
       "id": "engine_timeframes_rationale_1",
-      "community": 6,
+      "community": 110,
       "norm_label": "timeframe string \u2192 duration. matches the m1 universe (15m / 1h / 4h)."
     },
     {
@@ -12536,7 +12688,7 @@
       "source_file": "src/ats/engine/invalidation.py",
       "source_location": "L1",
       "id": "src_ats_engine_invalidation_py",
-      "community": 77,
+      "community": 106,
       "norm_label": "invalidation.py"
     },
     {
@@ -12554,7 +12706,7 @@
       "source_file": "src/ats/engine/invalidation.py",
       "source_location": "L54",
       "id": "engine_invalidation_handle_invalidation",
-      "community": 77,
+      "community": 106,
       "norm_label": "handle_invalidation()"
     },
     {
@@ -12563,7 +12715,7 @@
       "source_file": "src/ats/engine/invalidation.py",
       "source_location": "L1",
       "id": "engine_invalidation_rationale_1",
-      "community": 77,
+      "community": 106,
       "norm_label": "deterministic plan/setup invalidation.  invalidation is evaluated by code, never"
     },
     {
@@ -12581,7 +12733,7 @@
       "source_file": "src/ats/engine/invalidation.py",
       "source_location": "L66",
       "id": "engine_invalidation_rationale_66",
-      "community": 77,
+      "community": 106,
       "norm_label": "evaluate invalidation across the plan's setups. returns true if plan was killed."
     },
     {
@@ -12869,7 +13021,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L1",
       "id": "src_ats_engine_orchestrator_py",
-      "community": 19,
+      "community": 184,
       "norm_label": "orchestrator.py"
     },
     {
@@ -12887,7 +13039,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L62",
       "id": "engine_orchestrator_arm_limit_price",
-      "community": 19,
+      "community": 184,
       "norm_label": "_arm_limit_price()"
     },
     {
@@ -12896,7 +13048,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L73",
       "id": "engine_orchestrator_entry_gates_ok",
-      "community": 19,
+      "community": 184,
       "norm_label": "_entry_gates_ok()"
     },
     {
@@ -12914,7 +13066,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L169",
       "id": "engine_orchestrator_evaluate_now",
-      "community": 19,
+      "community": 184,
       "norm_label": "evaluate_now()"
     },
     {
@@ -12923,7 +13075,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L1",
       "id": "engine_orchestrator_rationale_1",
-      "community": 19,
+      "community": 184,
       "norm_label": "orchestrator \u2014 wires the engine collaborators for one evaluation tick.  for a gi"
     },
     {
@@ -12941,7 +13093,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L63",
       "id": "engine_orchestrator_rationale_63",
-      "community": 19,
+      "community": 184,
       "norm_label": "the resting-limit price for a setup: the zone edge a fill is *worst* at.      lo"
     },
     {
@@ -12950,7 +13102,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L80",
       "id": "engine_orchestrator_rationale_80",
-      "community": 19,
+      "community": 184,
       "norm_label": "non-price entry gates: regime-direction filter + optional bar-close confirmation"
     },
     {
@@ -12968,7 +13120,7 @@
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L183",
       "id": "engine_orchestrator_rationale_183",
-      "community": 19,
+      "community": 184,
       "norm_label": "run one full evaluation of the active plan against the current feature row."
     },
     {
@@ -12977,7 +13129,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L1",
       "id": "src_ats_engine_loop_py",
-      "community": 55,
+      "community": 153,
       "norm_label": "loop.py"
     },
     {
@@ -12986,7 +13138,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L37",
       "id": "engine_loop_accumulate",
-      "community": 55,
+      "community": 153,
       "norm_label": "_accumulate()"
     },
     {
@@ -12995,7 +13147,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L65",
       "id": "engine_loop_record_notes",
-      "community": 55,
+      "community": 153,
       "norm_label": "_record_notes()"
     },
     {
@@ -13004,7 +13156,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L85",
       "id": "engine_loop_ensure_plan",
-      "community": 55,
+      "community": 153,
       "norm_label": "_ensure_plan()"
     },
     {
@@ -13013,7 +13165,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L124",
       "id": "engine_loop_run_replay",
-      "community": 55,
+      "community": 153,
       "norm_label": "run_replay()"
     },
     {
@@ -13022,7 +13174,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L152",
       "id": "engine_loop_walk_replay",
-      "community": 55,
+      "community": 153,
       "norm_label": "_walk_replay()"
     },
     {
@@ -13031,7 +13183,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L219",
       "id": "engine_loop_run_tick",
-      "community": 55,
+      "community": 186,
       "norm_label": "run_tick()"
     },
     {
@@ -13040,7 +13192,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L258",
       "id": "engine_loop_run_live",
-      "community": 55,
+      "community": 186,
       "norm_label": "run_live()"
     },
     {
@@ -13049,7 +13201,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L1",
       "id": "engine_loop_rationale_1",
-      "community": 55,
+      "community": 153,
       "norm_label": "engine orchestration: replay, single-tick, and live-poll loops.  all three share"
     },
     {
@@ -13058,7 +13210,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L66",
       "id": "engine_loop_rationale_66",
-      "community": 55,
+      "community": 153,
       "norm_label": "append this tick's notes, collapsing sticky states to start/resume transitions."
     },
     {
@@ -13067,7 +13219,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L95",
       "id": "engine_loop_rationale_95",
-      "community": 55,
+      "community": 153,
       "norm_label": "refresh the plan if there is none, it expired, or the refresh cadence elapsed."
     },
     {
@@ -13076,7 +13228,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L134",
       "id": "engine_loop_rationale_134",
-      "community": 55,
+      "community": 153,
       "norm_label": "walk historical feature rows, running the full loop on each as if live.      ``r"
     },
     {
@@ -13085,7 +13237,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L222",
       "id": "engine_loop_rationale_222",
-      "community": 55,
+      "community": 186,
       "norm_label": "single evaluation against the most recent feature row."
     },
     {
@@ -13094,7 +13246,7 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L268",
       "id": "engine_loop_rationale_268",
-      "community": 55,
+      "community": 186,
       "norm_label": "poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon"
     },
     {
@@ -13103,7 +13255,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L1",
       "id": "src_ats_engine_reports_py",
-      "community": 55,
+      "community": 185,
       "norm_label": "reports.py"
     },
     {
@@ -13112,7 +13264,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L17",
       "id": "engine_reports_closedtradeinfo",
-      "community": 55,
+      "community": 185,
       "norm_label": "closedtradeinfo"
     },
     {
@@ -13121,7 +13273,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L34",
       "id": "engine_reports_tickreport",
-      "community": 0,
+      "community": 82,
       "norm_label": "tickreport"
     },
     {
@@ -13130,7 +13282,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L50",
       "id": "engine_reports_tradeoutcome",
-      "community": 55,
+      "community": 185,
       "norm_label": "tradeoutcome"
     },
     {
@@ -13139,7 +13291,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L68",
       "id": "engine_reports_replayreport",
-      "community": 55,
+      "community": 185,
       "norm_label": "replayreport"
     },
     {
@@ -13148,7 +13300,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L101",
       "id": "engine_reports_replayreport_finalise",
-      "community": 55,
+      "community": 185,
       "norm_label": ".finalise()"
     },
     {
@@ -13157,7 +13309,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L1",
       "id": "engine_reports_rationale_1",
-      "community": 55,
+      "community": 185,
       "norm_label": "engine dtos \u2014 per-tick and per-replay result records.  plain dataclasses with no"
     },
     {
@@ -13166,7 +13318,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L18",
       "id": "engine_reports_rationale_18",
-      "community": 55,
+      "community": 185,
       "norm_label": "minimal closed-trade data emitted by close_trade for metrics collection."
     },
     {
@@ -13175,7 +13327,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L51",
       "id": "engine_reports_rationale_51",
-      "community": 55,
+      "community": 185,
       "norm_label": "lightweight summary captured for each closed trade during replay."
     },
     {
@@ -13184,7 +13336,7 @@
       "source_file": "src/ats/engine/reports.py",
       "source_location": "L102",
       "id": "engine_reports_rationale_102",
-      "community": 55,
+      "community": 185,
       "norm_label": "compute summary metrics from trade_outcomes. call once after the loop."
     },
     {
@@ -13193,7 +13345,7 @@
       "source_file": "src/ats/engine/entries.py",
       "source_location": "L1",
       "id": "src_ats_engine_entries_py",
-      "community": 19,
+      "community": 77,
       "norm_label": "entries.py"
     },
     {
@@ -13202,7 +13354,7 @@
       "source_file": "src/ats/engine/entries.py",
       "source_location": "L28",
       "id": "engine_entries_setup_dict",
-      "community": 19,
+      "community": 77,
       "norm_label": "setup_dict()"
     },
     {
@@ -13211,7 +13363,7 @@
       "source_file": "src/ats/engine/entries.py",
       "source_location": "L47",
       "id": "engine_entries_execute_setup",
-      "community": 19,
+      "community": 77,
       "norm_label": "execute_setup()"
     },
     {
@@ -13220,7 +13372,7 @@
       "source_file": "src/ats/engine/entries.py",
       "source_location": "L1",
       "id": "engine_entries_rationale_1",
-      "community": 19,
+      "community": 77,
       "norm_label": "entry path: size and open a detected setup deterministically.  the per-setup llm"
     },
     {
@@ -13229,7 +13381,7 @@
       "source_file": "src/ats/engine/entries.py",
       "source_location": "L61",
       "id": "engine_entries_rationale_61",
-      "community": 19,
+      "community": 77,
       "norm_label": "size and open a detected setup deterministically at ``entry_price``.      ``entr"
     },
     {
@@ -13787,7 +13939,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L1",
       "id": "src_ats_strategy_bridge_py",
-      "community": 74,
+      "community": 69,
       "norm_label": "bridge.py"
     },
     {
@@ -13796,7 +13948,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L28",
       "id": "strategy_bridge_soft_rules",
-      "community": 74,
+      "community": 69,
       "norm_label": "_soft_rules()"
     },
     {
@@ -13805,7 +13957,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L45",
       "id": "strategy_bridge_invalidation_rules",
-      "community": 74,
+      "community": 69,
       "norm_label": "_invalidation_rules()"
     },
     {
@@ -13814,7 +13966,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L55",
       "id": "strategy_bridge_signal_to_setup",
-      "community": 74,
+      "community": 69,
       "norm_label": "signal_to_setup()"
     },
     {
@@ -13832,7 +13984,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L1",
       "id": "strategy_bridge_rationale_1",
-      "community": 74,
+      "community": 69,
       "norm_label": "bridge: synthesized ``signal`` \u2192 existing ``planoutput`` / ``setupoutput``.  the"
     },
     {
@@ -13841,7 +13993,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L29",
       "id": "strategy_bridge_rationale_29",
-      "community": 74,
+      "community": 69,
       "norm_label": "thesis-direction soft rules over whichever momentum features are present."
     },
     {
@@ -13850,7 +14002,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L46",
       "id": "strategy_bridge_rationale_46",
-      "community": 74,
+      "community": 69,
       "norm_label": "a close-confirmed momentum-reversal guard (structural, not a stop restatement)."
     },
     {
@@ -13859,7 +14011,7 @@
       "source_file": "src/ats/strategy/bridge.py",
       "source_location": "L56",
       "id": "strategy_bridge_rationale_56",
-      "community": 74,
+      "community": 69,
       "norm_label": "map a signal onto one executable setupoutput."
     },
     {
@@ -13895,7 +14047,7 @@
       "source_file": "src/ats/strategy/adjudication.py",
       "source_location": "L1",
       "id": "src_ats_strategy_adjudication_py",
-      "community": 110,
+      "community": 6,
       "norm_label": "adjudication.py"
     },
     {
@@ -13904,7 +14056,7 @@
       "source_file": "src/ats/strategy/adjudication.py",
       "source_location": "L35",
       "id": "strategy_adjudication_adjudication_envelope",
-      "community": 110,
+      "community": 6,
       "norm_label": "adjudication_envelope()"
     },
     {
@@ -13922,7 +14074,7 @@
       "source_file": "src/ats/strategy/adjudication.py",
       "source_location": "L1",
       "id": "strategy_adjudication_rationale_1",
-      "community": 110,
+      "community": 6,
       "norm_label": "plan-time bounded veto/bias (spec 07, part 2 role 1).  the deterministic synthes"
     },
     {
@@ -13931,7 +14083,7 @@
       "source_file": "src/ats/strategy/adjudication.py",
       "source_location": "L36",
       "id": "strategy_adjudication_rationale_36",
-      "community": 110,
+      "community": 6,
       "norm_label": "the compact judge envelope: the deterministic signal + market context.      deli"
     },
     {
@@ -20721,6 +20873,78 @@
       "norm_label": "derivatives / flow (perp-specific features)"
     },
     {
+      "label": "Last price for one symbol from the public futures ticker (stdlib, ~1 cheap GET).",
+      "file_type": "rationale",
+      "source_file": "ops/dashboard.py",
+      "source_location": "L41",
+      "community": 76,
+      "norm_label": "last price for one symbol from the public futures ticker (stdlib, ~1 cheap get).",
+      "id": "ops_dashboard_rationale_41"
+    },
+    {
+      "label": "Return the open position for ``symbol`` (positionAmt != 0), else None.",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L147",
+      "community": 61,
+      "norm_label": "return the open position for ``symbol`` (positionamt != 0), else none.",
+      "id": "execution_binance_futures_rationale_147"
+    },
+    {
+      "label": "Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill.",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L162",
+      "community": 60,
+      "norm_label": "place a market order. ``side`` is 'buy'/'sell'. returns the normalized fill.",
+      "id": "execution_binance_futures_rationale_162"
+    },
+    {
+      "label": "Place a CONDITIONAL algo order (STOP_MARKET / TAKE_PROFIT_MARKET / TRAILING_STOP",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L231",
+      "community": 61,
+      "norm_label": "place a conditional algo order (stop_market / take_profit_market / trailing_stop",
+      "id": "execution_binance_futures_rationale_231"
+    },
+    {
+      "label": "Cancel a single conditional algo order. Non-fatal: a gone order is logged, not r",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L271",
+      "community": 61,
+      "norm_label": "cancel a single conditional algo order. non-fatal: a gone order is logged, not r",
+      "id": "execution_binance_futures_rationale_271"
+    },
+    {
+      "label": "Cancel the existing SL and place a new STOP_MARKET at ``new_stop`` (trail / brea",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/live.py",
+      "source_location": "L135",
+      "community": 25,
+      "norm_label": "cancel the existing sl and place a new stop_market at ``new_stop`` (trail / brea",
+      "id": "execution_live_rationale_135"
+    },
+    {
+      "label": "Cancel any remaining SL/TP for a trade (on close).",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/live.py",
+      "source_location": "L152",
+      "community": 25,
+      "norm_label": "cancel any remaining sl/tp for a trade (on close).",
+      "id": "execution_live_rationale_152"
+    },
+    {
+      "label": "Close the FULL remaining exchange position (reduce-only), querying live size.",
+      "file_type": "rationale",
+      "source_file": "src/ats/execution/live.py",
+      "source_location": "L162",
+      "community": 25,
+      "norm_label": "close the full remaining exchange position (reduce-only), querying live size.",
+      "id": "execution_live_rationale_162"
+    },
+    {
       "label": "Add run_id to plans for concurrent same-symbol replay isolation.  Revision ID: 0",
       "file_type": "rationale",
       "source_file": "alembic/versions/0008_plan_run_id.py",
@@ -20752,7 +20976,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L262",
-      "community": 55,
+      "community": 186,
       "norm_label": "poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon",
       "id": "engine_loop_rationale_262"
     },
@@ -21679,7 +21903,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L164",
-      "community": 106,
+      "community": 37,
       "norm_label": "bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open.",
       "id": "execution_executor_rationale_164"
     },
@@ -21697,7 +21921,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L233",
-      "community": 77,
+      "community": 75,
       "norm_label": "mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the",
       "id": "execution_executor_rationale_233"
     },
@@ -21751,7 +21975,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L63",
-      "community": 19,
+      "community": 77,
       "norm_label": "insert an open paper trade for a detected+confirmed+risk-approved setup.      ``",
       "id": "execution_executor_rationale_63"
     },
@@ -21769,7 +21993,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L135",
-      "community": 106,
+      "community": 37,
       "norm_label": "bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open.",
       "id": "execution_executor_rationale_135"
     },
@@ -21787,7 +22011,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/execution/executor.py",
       "source_location": "L191",
-      "community": 77,
+      "community": 75,
       "norm_label": "mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the",
       "id": "execution_executor_rationale_191"
     },
@@ -21805,7 +22029,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/orchestrator.py",
       "source_location": "L182",
-      "community": 19,
+      "community": 184,
       "norm_label": "run one full evaluation of the active plan against the current feature row.",
       "id": "engine_orchestrator_rationale_182"
     },
@@ -21814,7 +22038,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L218",
-      "community": 55,
+      "community": 186,
       "norm_label": "single evaluation against the most recent feature row.",
       "id": "engine_loop_rationale_218"
     },
@@ -21823,7 +22047,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L258",
-      "community": 55,
+      "community": 186,
       "norm_label": "poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon",
       "id": "engine_loop_rationale_258"
     },
@@ -21832,7 +22056,7 @@
       "file_type": "rationale",
       "source_file": "src/ats/engine/entries.py",
       "source_location": "L60",
-      "community": 19,
+      "community": 77,
       "norm_label": "size and open a detected setup deterministically at ``entry_price``.      ``entr",
       "id": "engine_entries_rationale_60"
     },
@@ -28132,6 +28356,16 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "tests/test_live_execution.py",
+      "source_location": "L143",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_py",
+      "target": "tests_test_live_execution_algo_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
       "source_location": "L144",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -28147,6 +28381,56 @@
       "confidence_score": 1.0,
       "source": "tests_test_live_execution_py",
       "target": "tests_test_live_execution_test_place_conditional_trailing_uses_callback_and_quantity"
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L188",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_py",
+      "target": "tests_test_live_execution_test_round_price_snaps_to_tick",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L203",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_py",
+      "target": "tests_test_live_execution_test_round_price_requires_loaded_filters",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L211",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_py",
+      "target": "tests_test_live_execution_test_place_conditional_rounds_trigger_price",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L220",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_py",
+      "target": "tests_test_live_execution_retryprotclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L245",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_py",
+      "target": "tests_test_live_execution_test_place_protection_retries_before_flattening",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -28189,6 +28473,17 @@
       "confidence_score": 1.0,
       "source": "tests_test_live_execution_test_round_qty_below_min_returns_zero",
       "target": "tests_test_live_execution_client_with_filters"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L190",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_round_price_snaps_to_tick",
+      "target": "tests_test_live_execution_client_with_filters",
+      "confidence_score": 1.0
     },
     {
       "relation": "calls",
@@ -28338,20 +28633,9 @@
       "source_file": "tests/test_live_execution.py",
       "source_location": "L146",
       "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_live_execution_test_place_conditional_stop_market_closeposition",
-      "target": "tests_test_live_execution_fakeraw"
-    },
-    {
-      "relation": "calls",
-      "context": "call",
-      "confidence": "EXTRACTED",
-      "source_file": "tests/test_live_execution.py",
-      "source_location": "L165",
-      "weight": 1.0,
-      "confidence_score": 1.0,
-      "source": "tests_test_live_execution_test_place_conditional_trailing_uses_callback_and_quantity",
-      "target": "tests_test_live_execution_fakeraw"
+      "source": "tests_test_live_execution_algo_client",
+      "target": "tests_test_live_execution_fakeraw",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -28391,6 +28675,237 @@
       "weight": 0.8,
       "confidence_score": 0.5,
       "source": "tests_test_live_execution_fakeraw",
+      "target": "execution_binance_futures_ordererror"
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L246",
+      "weight": 0.8,
+      "source": "tests_test_live_execution_fakeraw",
+      "target": "execution_live_livecontext",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L146",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_stop_market_closeposition",
+      "target": "tests_test_live_execution_fakeraw"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "confidence_score": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_trailing_uses_callback_and_quantity",
+      "target": "tests_test_live_execution_fakeraw"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L158",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_stop_market_closeposition",
+      "target": "tests_test_live_execution_algo_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_trailing_uses_callback_and_quantity",
+      "target": "tests_test_live_execution_algo_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L213",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_rounds_trigger_price",
+      "target": "tests_test_live_execution_algo_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L144",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_rationale_144",
+      "target": "tests_test_live_execution_algo_client",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L149",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_algo_client",
+      "target": "execution_binance_futures_symbolfilters"
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L159",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_stop_market_closeposition",
+      "target": "tests_test_live_execution_retryprotclient_place_conditional",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L176",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_trailing_uses_callback_and_quantity",
+      "target": "tests_test_live_execution_retryprotclient_place_conditional",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L214",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_conditional_rounds_trigger_price",
+      "target": "tests_test_live_execution_retryprotclient_place_conditional",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L223",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "tests_test_live_execution_retryprotclient_init",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L228",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "tests_test_live_execution_retryprotclient_place_conditional",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L236",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "tests_test_live_execution_retryprotclient_cancel_conditional",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L239",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "tests_test_live_execution_retryprotclient_position_risk",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L249",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_test_place_protection_retries_before_flattening",
+      "target": "tests_test_live_execution_retryprotclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L221",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_rationale_221",
+      "target": "tests_test_live_execution_retryprotclient",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L14",
+      "weight": 0.8,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "execution_binance_futures_binancefuturestestnet",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L14",
+      "weight": 0.8,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "execution_binance_futures_symbolfilters",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L231",
+      "weight": 0.8,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "execution_binance_futures_ordererror",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "uses",
+      "confidence": "INFERRED",
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L246",
+      "weight": 0.8,
+      "source": "tests_test_live_execution_retryprotclient",
+      "target": "execution_live_livecontext",
+      "confidence_score": 0.5
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "INFERRED",
+      "confidence_score": 0.8,
+      "source_file": "tests/test_live_execution.py",
+      "source_location": "L233",
+      "weight": 1.0,
+      "source": "tests_test_live_execution_retryprotclient_place_conditional",
       "target": "execution_binance_futures_ordererror"
     },
     {
@@ -35236,12 +35751,22 @@
     {
       "relation": "contains",
       "confidence": "EXTRACTED",
+      "source_file": "ops/backfill.sh",
+      "source_location": "L1",
+      "weight": 1.0,
+      "source": "ops_backfill_sh",
+      "target": "users_nicost_development_trade_with_me_ops_backfill_sh__entry",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
       "source_file": "ops/bot-entrypoint.sh",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_bot_entrypoint_sh",
-      "target": "users_nicost_development_trade_with_me_ops_bot_entrypoint_sh__entry",
-      "confidence_score": 1.0
+      "target": "users_nicost_development_trade_with_me_ops_bot_entrypoint_sh__entry"
     },
     {
       "relation": "contains",
@@ -35249,9 +35774,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L33",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_py",
-      "target": "ops_dashboard_fnum",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_fnum"
     },
     {
       "relation": "contains",
@@ -35259,9 +35784,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L40",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_py",
-      "target": "ops_dashboard_fetch_price",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_fetch_price"
     },
     {
       "relation": "contains",
@@ -35269,9 +35794,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_py",
-      "target": "ops_dashboard_load_data",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_load_data"
     },
     {
       "relation": "contains",
@@ -35279,9 +35804,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L72",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_py",
-      "target": "ops_dashboard_row_unrealized",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_row_unrealized"
     },
     {
       "relation": "contains",
@@ -35289,9 +35814,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L85",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_py",
-      "target": "ops_dashboard_render",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_render"
     },
     {
       "relation": "contains",
@@ -35299,9 +35824,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L172",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_py",
-      "target": "ops_dashboard_handler",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_handler"
     },
     {
       "relation": "calls",
@@ -35310,9 +35835,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L75",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_row_unrealized",
-      "target": "ops_dashboard_fnum",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_fnum"
     },
     {
       "relation": "calls",
@@ -35321,9 +35846,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L88",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_render",
-      "target": "ops_dashboard_fnum",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_fnum"
     },
     {
       "relation": "calls",
@@ -35332,7 +35857,17 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L94",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_render",
+      "target": "ops_dashboard_fetch_price"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "ops/dashboard.py",
+      "source_location": "L42",
+      "weight": 1.0,
+      "source": "ops_dashboard_rationale_42",
       "target": "ops_dashboard_fetch_price",
       "confidence_score": 1.0
     },
@@ -35342,9 +35877,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L41",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_rationale_41",
-      "target": "ops_dashboard_fetch_price",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_fetch_price"
     },
     {
       "relation": "calls",
@@ -35353,9 +35888,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L178",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_handler_do_get",
-      "target": "ops_dashboard_load_data",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_load_data"
     },
     {
       "relation": "calls",
@@ -35364,9 +35899,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L106",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_render",
-      "target": "ops_dashboard_row_unrealized",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_row_unrealized"
     },
     {
       "relation": "calls",
@@ -35375,9 +35910,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L179",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_handler_do_get",
-      "target": "ops_dashboard_render",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_render"
     },
     {
       "relation": "inherits",
@@ -35385,9 +35920,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L172",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_handler",
-      "target": "basehttprequesthandler",
-      "confidence_score": 1.0
+      "target": "basehttprequesthandler"
     },
     {
       "relation": "method",
@@ -35395,9 +35930,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L173",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_handler",
-      "target": "ops_dashboard_handler_do_get",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_handler_do_get"
     },
     {
       "relation": "method",
@@ -35405,9 +35940,9 @@
       "source_file": "ops/dashboard.py",
       "source_location": "L188",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_dashboard_handler",
-      "target": "ops_dashboard_handler_log_message",
-      "confidence_score": 1.0
+      "target": "ops_dashboard_handler_log_message"
     },
     {
       "relation": "contains",
@@ -45108,6 +45643,17 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L145",
+      "weight": 1.0,
+      "source": "execution_binance_futures_binancefuturestestnet_round_price",
+      "target": "execution_binance_futures_ordererror",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
       "source_location": "L140",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -45257,6 +45803,16 @@
       "confidence_score": 1.0,
       "source": "execution_binance_futures_binancefuturestestnet",
       "target": "execution_binance_futures_binancefuturestestnet_round_qty"
+    },
+    {
+      "relation": "method",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L135",
+      "weight": 1.0,
+      "source": "execution_binance_futures_binancefuturestestnet",
+      "target": "execution_binance_futures_binancefuturestestnet_round_price",
+      "confidence_score": 1.0
     },
     {
       "relation": "method",
@@ -45433,6 +45989,37 @@
       "target": "execution_binance_futures_binancefuturestestnet_round_qty"
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L261",
+      "weight": 1.0,
+      "source": "execution_binance_futures_binancefuturestestnet_place_conditional",
+      "target": "execution_binance_futures_binancefuturestestnet_round_price",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L136",
+      "weight": 1.0,
+      "source": "execution_binance_futures_rationale_136",
+      "target": "execution_binance_futures_binancefuturestestnet_round_price",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L164",
+      "weight": 1.0,
+      "source": "execution_binance_futures_rationale_164",
+      "target": "execution_binance_futures_binancefuturestestnet_position_risk",
+      "confidence_score": 1.0
+    },
+    {
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/binance_futures.py",
@@ -45451,6 +46038,16 @@
       "confidence_score": 1.0,
       "source": "execution_binance_futures_rationale_143",
       "target": "execution_binance_futures_binancefuturestestnet_position_risk"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L179",
+      "weight": 1.0,
+      "source": "execution_binance_futures_rationale_179",
+      "target": "execution_binance_futures_binancefuturestestnet_market_order",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -45476,11 +46073,31 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L248",
+      "weight": 1.0,
+      "source": "execution_binance_futures_rationale_248",
+      "target": "execution_binance_futures_binancefuturestestnet_place_conditional",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
       "source_location": "L231",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "execution_binance_futures_rationale_231",
       "target": "execution_binance_futures_binancefuturestestnet_place_conditional"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/binance_futures.py",
+      "source_location": "L288",
+      "weight": 1.0,
+      "source": "execution_binance_futures_rationale_288",
+      "target": "execution_binance_futures_binancefuturestestnet_cancel_conditional",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -45816,6 +46433,16 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/live.py",
+      "source_location": "L148",
+      "weight": 1.0,
+      "source": "execution_live_rationale_148",
+      "target": "execution_live_livecontext_replace_stop",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/live.py",
       "source_location": "L135",
       "weight": 1.0,
       "confidence_score": 1.0,
@@ -45826,11 +46453,31 @@
       "relation": "rationale_for",
       "confidence": "EXTRACTED",
       "source_file": "src/ats/execution/live.py",
+      "source_location": "L165",
+      "weight": 1.0,
+      "source": "execution_live_rationale_165",
+      "target": "execution_live_livecontext_cancel_protection",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/live.py",
       "source_location": "L152",
       "weight": 1.0,
       "confidence_score": 1.0,
       "source": "execution_live_rationale_152",
       "target": "execution_live_livecontext_cancel_protection"
+    },
+    {
+      "relation": "rationale_for",
+      "confidence": "EXTRACTED",
+      "source_file": "src/ats/execution/live.py",
+      "source_location": "L175",
+      "weight": 1.0,
+      "source": "execution_live_rationale_175",
+      "target": "execution_live_livecontext_close_position",
+      "confidence_score": 1.0
     },
     {
       "relation": "rationale_for",
@@ -48749,9 +49396,9 @@
       "source_file": "src/ats/engine/loop.py",
       "source_location": "L268",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "engine_loop_rationale_268",
-      "target": "engine_loop_run_live",
-      "confidence_score": 1.0
+      "target": "engine_loop_run_live"
     },
     {
       "relation": "rationale_for",
@@ -57018,9 +57665,9 @@
       "source_file": "ops/README.md",
       "source_location": "L1",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_md",
-      "target": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "confidence_score": 1.0
+      "target": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker"
     },
     {
       "relation": "contains",
@@ -57028,9 +57675,9 @@
       "source_file": "ops/README.md",
       "source_location": "L13",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_what_runs",
-      "confidence_score": 1.0
+      "target": "ops_readme_what_runs"
     },
     {
       "relation": "contains",
@@ -57038,9 +57685,9 @@
       "source_file": "ops/README.md",
       "source_location": "L27",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_prerequisites",
-      "confidence_score": 1.0
+      "target": "ops_readme_prerequisites"
     },
     {
       "relation": "contains",
@@ -57048,9 +57695,9 @@
       "source_file": "ops/README.md",
       "source_location": "L36",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_setup_after_cloning",
-      "confidence_score": 1.0
+      "target": "ops_readme_setup_after_cloning"
     },
     {
       "relation": "contains",
@@ -57058,9 +57705,9 @@
       "source_file": "ops/README.md",
       "source_location": "L82",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_configure_the_bot",
-      "confidence_score": 1.0
+      "target": "ops_readme_configure_the_bot"
     },
     {
       "relation": "contains",
@@ -57068,9 +57715,9 @@
       "source_file": "ops/README.md",
       "source_location": "L100",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_monitor",
-      "confidence_score": 1.0
+      "target": "ops_readme_monitor"
     },
     {
       "relation": "contains",
@@ -57078,9 +57725,9 @@
       "source_file": "ops/README.md",
       "source_location": "L124",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_dashboard",
-      "confidence_score": 1.0
+      "target": "ops_readme_dashboard"
     },
     {
       "relation": "contains",
@@ -57088,9 +57735,9 @@
       "source_file": "ops/README.md",
       "source_location": "L135",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_manage",
-      "confidence_score": 1.0
+      "target": "ops_readme_manage"
     },
     {
       "relation": "contains",
@@ -57098,9 +57745,9 @@
       "source_file": "ops/README.md",
       "source_location": "L155",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_troubleshooting",
-      "confidence_score": 1.0
+      "target": "ops_readme_troubleshooting"
     },
     {
       "relation": "contains",
@@ -57108,9 +57755,9 @@
       "source_file": "ops/README.md",
       "source_location": "L167",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_deploy_24_7_binance_testnet_live_bot_docker",
-      "target": "ops_readme_files_in_this_folder",
-      "confidence_score": 1.0
+      "target": "ops_readme_files_in_this_folder"
     },
     {
       "relation": "contains",
@@ -57118,9 +57765,9 @@
       "source_file": "ops/README.md",
       "source_location": "L38",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_setup_after_cloning",
-      "target": "ops_readme_1_box_prep_docker_swap",
-      "confidence_score": 1.0
+      "target": "ops_readme_1_box_prep_docker_swap"
     },
     {
       "relation": "contains",
@@ -57128,9 +57775,9 @@
       "source_file": "ops/README.md",
       "source_location": "L50",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_setup_after_cloning",
-      "target": "ops_readme_2_clone_checkout",
-      "confidence_score": 1.0
+      "target": "ops_readme_2_clone_checkout"
     },
     {
       "relation": "contains",
@@ -57138,9 +57785,9 @@
       "source_file": "ops/README.md",
       "source_location": "L57",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_setup_after_cloning",
-      "target": "ops_readme_3_create_env_testnet_keys",
-      "confidence_score": 1.0
+      "target": "ops_readme_3_create_env_testnet_keys"
     },
     {
       "relation": "contains",
@@ -57148,9 +57795,9 @@
       "source_file": "ops/README.md",
       "source_location": "L73",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_setup_after_cloning",
-      "target": "ops_readme_4_logs_folder_launch",
-      "confidence_score": 1.0
+      "target": "ops_readme_4_logs_folder_launch"
     },
     {
       "relation": "contains",
@@ -57158,9 +57805,9 @@
       "source_file": "ops/README.md",
       "source_location": "L39",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_1_box_prep_docker_swap",
-      "target": "ops_readme_codeblock_1",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_1"
     },
     {
       "relation": "contains",
@@ -57168,9 +57815,9 @@
       "source_file": "ops/README.md",
       "source_location": "L51",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_2_clone_checkout",
-      "target": "ops_readme_codeblock_2",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_2"
     },
     {
       "relation": "contains",
@@ -57178,9 +57825,9 @@
       "source_file": "ops/README.md",
       "source_location": "L58",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_3_create_env_testnet_keys",
-      "target": "ops_readme_codeblock_3",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_3"
     },
     {
       "relation": "contains",
@@ -57188,9 +57835,9 @@
       "source_file": "ops/README.md",
       "source_location": "L74",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_4_logs_folder_launch",
-      "target": "ops_readme_codeblock_4",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_4"
     },
     {
       "relation": "contains",
@@ -57198,9 +57845,9 @@
       "source_file": "ops/README.md",
       "source_location": "L102",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_monitor",
-      "target": "ops_readme_codeblock_5",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_5"
     },
     {
       "relation": "contains",
@@ -57208,9 +57855,9 @@
       "source_file": "ops/README.md",
       "source_location": "L116",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_monitor",
-      "target": "ops_readme_codeblock_6",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_6"
     },
     {
       "relation": "contains",
@@ -57218,9 +57865,9 @@
       "source_file": "ops/README.md",
       "source_location": "L137",
       "weight": 1.0,
+      "confidence_score": 1.0,
       "source": "ops_readme_manage",
-      "target": "ops_readme_codeblock_7",
-      "confidence_score": 1.0
+      "target": "ops_readme_codeblock_7"
     },
     {
       "relation": "contains",
@@ -58114,5 +58761,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "0c8376fc73c50d7395884427c6abf1469be4c46d"
+  "built_at_commit": "8dce0995cf822b289c06f7010377ea94e2221482"
 }

@@ -1,16 +1,16 @@
-# Graph Report - trade-with-me  (2026-07-01)
+# Graph Report - trade-with-me  (2026-07-03)
 
 ## Corpus Check
-- 191 files · ~137,525 words
+- 192 files · ~138,485 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2428 nodes · 3508 edges · 183 communities (146 shown, 37 thin omitted)
-- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 672 edges (avg confidence: 0.77)
+- 2452 nodes · 3549 edges · 190 communities (153 shown, 37 thin omitted)
+- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 679 edges (avg confidence: 0.76)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `0c8376fc`
+- Built from commit: `8dce0995`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -161,6 +161,7 @@
 - [[_COMMUNITY_Community 150|Community 150]]
 - [[_COMMUNITY_Community 151|Community 151]]
 - [[_COMMUNITY_Community 152|Community 152]]
+- [[_COMMUNITY_Community 153|Community 153]]
 - [[_COMMUNITY_Community 154|Community 154]]
 - [[_COMMUNITY_Community 155|Community 155]]
 - [[_COMMUNITY_Community 156|Community 156]]
@@ -184,6 +185,12 @@
 - [[_COMMUNITY_Community 177|Community 177]]
 - [[_COMMUNITY_Community 179|Community 179]]
 - [[_COMMUNITY_Community 181|Community 181]]
+- [[_COMMUNITY_Community 184|Community 184]]
+- [[_COMMUNITY_Community 185|Community 185]]
+- [[_COMMUNITY_Community 186|Community 186]]
+- [[_COMMUNITY_Community 187|Community 187]]
+- [[_COMMUNITY_Community 188|Community 188]]
+- [[_COMMUNITY_Community 189|Community 189]]
 
 ## God Nodes (most connected - your core abstractions)
 1. `TradeState` - 50 edges
@@ -204,16 +211,16 @@
   tests/test_llm_schemas.py → src/ats/llm/schemas.py
 - `test_mock_adjudicate_is_delta_zero_baseline()` --calls--> `MockClient`  [INFERRED]
   tests/test_llm_schemas.py → src/ats/llm/client.py
-- `test_volume_context_handles_missing_taker_buy_vol()` --calls--> `build_volume_context()`  [INFERRED]
+- `test_exhaustion_context_marks_oversold_bear_squeeze_risk()` --calls--> `build_exhaustion_context()`  [INFERRED]
   tests/test_planner_context.py → src/ats/planning/context.py
-- `test_macd_returns_three_series()` --calls--> `macd()`  [INFERRED]
-  tests/test_indicators.py → src/ats/processing/indicators.py
+- `test_exhaustion_context_marks_overbought_long_squeeze_risk()` --calls--> `build_exhaustion_context()`  [INFERRED]
+  tests/test_planner_context.py → src/ats/planning/context.py
 
-## Communities (183 total, 37 thin omitted)
+## Communities (190 total, 37 thin omitted)
 
 ### Community 0 - "Community 0"
-Cohesion: 0.05
-Nodes (48): Agent, TickReport, BarStep, Adjudicator, _cost_usd(), LlmClient, MockClient, Observer (+40 more)
+Cohesion: 0.10
+Nodes (24): Agent, Adjudicator, _cost_usd(), LlmClient, MockClient, Observer, OpenAIClient, LLM client abstraction: a deterministic mock and a real OpenAI implementation. (+16 more)
 
 ### Community 1 - "Community 1"
 Cohesion: 0.06
@@ -221,7 +228,7 @@ Nodes (50): abstain(), AgentInput, AgentScore, clamp01(), f(), primary_close(), 
 
 ### Community 2 - "Community 2"
 Cohesion: 0.07
-Nodes (43): direction_vote(), Direction vote + weighted statistics over the eight agent scores.  Abstaining ag, Return (long_pressure, short_pressure) = Σ weight·score on each side., Weighted majority direction, or ``neutral`` on a tie / all-neutral., Weighted mean of scores from agents voting the chosen ``direction``.      Normal, Variance of the agreeing agents' scores (drives the alignment penalty).      Dis, score_variance(), weighted_mean() (+35 more)
+Nodes (42): direction_vote(), Direction vote + weighted statistics over the eight agent scores.  Abstaining ag, Return (long_pressure, short_pressure) = Σ weight·score on each side., Weighted majority direction, or ``neutral`` on a tie / all-neutral., Weighted mean of scores from agents voting the chosen ``direction``.      Normal, Variance of the agreeing agents' scores (drives the alignment penalty).      Dis, score_variance(), weighted_mean() (+34 more)
 
 ### Community 3 - "Community 3"
 Cohesion: 0.12
@@ -236,8 +243,8 @@ Cohesion: 0.07
 Nodes (48): entry_confirmed(), _entry_trigger(), eval_hard_rules(), eval_rule(), evaluate_setup(), in_entry_zone(), Deterministic rule engine — the real-time detector.  Evaluates a plan's setups a, All hard rules must pass. Returns (all_passed, list of failed rule descriptions) (+40 more)
 
 ### Community 6 - "Community 6"
-Cohesion: 0.05
-Nodes (48): Base, Basis, Candle, Feature, FundingRate, FundingRateXVenue, Heartbeat, Liquidation (+40 more)
+Cohesion: 0.07
+Nodes (45): Base, Basis, Candle, Feature, FundingRate, FundingRateXVenue, Heartbeat, Liquidation (+37 more)
 
 ### Community 7 - "Community 7"
 Cohesion: 0.04
@@ -288,8 +295,8 @@ Cohesion: 0.06
 Nodes (30): 0. One-time setup — DB + data, code:block1 (features / regimes / candles (specs 01 + 02)), code:bash (uv run ats db migrate                              # apply A), code:bash (uv run ats engine replay --symbol BTCUSDT --timeframe 15m --), code:bash (uv run ats engine run --symbol BTCUSDT --timeframe 15m --onc), Cross-cutting — Invalidation, Full replay walkthrough, How to Test (CLI) (+22 more)
 
 ### Community 19 - "Community 19"
-Cohesion: 0.06
-Nodes (51): execute_setup(), Entry path: size and open a detected setup deterministically.  The per-setup LLM, Size and open a detected setup deterministically at ``entry_price``.      ``entr, Size and open a detected setup deterministically at ``entry_price``.      ``entr, setup_dict(), _arm_limit_price(), _entry_gates_ok(), evaluate_now() (+43 more)
+Cohesion: 0.11
+Nodes (32): clamp_extended_tp(), clamp_tightened_stop(), exit_policy_for_regime(), exit_policy_from_metadata(), exit_policy_metadata(), ExitPolicy, is_sideways(), Exit policy — the concrete exit knobs a trade carries after entry.  Resolves the (+24 more)
 
 ### Community 20 - "Community 20"
 Cohesion: 0.10
@@ -300,8 +307,8 @@ Cohesion: 0.07
 Nodes (26): Acceptance criteria — 8a, Acceptance criteria — 8b (when built), `ats reflect validate`, CLI added, code:bash (uv add pgvector                  # Python client; SQL extens), code:block4 (SETUP), code:python (def retrieve_relevant_learnings(setup_snapshot, k=3, min_con), code:text (# 8a) (+18 more)
 
 ### Community 22 - "Community 22"
-Cohesion: 0.15
-Nodes (26): build_exhaustion_context(), build_planner_context(), build_structure_context(), build_volume_context(), _distance_atr(), _empty_memory_summary(), _f(), _htf_rsi_state() (+18 more)
+Cohesion: 0.18
+Nodes (23): build_exhaustion_context(), build_planner_context(), build_structure_context(), build_volume_context(), _distance_atr(), _empty_memory_summary(), _f(), _htf_rsi_state() (+15 more)
 
 ### Community 23 - "Community 23"
 Cohesion: 0.07
@@ -312,8 +319,8 @@ Cohesion: 0.07
 Nodes (26): Acceptance criteria, `ats ops validate`, CLI added, code:bash (uv add 'redis[hiredis]' arq), code:yaml (redis:), code:cron (*/15 * * * *  cd /path/to/ats && uv run ats session run >> l), code:bash (docker compose -f ops/docker-compose.yml up -d        # Post), code:text (ats ingest start                     # WS + continuous polle) (+18 more)
 
 ### Community 25 - "Community 25"
-Cohesion: 0.11
-Nodes (15): LiveContext, Live testnet execution context — the mirror-model bridge.  When ``--live-execute, Close the FULL remaining exchange position (reduce-only), querying live size., Place a STOP_MARKET (SL) + TAKE_PROFIT_MARKET (TP), both closePosition=true., Cancel the existing SL and place a new STOP_MARKET at ``new_stop`` (trail / brea, Cancel any remaining SL/TP for a trade (on close)., Close the FULL remaining exchange position (reduce-only), querying live size., Holds the testnet client + order log for one live run. Methods mirror executor s (+7 more)
+Cohesion: 0.08
+Nodes (21): LiveContext, Live testnet execution context — the mirror-model bridge.  When ``--live-execute, Close the FULL remaining exchange position (reduce-only), querying live size., Place a STOP_MARKET (SL) + TAKE_PROFIT_MARKET (TP), both closePosition=true., Cancel the existing SL and place a new STOP_MARKET at ``new_stop`` (trail / brea, Cancel the existing SL and place a new STOP_MARKET at ``new_stop`` (trail / brea, Cancel any remaining SL/TP for a trade (on close)., Close the FULL remaining exchange position (reduce-only), querying live size. (+13 more)
 
 ### Community 26 - "Community 26"
 Cohesion: 0.12
@@ -345,7 +352,7 @@ Nodes (17): PlanOutput, One executable trade setup within a plan., The full crea
 
 ### Community 33 - "Community 33"
 Cohesion: 0.16
-Nodes (18): build_fingerprint(), _clamp01(), _get(), Numeric setup fingerprint — the vector episodic memory is retrieved by.  A fixed, Map an unbounded z-score-like value into [0, 1] via tanh (0.5 = neutral/missing), Build the fixed-length setup fingerprint. ``regime`` is accepted for future use., _squash(), canned_reflection() (+10 more)
+Nodes (19): build_fingerprint(), _clamp01(), _get(), Numeric setup fingerprint — the vector episodic memory is retrieved by.  A fixed, Map an unbounded z-score-like value into [0, 1] via tanh (0.5 = neutral/missing), Build the fixed-length setup fingerprint. ``regime`` is accepted for future use., _squash(), canned_reflection() (+11 more)
 
 ### Community 34 - "Community 34"
 Cohesion: 0.12
@@ -357,11 +364,11 @@ Nodes (18): close_trade(), Single close path: record the close, then run the epi
 
 ### Community 36 - "Community 36"
 Cohesion: 0.14
-Nodes (18): breakeven_stop(), check_bar_exit(), _liq_hit(), net_of_costs(), PartialFill, _pnl_pct(), profit_lock_stop(), Paper-trade reconciliation — pure exit logic over candles.  Given an open trade (+10 more)
+Nodes (18): BarStep, breakeven_stop(), check_bar_exit(), ExitResult, _liq_hit(), PartialFill, _pnl_pct(), profit_lock_stop() (+10 more)
 
 ### Community 37 - "Community 37"
-Cohesion: 0.17
-Nodes (12): _merge_state(), Paper executor — records simulated trades. NEVER places a live order.  This is t, Persist updated exit state into ``trade_metadata`` (preserving other keys)., Persist updated exit state into ``trade_metadata`` (preserving other keys)., Persist updated exit state into ``trade_metadata`` (preserving other keys)., Persist a no-fill state change (e.g. a trailing-stop move) for an open trade., Persist a no-fill state change (e.g. a trailing-stop move) for an open trade., Persist a no-fill state change (e.g. a trailing-stop move) for an open trade. (+4 more)
+Cohesion: 0.12
+Nodes (16): _merge_state(), Paper executor — records simulated trades. NEVER places a live order.  This is t, Persist updated exit state into ``trade_metadata`` (preserving other keys)., Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open., Persist updated exit state into ``trade_metadata`` (preserving other keys)., Persist updated exit state into ``trade_metadata`` (preserving other keys)., Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open., Persist a no-fill state change (e.g. a trailing-stop move) for an open trade. (+8 more)
 
 ### Community 38 - "Community 38"
 Cohesion: 0.10
@@ -420,20 +427,20 @@ Cohesion: 0.12
 Nodes (9): basis (hypertable), candles (hypertable), Data model, funding_rates, funding_rates_xvenue, heartbeats, liquidations, mark_prices_1m (hypertable) (+1 more)
 
 ### Community 52 - "Community 52"
-Cohesion: 0.25
-Nodes (14): preferred_direction(), Deterministic soft directional steer (#4) from regime + exhaustion + structure., _candle(), _exh(), test_preferred_direction_bear_trend_is_short(), test_preferred_direction_bear_with_htf_oversold_flips_long(), test_preferred_direction_bull_trend_is_long(), test_preferred_direction_bull_with_htf_overbought_flips_short() (+6 more)
+Cohesion: 0.19
+Nodes (17): preferred_direction(), Deterministic soft directional steer (#4) from regime + exhaustion + structure., _candle(), _exh(), test_exhaustion_context_marks_overbought_long_squeeze_risk(), test_exhaustion_context_marks_oversold_bear_squeeze_risk(), test_exhaustion_context_neutral_when_not_extended(), test_preferred_direction_bear_trend_is_short() (+9 more)
 
 ### Community 53 - "Community 53"
 Cohesion: 0.17
 Nodes (15): backfill(), _f(), _parse_since(), CLI commands for feature processing., Inspect computed features: coverage summary, latest row, and sparklines.      Re, [Tier 3 / M4] Subscribe to candle-close events; compute as bars close., Programmatic smoke test: assert candles ≥30d, run backfill 7d, check pr_* bounds, Coerce a DB value (Decimal/None) to float, or None if null/non-numeric. (+7 more)
 
 ### Community 54 - "Community 54"
-Cohesion: 0.20
-Nodes (13): _guard_live(), Apply the profile, then refuse to run live execution unless it is safe + determi, _client_with_filters(), Tests for the Binance testnet live-execution layer (pure logic + CLI guards).  N, Guard tests mutate the global settings singleton; snapshot + restore so test, _reset_settings(), _restore_settings(), test_guard_passes_with_safe_config() (+5 more)
+Cohesion: 0.18
+Nodes (14): _guard_live(), Apply the profile, then refuse to run live execution unless it is safe + determi, _client_with_filters(), Tests for the Binance testnet live-execution layer (pure logic + CLI guards).  N, Guard tests mutate the global settings singleton; snapshot + restore so test, _reset_settings(), _restore_settings(), test_guard_passes_with_safe_config() (+6 more)
 
 ### Community 55 - "Community 55"
-Cohesion: 0.06
-Nodes (35): _accumulate(), _ensure_plan(), Engine orchestration: replay, single-tick, and live-poll loops.  All three share, Walk historical feature rows, running the full loop on each as if live.      ``r, Single evaluation against the most recent feature row., Single evaluation against the most recent feature row., Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon, Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon (+27 more)
+Cohesion: 0.27
+Nodes (9): Log a one-line live position snapshot (qty / entry / unrealized PnL)., snapshot(), _consume_klines(), _consume_user(), Websocket-driven live loop (event-driven, bar-close-precise).  A quick, robust i, Record real order/account updates from the user-data stream into the order log., Run the event-driven websocket live loop until cancelled., run_ws() (+1 more)
 
 ### Community 56 - "Community 56"
 Cohesion: 0.12
@@ -452,12 +459,12 @@ Cohesion: 0.15
 Nodes (14): media(), Show heartbeat statuses + row counts. Exits 1 only if a data class is missing., List recent media headlines without opening the DB., status(), list_(), CLI: ats learn — inspect the episodic-memory learnings written on each closed tr, List recent learnings (most recent first)., Show one learning in full. (+6 more)
 
 ### Community 60 - "Community 60"
-Cohesion: 0.15
-Nodes (11): create(), OrderError, OrderResult, Binance Futures TESTNET client — the ONLY component that places real orders.  Th, Round ``qty`` DOWN to the symbol's stepSize. Returns 0.0 if below minQty., Round ``qty`` DOWN to the symbol's stepSize. Returns 0.0 if below minQty., Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill., Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill. (+3 more)
+Cohesion: 0.14
+Nodes (12): create(), OrderError, OrderResult, Binance Futures TESTNET client — the ONLY component that places real orders.  Th, Round ``qty`` DOWN to the symbol's stepSize. Returns 0.0 if below minQty., Round ``qty`` DOWN to the symbol's stepSize. Returns 0.0 if below minQty., Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill., Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill. (+4 more)
 
 ### Community 61 - "Community 61"
-Cohesion: 0.16
-Nodes (6): BinanceFuturesTestnet, Return the open position for ``symbol`` (positionAmt != 0), else None., Return the open position for ``symbol`` (positionAmt != 0), else None., Place a CONDITIONAL algo order (STOP_MARKET / TAKE_PROFIT_MARKET / TRAILING_STOP, Cancel a single conditional algo order. Non-fatal: a gone order is logged, not r, Signed testnet client. Construct via ``await BinanceFuturesTestnet.create(...)``
+Cohesion: 0.12
+Nodes (10): BinanceFuturesTestnet, Snap ``price`` to the symbol's tickSize (NEAREST tick).          Conditional ord, Return the open position for ``symbol`` (positionAmt != 0), else None., Return the open position for ``symbol`` (positionAmt != 0), else None., Return the open position for ``symbol`` (positionAmt != 0), else None., Place a CONDITIONAL algo order (STOP_MARKET / TAKE_PROFIT_MARKET / TRAILING_STOP, Place a CONDITIONAL algo order (STOP_MARKET / TAKE_PROFIT_MARKET / TRAILING_STOP, Cancel a single conditional algo order. Non-fatal: a gone order is logged, not r (+2 more)
 
 ### Community 62 - "Community 62"
 Cohesion: 0.30
@@ -472,8 +479,8 @@ Cohesion: 0.09
 Nodes (21): 1. Box prep — Docker + swap, 2. Clone + checkout, 3. Create `.env` (testnet keys), 4. Logs folder + launch, code:bash (sudo apt update && sudo apt install -y docker.io docker-comp), code:bash (git clone https://github.com/ChrisJulLimantoro/trade-with-me), code:bash (cat > .env <<'EOF'), code:bash (mkdir -p logs) (+13 more)
 
 ### Community 65 - "Community 65"
-Cohesion: 0.17
-Nodes (12): Render a fingerprint as a pgvector text literal, e.g. ``[0.1,0.2,...]``., to_vector_literal(), _outcome(), Post-mortem: on a closed trade, write one structured ``learning`` row.  Called f, Run the post-mortem for ``trade`` and persist a learning + audit row., reflect_and_store(), Top-k learnings nearest to ``fingerprint`` by cosine distance.      ``direction`, retrieve_relevant_learnings() (+4 more)
+Cohesion: 0.16
+Nodes (13): Render a fingerprint as a pgvector text literal, e.g. ``[0.1,0.2,...]``., to_vector_literal(), _outcome(), Post-mortem: on a closed trade, write one structured ``learning`` row.  Called f, Run the post-mortem for ``trade`` and persist a learning + audit row., reflect_and_store(), _avg(), Retrieve the most-similar prior learnings for a setup (cosine over the fingerpri (+5 more)
 
 ### Community 66 - "Community 66"
 Cohesion: 0.22
@@ -484,12 +491,12 @@ Cohesion: 0.12
 Nodes (15): AI Crypto Trader Architecture Summary, code:text (AI decides WHAT to trade), code:json ({), code:text (price > ema_50_5m), code:text (Market Stream (WebSocket)), code:text (create_plan     = strategist), code:text (LLM defines the trading plan.), code:json ({) (+7 more)
 
 ### Community 68 - "Community 68"
-Cohesion: 0.27
-Nodes (9): ExitConfig, ObserverConfig, PlanConfig, Risk sizing + the round-trip cost model. A strategy profile overrides this as a, Dynamic exit observation (finer-timeframe trade management by the LLM exit manag, Planning / strategist / entry-gate knobs and re-plan discipline., Exit machine: time-stop, scale-out, breakeven, trailing — trend + sideways postu, RiskConfig (+1 more)
+Cohesion: 0.21
+Nodes (11): ExitConfig, ObserverConfig, PlanConfig, Risk sizing + the round-trip cost model. A strategy profile overrides this as a, Dynamic exit observation (finer-timeframe trade management by the LLM exit manag, Planning / strategist / entry-gate knobs and re-plan discipline., Exit machine: time-stop, scale-out, breakeven, trailing — trend + sideways postu, RiskConfig (+3 more)
 
 ### Community 69 - "Community 69"
-Cohesion: 0.16
-Nodes (13): Hand-set agent weights — version-controlled, anti-tuning.  The eight weights sum, Renormalize the weights of an active subset to sum to 1.0.      Used only after, renormalize(), Map a Signal (or None → stand-aside plan) onto a PlanOutput., signal_to_plan(), Signal, Weight invariants + Signal→PlanOutput bridge parity (spec 04 / Part 1 bridge)., _signal() (+5 more)
+Cohesion: 0.12
+Nodes (19): Hand-set agent weights — version-controlled, anti-tuning.  The eight weights sum, Renormalize the weights of an active subset to sum to 1.0.      Used only after, renormalize(), _invalidation_rules(), Bridge: synthesized ``Signal`` → existing ``PlanOutput`` / ``SetupOutput``.  The, Thesis-direction soft rules over whichever momentum features are present., A close-confirmed momentum-reversal guard (structural, not a stop restatement)., Map a Signal onto one executable SetupOutput. (+11 more)
 
 ### Community 70 - "Community 70"
 Cohesion: 0.23
@@ -504,20 +511,20 @@ Cohesion: 0.29
 Nodes (10): A single comparison the rule engine can evaluate.      ``left``/``right`` resolv, Rule, Drop hard ENTRY rules that merely restate the entry_zone as a bare price literal, _stripped_hard_rules(), Tests for the hard-rule sanitizer in create_plan.  The entry_zone is the executa, _setup(), test_empty_hard_rules_stay_empty(), test_keeps_price_vs_feature_and_non_price_rules() (+2 more)
 
 ### Community 74 - "Community 74"
-Cohesion: 0.24
-Nodes (9): InvalidationRule, A condition that, when true, degrades or kills a plan/setup.      ``on_close`` r, _invalidation_rules(), Bridge: synthesized ``Signal`` → existing ``PlanOutput`` / ``SetupOutput``.  The, Thesis-direction soft rules over whichever momentum features are present., A close-confirmed momentum-reversal guard (structural, not a stop restatement)., Map a Signal onto one executable SetupOutput., signal_to_setup() (+1 more)
+Cohesion: 0.16
+Nodes (16): FakeSession, ObserveClient, _patch_detector(), Detector entry-loop tests., _setup(), test_armed_setup_fills_on_a_later_touch_at_limit_price(), test_entry_confirmation_allows_confirmed_setup(), test_entry_confirmation_blocks_unconfirmed_setup() (+8 more)
 
 ### Community 75 - "Community 75"
-Cohesion: 0.33
-Nodes (6): margin_close_values(), Return ``(pnl_usd, margin_pnl_pct)`` from an internal notional-return result., Return ``(pnl_usd, margin_pnl_pct)`` from an internal notional-return result., Tests for paper executor PnL accounting helpers., test_margin_close_values_loss(), test_margin_close_values_profit()
+Cohesion: 0.20
+Nodes (10): close_paper_trade(), margin_close_values(), Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the, Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the, Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the, Return ``(pnl_usd, margin_pnl_pct)`` from an internal notional-return result., Return ``(pnl_usd, margin_pnl_pct)`` from an internal notional-return result., Tests for paper executor PnL accounting helpers. (+2 more)
 
 ### Community 76 - "Community 76"
-Cohesion: 0.29
-Nodes (8): BaseHTTPRequestHandler, fetch_price(), _fnum(), Handler, load_data(), Last price for one symbol from the public futures ticker (stdlib, ~1 cheap GET)., render(), _row_unrealized()
+Cohesion: 0.26
+Nodes (9): BaseHTTPRequestHandler, fetch_price(), _fnum(), Handler, load_data(), Last price for one symbol from the public futures ticker (stdlib, ~1 cheap GET)., Last price for one symbol from the public futures ticker (stdlib, ~1 cheap GET)., render() (+1 more)
 
 ### Community 77 - "Community 77"
-Cohesion: 0.22
-Nodes (8): handle_invalidation(), Deterministic plan/setup invalidation.  Invalidation is evaluated by CODE, never, Evaluate invalidation across the plan's setups. Returns True if plan was killed., close_paper_trade(), Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the, Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the, Mark a trade closed and record realized pnl.      ``exit_result.pnl_pct`` is the, ExitResult
+Cohesion: 0.18
+Nodes (10): execute_setup(), Entry path: size and open a detected setup deterministically.  The per-setup LLM, Size and open a detected setup deterministically at ``entry_price``.      ``entr, Size and open a detected setup deterministically at ``entry_price``.      ``entr, setup_dict(), open_paper_trade(), Insert an open paper trade for a detected+confirmed+risk-approved setup.      ``, Insert an open paper trade for a detected+confirmed+risk-approved setup.      `` (+2 more)
 
 ### Community 78 - "Community 78"
 Cohesion: 0.20
@@ -528,12 +535,16 @@ Cohesion: 0.20
 Nodes (9): At the end, code:block1 (uv run ats engine replay --symbol <COIN> --timeframe 15m \), Command template, Final holdout (run once — never tune against it), Gates (strict on TRAIN, relaxed out-of-sample), IMPORTANT CONSTRAINTS, The loop, Training Loop — multi-coin, overfit-resistant (+1 more)
 
 ### Community 80 - "Community 80"
-Cohesion: 0.27
-Nodes (8): _avg(), Retrieve the most-similar prior learnings for a setup (cosine over the fingerpri, Aggregate nearby learning rows into a compact planner-facing memory signal., retrieve_memory_summary(), _learning(), _Session, test_memory_summary_aggregates_similar_learning_rows(), test_memory_summary_low_confidence_when_sample_is_sparse()
+Cohesion: 0.22
+Nodes (5): _learning(), _Rows, _Session, test_memory_summary_aggregates_similar_learning_rows(), test_memory_summary_low_confidence_when_sample_is_sparse()
 
 ### Community 81 - "Community 81"
 Cohesion: 0.25
 Nodes (8): backfill(), media_pull(), _parse_since(), Parse strings like '7d', '120d', '2h', '30m' into timedelta., REST kline + funding + OI + premiumIndex backfill (Tier 1)., One-shot RSS + X (optional, disabled if no token) pull (Tier 1)., [Tier 3 / M4] Start WebSocket consumer + continuous pollers. Not available in M1, start()
+
+### Community 82 - "Community 82"
+Cohesion: 0.35
+Nodes (7): TickReport, _FakeSession, Isolation tests enabled by the Part 3 SOLID split.  Before the split these paths, test_close_trade_records_outcome_and_reflects(), test_close_trade_skips_reflection_when_memory_disabled(), test_handle_invalidation_hard_kills_plan_and_closes_trade(), _trade()
 
 ### Community 83 - "Community 83"
 Cohesion: 0.22
@@ -620,12 +631,12 @@ Cohesion: 0.40
 Nodes (5): _parse_since(), CLI commands for regime inspection., Parse strings like '7d', '120d', '2h', '30m' into timedelta., Show current regime + recent history., show()
 
 ### Community 105 - "Community 105"
-Cohesion: 0.33
-Nodes (4): _FakeRaw, Captures kwargs passed to futures_create_algo_order., test_place_conditional_stop_market_closeposition(), test_place_conditional_trailing_uses_callback_and_quantity()
+Cohesion: 0.29
+Nodes (7): _algo_client(), _FakeRaw, Captures kwargs passed to futures_create_algo_order., A client wired for conditional-order tests: fake raw client + loaded 0.01-tick f, test_place_conditional_rounds_trigger_price(), test_place_conditional_stop_market_closeposition(), test_place_conditional_trailing_uses_callback_and_quantity()
 
 ### Community 106 - "Community 106"
-Cohesion: 0.17
-Nodes (11): open_trades_for(), The single trade-close path + the open-trades query.  Every exit route (stop/tar, Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open., Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open., Bank a scaled-out leg: accrue realized pnl into ``trade_metadata``, stay open., record_partial_exit(), advance_trade(), Deterministic exit machine driver.  Walks each open trade across a sequence of c (+3 more)
+Cohesion: 0.15
+Nodes (12): open_trades_for(), The single trade-close path + the open-trades query.  Every exit route (stop/tar, handle_invalidation(), Deterministic plan/setup invalidation.  Invalidation is evaluated by CODE, never, Evaluate invalidation across the plan's setups. Returns True if plan was killed., net_of_costs(), Position-weighted pnl for a leg of size ``frac`` after round-trip trading costs., advance_trade() (+4 more)
 
 ### Community 107 - "Community 107"
 Cohesion: 0.33
@@ -640,8 +651,8 @@ Cohesion: 0.33
 Nodes (6): Binance REST, Binance WebSocket, Cross-venue funding REST (M1), Data sources, Media — RSS, Media — X/Twitter
 
 ### Community 110 - "Community 110"
-Cohesion: 0.50
-Nodes (3): adjudication_envelope(), Plan-time bounded veto/bias (spec 07, Part 2 Role 1).  The deterministic synthes, The compact judge envelope: the deterministic signal + market context.      Deli
+Cohesion: 0.18
+Nodes (6): Timeframe string → duration. Matches the M1 universe (15m / 1h / 4h)., timeframe_to_timedelta(), _patch_state(), Higher-timeframe context in build_envelope: the look-ahead guard.  A slower-char, Stub the DB readers with an in-memory candle store keyed by timeframe.      Each, test_htf_bar_is_already_closed_no_lookahead()
 
 ### Community 111 - "Community 111"
 Cohesion: 0.60
@@ -660,8 +671,8 @@ Cohesion: 0.40
 Nodes (3): fetch_recent(), Yahoo Finance — exploratory feasibility probe (NOT wired into M1 ingestion).  `y, Fetch recent OHLCV bars for a Yahoo ticker. Runs the sync client off-thread.
 
 ### Community 115 - "Community 115"
-Cohesion: 0.40
-Nodes (4): Fetch and cache LOT_SIZE / PRICE_FILTER / MIN_NOTIONAL for ``symbol``., Trading filters for one symbol, used to round quantities to an acceptable order., Fetch and cache LOT_SIZE / PRICE_FILTER / MIN_NOTIONAL for ``symbol``., SymbolFilters
+Cohesion: 0.18
+Nodes (7): Fetch and cache LOT_SIZE / PRICE_FILTER / MIN_NOTIONAL for ``symbol``., Trading filters for one symbol, used to round quantities to an acceptable order., Fetch and cache LOT_SIZE / PRICE_FILTER / MIN_NOTIONAL for ``symbol``., SymbolFilters, Fake exchange client: first place_conditional raises, the rest succeed., _RetryProtClient, test_place_protection_retries_before_flattening()
 
 ### Community 116 - "Community 116"
 Cohesion: 0.40
@@ -739,20 +750,44 @@ Nodes (3): code:text (Redis), code:text (active_plan), Shared State
 Cohesion: 0.27
 Nodes (6): code:json ({), code:python (if setup.plan_id != current_plan.plan_id:), code:text (create_plan), code:text (confirm_setup), Cost Optimization Strategy, Plan Versioning
 
+### Community 153 - "Community 153"
+Cohesion: 0.29
+Nodes (9): _accumulate(), _ensure_plan(), Engine orchestration: replay, single-tick, and live-poll loops.  All three share, Walk historical feature rows, running the full loop on each as if live.      ``r, Append this tick's notes, collapsing sticky states to start/resume transitions., Refresh the plan if there is none, it expired, or the refresh cadence elapsed., _record_notes(), run_replay() (+1 more)
+
+### Community 184 - "Community 184"
+Cohesion: 0.28
+Nodes (8): _arm_limit_price(), _entry_gates_ok(), evaluate_now(), Orchestrator — wires the engine collaborators for one evaluation tick.  For a gi, Run one full evaluation of the active plan against the current feature row., Run one full evaluation of the active plan against the current feature row., The resting-limit price for a setup: the zone edge a fill is *worst* at.      Lo, Non-price entry gates: regime-direction filter + optional bar-close confirmation
+
+### Community 185 - "Community 185"
+Cohesion: 0.22
+Nodes (7): ClosedTradeInfo, Engine DTOs — per-tick and per-replay result records.  Plain dataclasses with no, Compute summary metrics from trade_outcomes. Call once after the loop., Minimal closed-trade data emitted by close_trade for metrics collection., Lightweight summary captured for each closed trade during replay., ReplayReport, TradeOutcome
+
+### Community 186 - "Community 186"
+Cohesion: 0.29
+Nodes (7): Single evaluation against the most recent feature row., Single evaluation against the most recent feature row., Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon, Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon, Poll loop: optionally refresh data, then run a tick, sleeping ``interval`` secon, run_live(), run_tick()
+
+### Community 187 - "Community 187"
+Cohesion: 0.50
+Nodes (3): canned_adjudication(), Deterministic mock LLM outputs.  The mock turns a structured envelope into a val, The control-group judgement: no adjustment, no veto (``confidence_delta = 0``).
+
+### Community 188 - "Community 188"
+Cohesion: 0.67
+Nodes (3): build_envelope(), Assemble the JSON-only context passed to create_plan., test_build_envelope_includes_planner_context_and_prior_lessons()
+
 ## Knowledge Gaps
-- **544 isolated node(s):** `list`, `symbol`, `markPrice`, `indexPrice`, `lastFundingRate` (+539 more)
+- **545 isolated node(s):** `list`, `symbol`, `markPrice`, `indexPrice`, `lastFundingRate` (+540 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **37 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `_ensure_data()` connect `Community 10` to `Community 42`, `Community 43`, `Community 6`?**
+- **Why does `_ensure_data()` connect `Community 10` to `Community 42`, `Community 43`, `Community 110`?**
+  _High betweenness centrality (0.085) - this node is a cross-community bridge._
+- **Why does `timeframe_to_timedelta()` connect `Community 110` to `Community 6`, `Community 10`, `Community 77`, `Community 46`, `Community 153`, `Community 188`?**
   _High betweenness centrality (0.077) - this node is a cross-community bridge._
-- **Why does `timeframe_to_timedelta()` connect `Community 6` to `Community 65`, `Community 10`, `Community 46`, `Community 19`, `Community 55`?**
-  _High betweenness centrality (0.076) - this node is a cross-community bridge._
-- **Why does `_run()` connect `Community 59` to `Community 0`, `Community 66`, `Community 104`, `Community 43`, `Community 44`, `Community 46`, `Community 47`, `Community 81`, `Community 53`, `Community 29`?**
-  _High betweenness centrality (0.066) - this node is a cross-community bridge._
+- **Why does `_run()` connect `Community 59` to `Community 66`, `Community 104`, `Community 43`, `Community 44`, `Community 46`, `Community 47`, `Community 81`, `Community 82`, `Community 53`, `Community 29`?**
+  _High betweenness centrality (0.069) - this node is a cross-community bridge._
 - **Are the 47 inferred relationships involving `TradeState` (e.g. with `FakeSession` and `ObserveClient`) actually correct?**
   _`TradeState` has 47 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 34 inferred relationships involving `_run()` (e.g. with `TickReport` and `_reconcile_entry_bar()`) actually correct?**
@@ -760,4 +795,4 @@ _Questions this graph is uniquely positioned to answer:_
 - **Are the 19 inferred relationships involving `synthesize()` (e.g. with `test_weighted_majority_sets_direction()` and `test_all_neutral_rejects()`) actually correct?**
   _`synthesize()` has 19 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `Mean-reversion proposer: range-fade triggers, skips, RR floor, causality + route`, `20 range bars (high 110 / low 90) + one wild decision bar that must be EXCLUDED.`, `Tests for momentum_composite with pinned MACD_SCALE golden values.` to the rest of the system?**
-  _1020 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _1032 weakly-connected nodes found - possible documentation gaps or missing edges._

@@ -113,21 +113,34 @@ class LiveContext:
         scale-outs are handled by the engine firing reduce-only market orders.
         """
         side = _side_for_reduce(direction)
-        prot: dict[str, str] = {"direction": direction}
-        try:
-            prot["sl"] = await self._client.place_conditional(
-                symbol, side, "STOP_MARKET", trigger_price=stop_loss, close_position=True
-            )
-            prot["tp"] = await self._client.place_conditional(
-                symbol, side, "TAKE_PROFIT_MARKET", trigger_price=take_profit, close_position=True
-            )
-        except OrderError as exc:
-            # Protection failed: flatten immediately rather than hold an unprotected position.
-            log.warning("live_protection_failed", symbol=symbol, trade_id=trade_id, error=str(exc))
-            self.record("protect", {"trade_id": trade_id, "status": "failed_flattening"})
-            await self.close_position(symbol, direction)
-            return
-        self._protection[trade_id] = prot
+        # Try once, then retry once on failure before giving up — a transient reject shouldn't
+        # cost us a good entry. Only the FINAL failure flattens (never hold unprotected).
+        last_exc: OrderError | None = None
+        for attempt in range(2):
+            prot: dict[str, str] = {"direction": direction}
+            try:
+                prot["sl"] = await self._client.place_conditional(
+                    symbol, side, "STOP_MARKET", trigger_price=stop_loss, close_position=True
+                )
+                prot["tp"] = await self._client.place_conditional(
+                    symbol, side, "TAKE_PROFIT_MARKET", trigger_price=take_profit,
+                    close_position=True,
+                )
+                self._protection[trade_id] = prot
+                return
+            except OrderError as exc:
+                last_exc = exc
+                log.warning(
+                    "live_protection_attempt_failed",
+                    symbol=symbol, trade_id=trade_id, attempt=attempt, error=str(exc),
+                )
+                # An SL may have landed before the TP failed — cancel it so the retry starts clean.
+                if prot.get("sl"):
+                    await self._client.cancel_conditional(symbol, prot["sl"])
+        # Both attempts failed: flatten immediately rather than hold an unprotected position.
+        log.warning("live_protection_failed", symbol=symbol, trade_id=trade_id, error=str(last_exc))
+        self.record("protect", {"trade_id": trade_id, "status": "failed_flattening"})
+        await self.close_position(symbol, direction)
 
     async def replace_stop(
         self, trade_id: str, symbol: str, direction: str, new_stop: float
