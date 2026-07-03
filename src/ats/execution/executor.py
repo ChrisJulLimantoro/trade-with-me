@@ -9,7 +9,7 @@ from __future__ import annotations
 import uuid
 from contextvars import ContextVar
 from dataclasses import dataclass
-from datetime import datetime
+from datetime import UTC, datetime
 from typing import Any
 
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -193,6 +193,7 @@ async def record_partial_exit(
             notional_usd=notional_usd,
             entry_price=float(trade.entry_price),
             frac=partial.frac,
+            intended_price=partial.price,
         )
         leg_order_id = result.order_id if result is not None else None
     md = dict(trade.trade_metadata or {})
@@ -280,9 +281,33 @@ async def close_paper_trade(
     ctx = live_ctx.get()
     if ctx is not None and trade.venue == "binance_testnet":
         await ctx.cancel_protection(str(trade_id), trade.symbol)
-        result = await ctx.close_position(trade.symbol, trade.direction)
+        result = await ctx.close_position(
+            trade.symbol, trade.direction, intended_price=exit_result.exit_price
+        )
         if result is not None:
             trade.exit_order_id = result.order_id
+        # Reconcile the paper PnL against what the exchange actually booked for this trade —
+        # realized PnL, commissions, and any funding paid while the position was open. Purely
+        # observability; a failed income pull must never break the close.
+        try:
+            entry_dt = trade.entry_time
+            if entry_dt.tzinfo is None:
+                entry_dt = entry_dt.replace(tzinfo=UTC)
+            start_ms = int(entry_dt.timestamp() * 1000) - 60_000  # 1-min buffer for clock skew
+            costs = await ctx.client.realized_costs(trade.symbol, start_ms)
+            log.info(
+                "live_pnl_reconciled",
+                trade_id=str(trade_id),
+                paper_pnl_usd=pnl_usd,
+                realized_pnl_usd=costs["realized_pnl"],
+                commission_usd=costs["commission"],
+                funding_usd=costs["funding"],
+                net_realized_usd=round(
+                    costs["realized_pnl"] + costs["commission"] + costs["funding"], 6
+                ),
+            )
+        except Exception as exc:  # observability only — never break the close
+            log.warning("live_pnl_reconcile_failed", trade_id=str(trade_id), error=str(exc))
     trade.exit_price = exit_result.exit_price
     trade.exit_time = exit_result.exit_time
     trade.exit_reason = exit_result.exit_reason

@@ -61,6 +61,7 @@ async def reconcile_on_start(
                 await client.market_order(
                     symbol, _side_for_reduce(direction), qty, reduce_only=True
                 )
+            log.warning("live_orphan_closed", symbol=symbol, direction=direction, qty=qty)
             ctx.record("reconcile", {"symbol": symbol, "action": "closed_orphan", "qty": qty})
         elif mode == "warn":
             ctx.record("reconcile", {"symbol": symbol, "action": "warn_orphan_left_open"})
@@ -81,11 +82,44 @@ async def reconcile_on_start(
             )
 
 
-async def snapshot(ctx: LiveContext, symbol: str) -> None:
-    """Log a one-line live position snapshot (qty / entry / unrealized PnL)."""
+async def _expected_qty(session: AsyncSession, ctx: LiveContext, symbol: str) -> float:
+    """Gross qty the internal book expects to be holding on the exchange for ``symbol``.
+
+    Sum of each open live trade's original quantity (notional / entry). Scale-outs only ever
+    SHRINK the real position below this, so ``expected`` is an upper bound — drift is flagged
+    only when the exchange holds MORE than expected, or presence disagrees (see ``snapshot``).
+    """
+    trades = await open_trades_for(session, symbol)
+    total = 0.0
+    for t in trades:
+        if t.venue != "binance_testnet" or not t.notional_usd or not t.entry_price:
+            continue
+        entry = float(t.entry_price)
+        if entry > 0:
+            total += ctx.client.round_qty(symbol, float(t.notional_usd) / entry)
+    return total
+
+
+async def snapshot(ctx: LiveContext, session: AsyncSession, symbol: str) -> None:
+    """Log a one-line live position snapshot (qty / entry / uPnL) + internal-vs-exchange drift."""
     pos = await ctx.client.position_risk(symbol)
+    expected = await _expected_qty(session, ctx, symbol)
+    pos_amt = abs(float(pos.get("positionAmt", 0))) if pos else 0.0
+    # Dangerous divergences: exchange holds a position the book doesn't expect, the book
+    # expects one the exchange doesn't hold, or the exchange is BIGGER than the book (scale-outs
+    # only shrink it, so a 1% tolerance catches rounding without false-flagging partials).
+    drift = (
+        (expected == 0 and pos_amt > 0)
+        or (expected > 0 and pos_amt == 0)
+        or (pos_amt > expected * 1.01)
+    )
+    if drift:
+        log.warning(
+            "live_position_drift", symbol=symbol, exchange_qty=pos_amt,
+            expected_qty=round(expected, 6),
+        )
     if pos is None:
-        ctx.record("snapshot", {"symbol": symbol, "flat": True})
+        ctx.record("snapshot", {"symbol": symbol, "flat": True, "expected_qty": round(expected, 6)})
         return
     ctx.record(
         "snapshot",
@@ -93,6 +127,8 @@ async def snapshot(ctx: LiveContext, symbol: str) -> None:
             "ts": datetime.now(UTC).isoformat(),
             "symbol": symbol,
             "position_amt": float(pos.get("positionAmt", 0)),
+            "expected_qty": round(expected, 6),
+            "drift": drift,
             "entry_price": float(pos.get("entryPrice", 0)),
             "unrealized_pnl": float(pos.get("unRealizedProfit", 0)),
         },

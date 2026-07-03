@@ -49,28 +49,28 @@ async def run(
     async with httpx.AsyncClient(timeout=30.0) as client:
         for symbol in symbols:
             for tf in timeframes:
-                log.info("backfill_klines_start", symbol=symbol, timeframe=tf)
+                log.debug("backfill_klines_start", symbol=symbol, timeframe=tf)
                 rows = await br.fetch_klines(client, symbol, tf, start_ms, end_ms)
                 count = await br.upsert_candles(session, symbol, tf, rows)
-                log.info("backfill_klines_done", symbol=symbol, timeframe=tf, rows=count)
+                log.debug("backfill_klines_done", symbol=symbol, timeframe=tf, rows=count)
                 await upsert_heartbeat(session, f"kline_{tf}", "ok")
 
-            log.info("backfill_funding_start", symbol=symbol)
+            log.debug("backfill_funding_start", symbol=symbol)
             funding_rows = await br.fetch_funding(client, symbol)
             count = await br.upsert_funding(session, symbol, funding_rows)
-            log.info("backfill_funding_done", symbol=symbol, rows=count)
+            log.debug("backfill_funding_done", symbol=symbol, rows=count)
             await upsert_heartbeat(session, "funding", "ok")
 
-            log.info("backfill_oi_start", symbol=symbol)
+            log.debug("backfill_oi_start", symbol=symbol)
             oi_row = await br.fetch_open_interest(client, symbol)
             await br.upsert_open_interest(session, symbol, oi_row)
-            log.info("backfill_oi_done", symbol=symbol)
+            log.debug("backfill_oi_done", symbol=symbol)
             await upsert_heartbeat(session, "open_int", "ok")
 
-            log.info("backfill_basis_start", symbol=symbol)
+            log.debug("backfill_basis_start", symbol=symbol)
             basis_row = await br.fetch_premium_index(client, symbol)
             await br.upsert_basis(session, symbol, basis_row)
-            log.info("backfill_basis_done", symbol=symbol)
+            log.debug("backfill_basis_done", symbol=symbol)
             await upsert_heartbeat(session, "basis", "ok")
 
     # Cross-venue funding (Bybit/OKX/Hyperliquid) — historical, powers funding_divergence.

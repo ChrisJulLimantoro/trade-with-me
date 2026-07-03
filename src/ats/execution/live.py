@@ -77,15 +77,30 @@ class LiveContext:
             log.warning("live_open_below_min", symbol=symbol, notional=notional_usd)
             return None
         try:
+            acct = await self._client.account_state()
+            if acct:
+                log.info(
+                    "live_account_state",
+                    symbol=symbol,
+                    leverage=leverage,
+                    notional_usd=notional_usd,
+                    wallet_balance=acct.get("wallet_balance"),
+                    available_balance=acct.get("available_balance"),
+                )
             if leverage is not None:
                 await self._client.set_leverage(symbol, int(leverage))
-            return await self._client.market_order(symbol, _side_for_open(direction), qty)
+            return await self._client.market_order(
+                symbol, _side_for_open(direction), qty, intended_price=entry_price
+            )
         except OrderError as exc:
-            log.warning("live_open_rejected", symbol=symbol, error=str(exc))
+            log.warning(
+                "live_open_rejected", symbol=symbol, qty=qty, notional=notional_usd, error=str(exc)
+            )
             return None
 
     async def reduce_position(
-        self, symbol: str, direction: str, *, notional_usd: float, entry_price: float, frac: float
+        self, symbol: str, direction: str, *, notional_usd: float, entry_price: float, frac: float,
+        intended_price: float | None = None,
     ) -> OrderResult | None:
         """Scale out ``frac`` of the original position with a reduce-only market order."""
         await self._client.load_filters(symbol)
@@ -95,7 +110,8 @@ class LiveContext:
             return None
         try:
             return await self._client.market_order(
-                symbol, _side_for_reduce(direction), qty, reduce_only=True
+                symbol, _side_for_reduce(direction), qty, reduce_only=True,
+                intended_price=intended_price,
             )
         except OrderError as exc:
             log.warning("live_reduce_rejected", symbol=symbol, error=str(exc))
@@ -127,6 +143,15 @@ class LiveContext:
                     close_position=True,
                 )
                 self._protection[trade_id] = prot
+                log.info(
+                    "live_protection_placed",
+                    symbol=symbol,
+                    trade_id=trade_id,
+                    sl_id=prot.get("sl"),
+                    sl_trigger=stop_loss,
+                    tp_id=prot.get("tp"),
+                    tp_trigger=take_profit,
+                )
                 return
             except OrderError as exc:
                 last_exc = exc
@@ -138,7 +163,14 @@ class LiveContext:
                 if prot.get("sl"):
                     await self._client.cancel_conditional(symbol, prot["sl"])
         # Both attempts failed: flatten immediately rather than hold an unprotected position.
-        log.warning("live_protection_failed", symbol=symbol, trade_id=trade_id, error=str(last_exc))
+        log.warning(
+            "live_protection_failed",
+            symbol=symbol,
+            trade_id=trade_id,
+            stop_loss=stop_loss,
+            take_profit=take_profit,
+            error=str(last_exc),
+        )
         self.record("protect", {"trade_id": trade_id, "status": "failed_flattening"})
         await self.close_position(symbol, direction)
 
@@ -158,6 +190,13 @@ class LiveContext:
                 trigger_price=new_stop, close_position=True,
             )
             self._protection[trade_id] = prot
+            log.info(
+                "live_stop_replaced",
+                symbol=symbol,
+                trade_id=trade_id,
+                new_stop=new_stop,
+                sl_id=prot.get("sl"),
+            )
         except OrderError as exc:
             log.warning("live_replace_stop_failed", symbol=symbol, trade_id=trade_id, error=str(exc))
 
@@ -171,7 +210,9 @@ class LiveContext:
             if algo_id:
                 await self._client.cancel_conditional(symbol, algo_id)
 
-    async def close_position(self, symbol: str, direction: str) -> OrderResult | None:
+    async def close_position(
+        self, symbol: str, direction: str, *, intended_price: float | None = None
+    ) -> OrderResult | None:
         """Close the FULL remaining exchange position (reduce-only), querying live size."""
         pos = await self._client.position_risk(symbol)
         if pos is None:
@@ -183,7 +224,8 @@ class LiveContext:
             return None
         try:
             return await self._client.market_order(
-                symbol, _side_for_reduce(direction), qty, reduce_only=True
+                symbol, _side_for_reduce(direction), qty, reduce_only=True,
+                intended_price=intended_price,
             )
         except OrderError as exc:
             log.warning("live_close_rejected", symbol=symbol, error=str(exc))

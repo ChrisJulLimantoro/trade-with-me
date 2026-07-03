@@ -12,6 +12,7 @@ or crash (see ``execution.executor`` / the live order jsonl).
 from __future__ import annotations
 
 import math
+import time
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -171,12 +172,59 @@ class BinanceFuturesTestnet:
     async def open_orders(self, symbol: str) -> list[dict[str, Any]]:
         return await self._client.futures_get_open_orders(symbol=symbol)
 
+    async def account_state(self) -> dict[str, float]:
+        """USDT wallet + available balance, for a pre-entry margin check. Never raises."""
+        try:
+            rows = await self._client.futures_account_balance()
+        except BinanceAPIException as exc:
+            log.warning("live_account_state_failed", error=str(exc))
+            return {}
+        for r in rows:
+            if r.get("asset") == "USDT":
+                return {
+                    "wallet_balance": float(r.get("balance", 0) or 0),
+                    "available_balance": float(r.get("availableBalance", 0) or 0),
+                }
+        return {}
+
+    async def realized_costs(self, symbol: str, start_ms: int) -> dict[str, float]:
+        """Sum REALIZED_PNL / COMMISSION / FUNDING_FEE income since ``start_ms``. Never raises."""
+        out = {"realized_pnl": 0.0, "commission": 0.0, "funding": 0.0}
+        try:
+            rows = await self._client.futures_income_history(
+                symbol=symbol, startTime=start_ms, limit=1000
+            )
+        except BinanceAPIException as exc:
+            log.warning("live_realized_costs_failed", symbol=symbol, error=str(exc))
+            return out
+        for r in rows:
+            kind = r.get("incomeType")
+            val = float(r.get("income", 0) or 0)
+            if kind == "REALIZED_PNL":
+                out["realized_pnl"] += val
+            elif kind == "COMMISSION":
+                out["commission"] += val
+            elif kind == "FUNDING_FEE":
+                out["funding"] += val
+        return {k: round(v, 6) for k, v in out.items()}
+
     # --- order placement --------------------------------------------------------------
 
     async def market_order(
-        self, symbol: str, side: str, qty: float, *, reduce_only: bool = False
+        self,
+        symbol: str,
+        side: str,
+        qty: float,
+        *,
+        reduce_only: bool = False,
+        intended_price: float | None = None,
     ) -> OrderResult:
-        """Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill."""
+        """Place a MARKET order. ``side`` is 'BUY'/'SELL'. Returns the normalized fill.
+
+        ``intended_price`` is the price the engine expected to trade at (entry / TP / exit). When
+        given, execution quality is logged: signed ``slippage_bps`` (positive = worse than
+        intended for this ``side``) plus requested-vs-executed qty and round-trip ``latency_ms``.
+        """
         params: dict[str, Any] = {
             "symbol": symbol,
             "side": side,
@@ -188,11 +236,13 @@ class BinanceFuturesTestnet:
             params["reduceOnly"] = "true"
         action = "close" if reduce_only else "open"
         self._record(action, {"request": params, "status": "submitting"})
+        t0 = time.perf_counter()
         try:
             resp = await self._client.futures_create_order(**params)
         except BinanceAPIException as exc:
             self._record(action, {"request": params, "status": "rejected", "error": str(exc)})
             raise OrderError(f"market_order {side} {qty} {symbol} rejected: {exc}") from exc
+        latency_ms = round((time.perf_counter() - t0) * 1000, 1)
         avg = float(resp.get("avgPrice") or 0.0)
         if avg == 0.0:
             executed = float(resp.get("executedQty") or 0.0)
@@ -206,6 +256,11 @@ class BinanceFuturesTestnet:
             status=str(resp.get("status", "")),
             raw=resp,
         )
+        # Signed adverse slippage: BUY is worse when it fills ABOVE intended, SELL when BELOW.
+        slippage_bps: float | None = None
+        if intended_price and intended_price > 0 and avg > 0:
+            diff = (avg - intended_price) if side == "BUY" else (intended_price - avg)
+            slippage_bps = round(diff / intended_price * 1e4, 2)
         self._record(
             action,
             {
@@ -213,6 +268,9 @@ class BinanceFuturesTestnet:
                 "status": result.status,
                 "order_id": result.order_id,
                 "fill_price": result.avg_price,
+                "intended_price": intended_price,
+                "slippage_bps": slippage_bps,
+                "latency_ms": latency_ms,
             },
         )
         log.info(
@@ -220,9 +278,13 @@ class BinanceFuturesTestnet:
             action=action,
             symbol=symbol,
             side=side,
-            qty=result.qty,
+            requested_qty=qty,
+            executed_qty=result.qty,
             order_id=result.order_id,
+            intended_price=intended_price,
             fill=result.avg_price,
+            slippage_bps=slippage_bps,
+            latency_ms=latency_ms,
             status=result.status,
         )
         return result
@@ -257,8 +319,10 @@ class BinanceFuturesTestnet:
             "type": order_type,
             "workingType": working_type,
         }
+        sent_trigger: float | None = None
         if trigger_price is not None:
-            params["triggerPrice"] = self.round_price(symbol, trigger_price)
+            sent_trigger = self.round_price(symbol, trigger_price)
+            params["triggerPrice"] = sent_trigger
         if close_position:
             params["closePosition"] = "true"
         else:
@@ -275,6 +339,20 @@ class BinanceFuturesTestnet:
             resp = await self._client.futures_create_algo_order(**params)
         except BinanceAPIException as exc:
             self._record("protect", {"request": params, "status": "rejected", "error": str(exc)})
+            # Surface the exact price we sent + the tick it should have snapped to, so a -1111
+            # "Precision is over the maximum" reject is diagnosable from a single line.
+            f = self._filters.get(symbol)
+            tick = f.tick_size if f else None
+            log.warning(
+                "live_conditional_rejected",
+                symbol=symbol,
+                type=order_type,
+                raw_trigger=trigger_price,
+                sent_trigger=sent_trigger,
+                tick_size=tick,
+                tick_decimals=(max(0, -int(math.floor(math.log10(tick)))) if tick else None),
+                error=str(exc),
+            )
             raise OrderError(f"conditional {order_type} {symbol} rejected: {exc}") from exc
         algo_id = str(resp.get("algoId") or resp.get("orderId") or "")
         self._record(

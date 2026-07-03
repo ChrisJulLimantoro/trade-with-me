@@ -100,7 +100,7 @@ async def _consume_klines(
             await refresh_fn()
             async with session_factory() as session:
                 tick = await run_tick(session, client, symbol=symbol, tf=tf)
-            await snapshot_in_session(ctx, symbol)
+            await snapshot_in_session(ctx, session_factory, symbol)
             log.info(
                 "live_ws_tick",
                 symbol=symbol,
@@ -114,9 +114,12 @@ async def _consume_klines(
                 return
 
 
-async def snapshot_in_session(ctx: LiveContext, symbol: str) -> None:
+async def snapshot_in_session(
+    ctx: LiveContext, session_factory: Callable[[], AsyncSession], symbol: str
+) -> None:
     try:
-        await snapshot(ctx, symbol)
+        async with session_factory() as session:
+            await snapshot(ctx, session, symbol)
     except Exception as exc:  # snapshot is observability only — never break the loop
         log.warning("live_ws_snapshot_failed", symbol=symbol, error=str(exc))
 
