@@ -317,6 +317,73 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "observe_only_on_health": True,
         },
     },
+    # Swing: the STRUCTURAL OPPOSITE of the scalper. Where the scalper takes small, fast,
+    # tight trades and scalps runners out on the first wobble, the swing profile trades
+    # rarely, holds for multi-hour→multi-day trend legs, aims at a FAR conservative target,
+    # and protects the runner with a WIDE, SLOW trail instead of an early breakeven choke.
+    # The intended edge is different in shape: capture the meat of a trend leg, not the noise.
+    #
+    # Seed only (Iteration 0 in docs/ITERATION_SWING.md) — the loop tunes from here. Same
+    # $1,000 book as `scalper` so the equity curves / drawdowns are directly comparable.
+    "swing": {
+        "risk": {
+            "paper_equity_usd": 1_000.0,      # same book as scalper → comparable curves
+            "max_leverage": 10.0,             # wide stops need far less leverage than the scalper's 20x
+            "risk_per_trade_pct": 0.02,       # ~2% of equity risked per stop-out
+            "max_margin_pct_per_trade": 0.20,
+            "max_total_margin_pct": 0.60,
+            "max_portfolio_risk_pct": 0.06,
+            # Entry is a resting limit (wick_limit) → maker-in fill, same honest round-trip
+            # cost model the scalper validated: maker-in (2bps,0slip)+taker-out(5bps,2slip)=9bps,
+            # split symmetrically as 4.5/1.0 per leg → set 3.5/1.0 (rounded as scalper does).
+            "fee_bps": 3.5,
+            "slippage_bps": 1.0,
+            "min_rr": 2.0,                    # a far target demands ≥2:1 geometry to qualify
+            "min_stop_atr_mult": 1.5,         # WIDE stop: give the swing room to breathe through noise
+            "reward_atr_mult": 4.0,           # FAR, conservative take-profit (a trend-leg target)
+            "entry_pullback_atr_frac": 0.5,   # deeper pullback → better price near local exhaustion
+        },
+        "plan": {
+            "max_setups_per_plan": 2,
+            "plan_refresh_bars": 16,          # ~4h; patient — don't churn plans every bar
+            "signal_min_confidence": 0.60,    # quality filter for the (rarer) swing entries
+            "entry_confirmation_enabled": False,
+            "htf_trend_filter": True,         # trade WITH the 4h trend — the whole point is trend legs
+            # Iter 3/4 (NEW mechanism, ACCEPTED): stand aside when the 4h slow-EMA stack is flatter
+            # than this (|ema_50−ema_200|/ema_200) — no established trend, so a trend-swing has no
+            # edge. BTC's stack is structurally tight (TRAIN median 0.022) vs ETH 0.084 / SOL 0.057,
+            # so an ABSOLUTE floor discriminates per-symbol. 0.012 filters BTC's worst chop quartile
+            # while touching only ETH ~p9 / SOL ~p11 — best VALIDATION robustness.
+            # Iter 5 (REJECTED): the aggressive 0.02 + a momentum escape (swing_trend_strength_mom_
+            # escape). Analysis showed momentum_composite does NOT separate BTC chop from ETH early
+            # trends (both ~77% of gated bars have |mom−0.5|≥0.10), so the escape unblocks BTC chop
+            # too — BTC back to −$210, VAL −$258→−$328. Escape mechanism left in code but OFF here.
+            "swing_trend_strength_min": 0.012,
+            "counter_trend_on_htf_exhaustion": False,
+            "sideways_block_longs": True,     # trend-pullback longs have no edge in chop
+            "sideways_block_shorts": False,   # keep the with-bias short side for trade volume
+            "mr_enabled": False,              # mean-reversion is a scalp mechanism — off for swing
+        },
+        "exits": {
+            "max_hold_bars": 96,              # ~24h on 15m — swings marinate (vs scalper's 8 = ~2h)
+            "scale_out_frac": 0.33,           # bank a third at TP1, RIDE the majority of the leg
+            "trail_atr_mult": 3.0,            # WIDE, slow trail — protect the runner loosely
+            # Exit posture is the iter0 seed (breakeven park + wide 3.0-ATR chandelier). Iter 1
+            # (breakeven_lock_atr 0.5) and Iter 2 (early_stop_mode="trail") were knob changes that
+            # BOTH degraded TRAIN money-makers by clipping runners — the breakeven park maximizes
+            # runner capture (zero giveback until +3.0 ATR), only scratching round-trippers to 0.
+            # Kept as the baseline; profitability is attacked via new entry-quality mechanisms below.
+            "early_stop_mode": "breakeven",
+            "breakeven_arm_atr": 1.5,         # arm no-loss LATE (vs scalper 0.50) so the leg can develop
+            "breakeven_arm_cost_mult": 1.0,
+            "breakeven_lock_atr": 0.0,        # park at breakeven; let the wide trail do the harvesting
+            "sideways_early_stop_mode": "breakeven",
+            "sideways_exit_mode": "trend",
+        },
+        "observer": {
+            "observe_enabled": False,         # deterministic replay, no LLM exit manager
+        },
+    },
 }
 
 

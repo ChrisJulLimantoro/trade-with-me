@@ -8,11 +8,41 @@ from ats import config
 from ats.engine import state
 from ats.learning.retrieval import retrieve_memory_summary
 from ats.planning.context import (
+    _htf_momentum,
+    _htf_trend_strength,
     build_exhaustion_context,
     build_structure_context,
     build_volume_context,
     preferred_direction,
 )
+
+
+def _htf(tf: str, **feats) -> dict:
+    return {tf: {"features": feats}}
+
+
+def test_htf_trend_strength_is_normalized_ema_separation() -> None:
+    # |ema_50 - ema_200| / ema_200 on the 4h chart.
+    htf = _htf("4h", ema_50=110.0, ema_200=100.0)
+    assert _htf_trend_strength(htf) == pytest.approx(0.10)
+    # Flat/coiled stack → ~0 (would be gated by the swing trend-strength floor).
+    assert _htf_trend_strength(_htf("4h", ema_50=100.5, ema_200=100.0)) == pytest.approx(0.005)
+
+
+def test_htf_trend_strength_prefers_4h_then_falls_back_to_1h() -> None:
+    both = {"4h": {"features": {"ema_50": 130.0, "ema_200": 100.0}},
+            "1h": {"features": {"ema_50": 105.0, "ema_200": 100.0}}}
+    assert _htf_trend_strength(both) == pytest.approx(0.30)  # 4h wins
+    assert _htf_trend_strength(_htf("1h", ema_50=105.0, ema_200=100.0)) == pytest.approx(0.05)
+    assert _htf_trend_strength(_htf("4h", ema_50=None, ema_200=None)) is None
+
+
+def test_htf_momentum_is_recentred_composite() -> None:
+    # momentum_composite in [0,1]; recentred to [-0.5, +0.5] (sign = drive direction).
+    assert _htf_momentum(_htf("4h", momentum_composite=0.8)) == pytest.approx(0.30)
+    assert _htf_momentum(_htf("4h", momentum_composite=0.2)) == pytest.approx(-0.30)
+    assert _htf_momentum(_htf("4h", momentum_composite=0.5)) == pytest.approx(0.0)
+    assert _htf_momentum({"4h": {"features": {}}}) is None
 from ats.planning.create_plan import build_envelope
 
 

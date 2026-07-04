@@ -27,8 +27,10 @@ from ats.llm.client import Adjudicator
 from ats.llm.schemas import InvalidationRule, LlmResult, PlanOutput, SetupOutput
 from ats.logging import get_logger
 from ats.planning.context import (
+    _htf_momentum,
     _htf_rsi_state,
     _htf_trend,
+    _htf_trend_strength,
     build_planner_context,
     preferred_direction,
 )
@@ -296,6 +298,36 @@ async def build_envelope(
         log.info(
             "htf_trend_filter", htf_trend=htf_trend, allowed_directions=allowed_directions
         )
+
+    # Swing trend-strength gate (NEW, swing-only; default 0.0 = OFF): stand aside entirely when
+    # the 4h slow-EMA stack is too flat/coiled to be an established trend. A trend-swing has no
+    # edge in choppy drift — the dominant loss bucket — so below the strength floor NO direction
+    # is allowed that bar. Additive-safe for every other profile (0.0 short-circuits). Placed
+    # before the sideways/HTF direction trims so a weak-trend bar is skipped regardless of them.
+    if settings.plan.swing_trend_strength_min > 0.0 and allowed_directions:
+        strength = _htf_trend_strength(higher_timeframes)
+        if strength is not None and strength < settings.plan.swing_trend_strength_min:
+            # Momentum escape: spare an early-but-accelerating trend (weak EMA separation yet
+            # decisive higher-tf momentum) so the strength floor can run aggressive without
+            # amputating fast symbols' coiled legs. 0.0 escape = no exception (pure separation gate).
+            mom = (
+                _htf_momentum(higher_timeframes)
+                if settings.plan.swing_trend_strength_mom_escape > 0.0
+                else None
+            )
+            escaped = (
+                mom is not None
+                and abs(mom) >= settings.plan.swing_trend_strength_mom_escape
+            )
+            if not escaped:
+                log.info(
+                    "swing_trend_strength_gate",
+                    strength=round(strength, 5),
+                    min=settings.plan.swing_trend_strength_min,
+                    momentum=round(mom, 4) if mom is not None else None,
+                    allowed_directions=[],
+                )
+                allowed_directions = []
 
     # Sideways long gate: a trend-pullback strategy has no long edge in low-vol chop. Drop
     # longs in any "side-*" regime so the engine only takes the (with-trend) short side there.

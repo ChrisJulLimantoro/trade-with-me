@@ -245,6 +245,24 @@ class PlanConfig(BaseModel):
     # adds the missing "the world changed" trigger while a plan rests with no open position.
     # The timer / expires_at stay as a backstop.
     replan_on_regime_change: bool = False
+    # Swing trend-strength entry gate (NEW mechanism, default OFF — swing profile only). A
+    # trend-swing profile has no edge in flat/choppy drift (the dominant loss bucket is weak-
+    # "trend" pullback entries that whipsaw). When > 0.0, plan-time entries are permitted ONLY
+    # when the 4h slow-EMA stack is separated by at least this fraction:
+    # ``|ema_50 - ema_200| / ema_200 >= swing_trend_strength_min`` on the most-recent CLOSED 4h
+    # bar (fully causal). Below it the 4h trend is judged too weak/flat and NO direction is
+    # allowed that bar (stand aside). This "trades less, only in established trends" — 0.0 keeps
+    # every other profile byte-unchanged.
+    swing_trend_strength_min: float = 0.0
+    # Momentum escape for the swing trend-strength gate (default 0.0 = OFF; swing only). The raw
+    # EMA-separation gate filters flat chop well but a single ABSOLUTE floor also catches a fast
+    # symbol's EARLY trend, where the slow EMA stack hasn't fanned out yet but momentum is already
+    # decisive (ETH's coiled-but-accelerating legs). When > 0.0, a bar that would be gated for weak
+    # separation is SPARED if the higher-tf ``momentum_composite`` is decisively directional —
+    # ``|momentum_composite - 0.5| >= swing_trend_strength_mom_escape`` on the most-recent CLOSED 4h
+    # (then 1h) bar. This lets the strength floor run aggressive (kills dead chop) without amputating
+    # early-trend entries. Requires ``swing_trend_strength_min > 0`` to have any effect.
+    swing_trend_strength_mom_escape: float = 0.0
     # Higher-timeframe trend filter (default OFF). When on, the plan-time allowed_directions
     # gate also drops the direction that fights the higher-timeframe (4h, then 1h) trend —
     # no longs when the 4h close is below its EMA50 with MACD negative, no shorts in the

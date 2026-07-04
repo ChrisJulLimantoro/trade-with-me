@@ -233,6 +233,41 @@ def _htf_trend(higher_timeframes: dict[str, Any]) -> str | None:
     return None
 
 
+def _htf_trend_strength(higher_timeframes: dict[str, Any]) -> float | None:
+    """Normalized 4h (then 1h) slow-EMA-stack separation — a causal trend-strength proxy.
+
+    Returns ``|ema_50 - ema_200| / ema_200`` from the most-recent CLOSED higher-tf bar: ~0 when
+    the stack is flat/coiled (choppy drift, no established trend), rising as the trend extends and
+    the EMAs fan apart. Magnitude only (direction is handled by :func:`_htf_trend`). ``None`` when
+    neither chart has a warm ema_200 yet. Used by the swing trend-strength entry gate to stand
+    aside in weak trends. Purely a function of closed higher-tf features — no look-ahead.
+    """
+    for tf in ("4h", "1h"):
+        feats = ((higher_timeframes.get(tf) or {}).get("features")) or {}
+        ema50 = _f(feats.get("ema_50"))
+        ema200 = _f(feats.get("ema_200"))
+        if ema50 is None or ema200 is None or ema200 == 0:
+            continue
+        return abs(ema50 - ema200) / abs(ema200)
+    return None
+
+
+def _htf_momentum(higher_timeframes: dict[str, Any]) -> float | None:
+    """Signed higher-tf momentum in [-0.5, +0.5] — ``momentum_composite - 0.5`` (4h, then 1h).
+
+    ``momentum_composite`` is a symbol-agnostic [0,1] blend (0.5 neutral), so the recentred value
+    is directly comparable across coins: > 0 = bullish drive, < 0 = bearish. Used by the swing
+    trend-strength gate's momentum escape to spare an early-but-accelerating trend. Causal (a
+    closed higher-tf feature). ``None`` when neither chart has it yet.
+    """
+    for tf in ("4h", "1h"):
+        feats = ((higher_timeframes.get(tf) or {}).get("features")) or {}
+        mc = _f(feats.get("momentum_composite"))
+        if mc is not None:
+            return mc - 0.5
+    return None
+
+
 def preferred_direction(
     regime_cell: str | None,
     exhaustion_ctx: dict[str, Any],
