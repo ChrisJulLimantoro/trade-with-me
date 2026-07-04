@@ -172,6 +172,7 @@ class ObserverConfig(BaseModel):
 class PlanConfig(BaseModel):
     """Planning / strategist / entry-gate knobs and re-plan discipline."""
 
+    decision_timeframe: str = "15m"
     # Minimum synthesized confidence for the deterministic proposer to emit a setup, and the
     # floor the adjudicated (post-delta) confidence must still clear or the trade is vetoed.
     signal_min_confidence: float = 0.55

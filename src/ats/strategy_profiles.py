@@ -108,6 +108,13 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
         },
         "plan": {
             "max_setups_per_plan": 3,
+            # Decision timeframe (entry/exit monitoring cadence) FINER than the plan tf (15m):
+            # the planner thinks on 15m bars, the engine monitors entries/exits every 5m bar.
+            # Plans refresh on 15m boundaries (every plan_refresh_bars=6 → 1.5h, unchanged);
+            # max_hold_bars=8 counts in DECISION-tf bars → 8×5m = 40min hold (was 8×15m = 2h).
+            # The hold-horizon change is part of the planned scalper re-baseline under the new
+            # finer entry tf; re-tune max_hold_bars on the new baseline if the 40min cap clips.
+            "decision_timeframe": "5m",
             # Iter 7: replan every ~3h (was 6/~1.5h). The fast 6-bar churn re-created plans
             # constantly and fed marginal entries; slow it back down so only fresh, qualified
             # setups fire.
@@ -308,7 +315,7 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "replan_on_regime_change": True,
         },
         "exits": {
-            "max_hold_bars": 8,            # ~2h on 15m; scalps don't marinate (>0 = time-stop ON)
+            "max_hold_bars": 24,            # ~2h on 15m; scalps don't marinate (>0 = time-stop ON)
             "trail_atr_mult": 1.0,
             "scale_out_frac": 0.5,
         },
@@ -345,6 +352,15 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
         },
         "plan": {
             "max_setups_per_plan": 2,
+            # Decision timeframe (entry/exit monitoring cadence) FINER than the plan tf (1h):
+            # the planner thinks on 1h bars, the engine monitors entries/exits every 15m bar.
+            # Plans refresh on 1h boundaries (every plan_refresh_bars=16 → 16h, patient);
+            # max_hold_bars=96 counts in DECISION-tf bars → 96×15m = 24h hold (unchanged from
+            # the 15m-only era, preserving the iter4 calibration). The plan/decision split
+            # removes the iter10 1h-only trade-count collapse (49/coin < 75 floor): entries
+            # fire on the 4× denser 15m cadence while the planner still reasons on confirmed
+            # 1h closes (iter10's healthier trail/tp shape — +15%/+38% vs +10%/+30%).
+            "decision_timeframe": "15m",
             "plan_refresh_bars": 16,          # ~4h; patient — don't churn plans every bar
             "signal_min_confidence": 0.60,    # quality filter for the (rarer) swing entries
             "entry_confirmation_enabled": False,

@@ -9,7 +9,7 @@ from __future__ import annotations
 
 import asyncio
 from collections.abc import Awaitable, Callable
-from datetime import datetime
+from datetime import UTC, datetime, timedelta
 
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
@@ -25,6 +25,21 @@ from ats.logging import get_logger
 from ats.planning.create_plan import create_plan
 
 log = get_logger(__name__)
+
+
+def _plan_bar_open(now: datetime, plan_dt: timedelta) -> datetime:
+    """Open_time of the most-recent CLOSED plan-tf bar as of ``now`` (UTC, epoch-aligned).
+
+    Crypto bars are epoch-aligned to the bar length, so the bar with ``open_time = T`` closes at
+    ``T + plan_dt``. As of ``now`` the most-recent CLOSED plan-tf bar has
+    ``open_time = floor(now / plan_dt) * plan_dt - plan_dt``: at ``now = 02:15`` on 1h bars that's
+    the 01:00 bar (closed at 02:00); at ``now = 02:00`` exactly that's still the 01:00 bar. Used by
+    the hybrid plan/decision split to detect plan-tf boundaries from finer decision-tf rows.
+    """
+    bar_s = int(plan_dt.total_seconds())
+    epoch = int(now.timestamp())
+    last_closed_epoch = (epoch // bar_s) * bar_s - bar_s
+    return datetime.fromtimestamp(last_closed_epoch, tz=UTC)
 
 
 # Per-bar status notes that persist across many consecutive bars. We collapse these
@@ -91,12 +106,18 @@ async def _ensure_plan(
     now: datetime,
     bars_since_plan: int,
     run_id: str | None = None,
+    crossed_plan_boundary: bool = True,
 ) -> tuple[bool, int, int]:
     """Refresh the plan if there is none, it expired, or the refresh cadence elapsed.
 
     Never refreshes while a position is open: re-thinking the thesis mid-trade is the
     exit manager's / invalidation rules' job, not the strategist's, and a plan built
     while holding would be discarded unused (entries are blocked) — wasting an LLM call.
+
+    ``bars_since_plan`` counts in PLAN-tf bars: under the hybrid plan/decision split it is only
+    incremented when ``crossed_plan_boundary`` is True (a new plan-tf bar just closed), so
+    ``plan_refresh_bars`` keeps its plan-tf semantics regardless of the decision tf. Defaults True
+    so the single-tf path (caller walks plan-tf rows, every row is a boundary) is byte-unchanged.
 
     Returns (created, bars_since_plan, setup_count).
     """
@@ -118,7 +139,7 @@ async def _ensure_plan(
     if stale:
         result = await create_plan(session, client, symbol=symbol, tf=tf, as_of=now, run_id=run_id)
         return True, 0, len(result.setups)
-    return False, bars_since_plan + 1, 0
+    return False, (bars_since_plan + 1) if crossed_plan_boundary else bars_since_plan, 0
 
 
 async def run_replay(
@@ -130,21 +151,33 @@ async def run_replay(
     since: datetime,
     until: datetime | None = None,
     run: RunTag | None = None,
+    decision_tf: str | None = None,
 ) -> ReplayReport:
     """Walk historical feature rows, running the full loop on each as if live.
 
     ``run`` tags every trade opened during the walk (run_id / run_label / config_hash) so
     overlapping replay windows stay isolated and A/B-comparable.
+
+    ``tf`` is the PLAN timeframe (planner cadence + plan features). ``decision_tf`` (defaults to
+    ``tf`` for the historic single-tf behavior) is the DECISION timeframe — the bar cadence the
+    replay walks and on which ``evaluate_now`` runs (entry detection + exit reconciliation). When
+    set finer than ``tf``, plans refresh on ``tf`` boundaries (every ``plan_refresh_bars`` plan-tf
+    bars) while entries/exits monitor every decision-tf bar. ``max_hold_bars`` counts in
+    decision-tf bars.
     """
-    rows = await state.feature_rows_since(session, symbol, tf, since, until=until)
-    report = ReplayReport(symbol=symbol, timeframe=tf)
+    dec_tf = decision_tf or tf
+    rows = await state.feature_rows_since(session, symbol, dec_tf, since, until=until)
+    report = ReplayReport(symbol=symbol, timeframe=dec_tf)
     if not rows:
         report.notes.append("no feature rows in window")
         return report
 
     token = current_run.set(run)
     try:
-        return await _walk_replay(session, client, symbol=symbol, tf=tf, rows=rows, report=report)
+        return await _walk_replay(
+            session, client, symbol=symbol, plan_tf=tf, decision_tf=dec_tf,
+            rows=rows, report=report,
+        )
     finally:
         current_run.reset(token)
 
@@ -154,7 +187,8 @@ async def _walk_replay(
     client: LlmClient,
     *,
     symbol: str,
-    tf: str,
+    plan_tf: str,
+    decision_tf: str,
     rows: list,
     report: ReplayReport,
 ) -> ReplayReport:
@@ -164,8 +198,14 @@ async def _walk_replay(
     active_sticky: str | None = None
     running_equity = settings.risk.paper_equity_usd
     observe_tf = settings.observer.observe_timeframe
-    base_dt = timeframe_to_timedelta(tf)
-    obs_dt = timeframe_to_timedelta(observe_tf) if observe_tf != tf else base_dt
+    base_dt = timeframe_to_timedelta(decision_tf)
+    obs_dt = timeframe_to_timedelta(observe_tf) if observe_tf != decision_tf else base_dt
+    # Hybrid plan/decision split: detect plan-tf boundaries from the (finer) decision-tf rows so
+    # `plan_refresh_bars` keeps its plan-tf semantics. When decision_tf == plan_tf every decision
+    # row IS a plan-tf boundary (crossed=True each tick), preserving the historic single-tf path.
+    plan_dt = timeframe_to_timedelta(plan_tf)
+    hybrid = decision_tf != plan_tf
+    last_plan_bar: datetime | None = None
     for i, row in enumerate(rows):
         now = row["open_time"]
         prev = rows[i - 1] if i > 0 else None
@@ -178,21 +218,31 @@ async def _walk_replay(
         # now+base_dt-obs_dt includes the last sub-candle and excludes the next bar's open.
         open_before = bool(await state.open_positions(session, symbol=symbol, run_id=run_id))
         fine_candles = None
-        if open_before and prev is not None and observe_tf != tf:
+        if open_before and prev is not None and observe_tf != decision_tf:
             fine_candles = await state.candles_between(
                 session, symbol, observe_tf, now - obs_dt, now + base_dt - obs_dt
             )
 
+        # Plan-tf boundary detection: a new plan-tf bar has closed since the last row when the
+        # most-recent-closed plan-tf bar's open_time advanced. On the first row `last_plan_bar`
+        # is None → treat as a boundary so a plan is forced immediately.
+        crossed_plan_boundary = True
+        if hybrid:
+            current_plan_bar = _plan_bar_open(now, plan_dt)
+            crossed_plan_boundary = last_plan_bar is None or current_plan_bar != last_plan_bar
+            if crossed_plan_boundary:
+                last_plan_bar = current_plan_bar
+
         created, bars_since_plan, setup_count = await _ensure_plan(
-            session, client, symbol=symbol, tf=tf, now=now, bars_since_plan=bars_since_plan,
-            run_id=run_id,
+            session, client, symbol=symbol, tf=plan_tf, now=now, bars_since_plan=bars_since_plan,
+            run_id=run_id, crossed_plan_boundary=crossed_plan_boundary,
         )
         if created:
             report.plans_created += 1
             if setup_count > 0:
                 report.plans_with_setups += 1
         tick = await evaluate_now(
-            session, client, symbol=symbol, tf=tf, feature_row=row, prev_row=prev,
+            session, client, symbol=symbol, tf=decision_tf, feature_row=row, prev_row=prev,
             candle_closed=True, now=now, fine_candles=fine_candles, run_id=run_id,
             equity_usd=running_equity,
         )

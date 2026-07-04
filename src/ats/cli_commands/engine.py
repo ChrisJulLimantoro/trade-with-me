@@ -135,6 +135,15 @@ def replay(
         "unique run_id + this label + a config hash for the A/B harness "
         "(see 'ats trades runs' / 'ats trades compare').",
     ),
+    decision_timeframe: str = typer.Option(
+        None,
+        "--decision-timeframe",
+        help="Decision timeframe (entry/exit monitoring cadence). Defaults to --timeframe "
+        "(the historic single-tf behavior) or the profile's plan.decision_timeframe when set. "
+        "When finer than --timeframe, plans refresh on --timeframe boundaries while "
+        "entries/exits monitor every decision-tf bar (e.g. scalper plan 15m/decide 5m, "
+        "swing plan 1h/decide 15m).",
+    ),
 ) -> None:
     """Replay the full loop over historical features (the primary POC demo)."""
     import hashlib
@@ -159,12 +168,20 @@ def replay(
         applied = apply_profile(profile)
     except (KeyError, AttributeError) as exc:
         raise typer.BadParameter(str(exc)) from exc
+    # Resolve the decision timeframe (entry/exit monitoring cadence): an explicit CLI flag
+    # wins; otherwise the profile's ``plan.decision_timeframe`` override; otherwise the plan
+    # timeframe (historic single-tf behavior — byte-unchanged for every profile predating the
+    # plan/decision split).
+    effective_decision_tf = (
+        decision_timeframe or settings.plan.decision_timeframe or timeframe
+    )
     # Build the run tag AFTER the profile is applied: hash the behavior-affecting knobs so
     # two runs with identical config share a config_hash, and a knob change is visible.
     behavior_knobs = {
         "profile": profile,
         "symbol": symbol,
         "timeframe": timeframe,
+        "decision_timeframe": effective_decision_tf,
         "max_leverage": settings.risk.max_leverage,
         "risk_per_trade_pct": settings.risk.risk_per_trade_pct,
         "min_rr": settings.risk.min_rr,
@@ -217,6 +234,11 @@ def replay(
     async def _run() -> None:
         async with SessionLocal() as session:
             await _ensure_data(session, symbol, timeframe, from_dt, to_dt)
+            # The decision tf (when finer than the plan tf) needs its own candles+features
+            # backfilled too, since the replay walks decision-tf rows. The plan tf is already
+            # covered above; only backfill the decision tf when it differs.
+            if effective_decision_tf != timeframe:
+                await _ensure_data(session, symbol, effective_decision_tf, from_dt, to_dt)
             if reset:
                 deleted = (
                     await session.execute(
@@ -226,7 +248,9 @@ def replay(
                 await session.commit()
                 console.print(f"[dim]reset: deleted {deleted} paper_trades for {symbol}[/dim]")
             rep = await run_replay(
-                session, client, symbol=symbol, tf=timeframe, since=from_dt, until=to_dt,
+                session, client, symbol=symbol, tf=timeframe,
+                decision_tf=effective_decision_tf,
+                since=from_dt, until=to_dt,
                 run=run,
             )
 
