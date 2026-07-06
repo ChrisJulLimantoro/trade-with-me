@@ -116,6 +116,7 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
         stop_vol_lo=settings.risk.stop_vol_lo,
         stop_vol_hi=settings.risk.stop_vol_hi,
         preferred_direction=preferred if settings.plan.deterministic_direction_hint else None,
+        min_voting_agents=settings.plan.swing_min_voting_agents,
         log=log,
     )
 

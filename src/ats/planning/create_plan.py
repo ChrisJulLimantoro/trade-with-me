@@ -35,6 +35,7 @@ from ats.planning.context import (
     preferred_direction,
 )
 from ats.risk.manager import regime_allows, reward_risk
+from ats.synthesis.synthesizer import Signal
 
 log = get_logger(__name__)
 
@@ -437,6 +438,7 @@ async def _persist(
     allowed_directions: list[str] | None = None,
     preferred_dir: str | None = None,
     run_id: str | None = None,
+    signal: Signal | None = None,
 ) -> tuple[Plan, list[Setup]]:
     # Supersede only this run's active plans so concurrent replays don't clobber each other.
     where = [Plan.symbol == symbol, Plan.status == "active"]
@@ -465,7 +467,30 @@ async def _persist(
     session.add(plan)
 
     setups: list[Setup] = []
-    for s in _admissible_setups(plan_out.allowed_setups, min_rr=settings.risk.min_rr):
+    admissible = _admissible_setups(plan_out.allowed_setups, min_rr=settings.risk.min_rr)
+    # The deterministic proposer emits exactly one setup per Signal; if adjudication
+    # vetoed it there are zero. Persist the Signal's (post-adjudication) confidence +
+    # raw deterministic confidence onto the matching setup's metadata so the entry path
+    # (and downstream diagnosis) can read it without re-deriving from the coarse
+    # ``size_for`` buckets. Identity-match by direction since the proposer is 1:1.
+    conf_meta: dict[str, Any] = {}
+    if signal is not None:
+        conf_meta = {
+            "confidence": float(signal.confidence),
+            "det_confidence": float(signal.metadata.get("det_confidence", signal.confidence))
+            if signal.metadata
+            else float(signal.confidence),
+        }
+        if "adjudication_delta" in (signal.metadata or {}):
+            conf_meta["adjudication_delta"] = float(signal.metadata["adjudication_delta"])
+    for idx, s in enumerate(admissible):
+        # Only the setup that matches the signal's direction carries the confidence
+        # (the proposer is 1:1, but be defensive if a future caller adds more setups).
+        meta: dict[str, Any] = {}
+        if signal is not None and (
+            idx == 0 or (conf_meta and s.direction == getattr(signal, "direction", None))
+        ):
+            meta = dict(conf_meta)
         setup = Setup(
             setup_id=uuid.uuid4(),
             plan_id=plan.plan_id,
@@ -481,6 +506,7 @@ async def _persist(
             soft_rules=[r.model_dump() for r in s.soft_rules],
             invalidation_rules=[r.model_dump() for r in _stripped_invalidation_rules(s)],
             expires_at=expires_at,
+            setup_metadata=meta,
         )
         session.add(setup)
         setups.append(setup)
@@ -558,6 +584,7 @@ async def create_plan(
             allowed_directions=allowed_directions,
             preferred_dir=preferred_dir,
             run_id=run_id,
+            signal=signal,
         )
         trace.plan(plan, setups, agent_scores=signal.agent_scores if signal else None)
     else:

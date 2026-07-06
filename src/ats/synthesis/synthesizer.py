@@ -78,6 +78,7 @@ def synthesize(
     stop_vol_lo: float = 0.0,
     stop_vol_hi: float = 0.0,
     preferred_direction: str | None = None,
+    min_voting_agents: int = 0,
     log=None,
 ) -> Signal | None:
     """Combine the agent scores into a Signal, or return None (rejected)."""
@@ -90,6 +91,23 @@ def synthesize(
             direction = preferred_direction
         else:
             _reject(log, "neutral_vote", agent_scores)
+            return None
+
+    # 1b. Minimum voting agents (i11 mechanism, default 0 = OFF). Reject signals where
+    # fewer than ``min_voting_agents`` agents voted in the chosen direction. Kills the
+    # lone-agent Q4 whipsaws the i10 conviction-sizing diagnosis surfaced: on the swing
+    # profile ~33% of signals are single-agent (one strong voter, seven abstentions) →
+    # ``weighted_mean`` of one voter = that voter's score → conf≈1.0 with zero alignment
+    # penalty → over-confident whipsaws. Demanding ≥2 voters ensures confirmation before a
+    # setup is admissible. A subtractive filter in the same class as ``htf_trend_filter``
+    # / ``sideways_block_longs`` / the swing trend-strength gate (all already shipping).
+    if min_voting_agents > 0:
+        voter_count = sum(1 for s in scores.values() if s.direction == direction)
+        if voter_count < min_voting_agents:
+            _reject(
+                log, "min_voting_agents", agent_scores,
+                direction=direction, voters=voter_count, min=min_voting_agents,
+            )
             return None
 
     # 2. Base confidence = weighted mean of the agreeing agents.

@@ -93,3 +93,55 @@ def test_identical_input_is_byte_identical() -> None:
     a = synthesize(_long_scores(), {"regime_cell": "bull-low"}, _FEATURES, [], **_KW)
     b = synthesize(_long_scores(), {"regime_cell": "bull-low"}, _FEATURES, [], **_KW)
     assert dataclasses.asdict(a) == dataclasses.asdict(b)
+
+
+# --- min_voting_agents (i11 mechanism, default 0 = OFF) -------------------------------
+
+
+def test_min_voting_agents_off_by_default() -> None:
+    # default min_voting_agents=0 → a lone-agent signal still synthesizes
+    lone = {"htf_trend": _sc("htf_trend", 1.0, "long")}
+    sig = synthesize(lone, {}, _FEATURES, [], **_KW)
+    assert sig is not None and sig.direction == "long"
+
+
+def test_min_voting_agents_rejects_lone_agent() -> None:
+    # 1 voter below min_voting_agents=2 → rejected
+    lone = {"htf_trend": _sc("htf_trend", 1.0, "long")}
+    assert synthesize(lone, {}, _FEATURES, [], **{**_KW, "min_voting_agents": 2}) is None
+
+
+def test_min_voting_agents_passes_two_voters() -> None:
+    # 2 voters ≥ min_voting_agents=2 → passes
+    two = {
+        "htf_trend": _sc("htf_trend", 0.8, "long"),
+        "momentum": _sc("momentum", 0.7, "long"),
+    }
+    sig = synthesize(two, {}, _FEATURES, [], **{**_KW, "min_voting_agents": 2})
+    assert sig is not None and sig.direction == "long"
+
+
+def test_min_voting_agents_counts_chosen_direction_only() -> None:
+    # 2 long + 1 short, min=3 → rejected for long (only 2 long voters < 3)
+    mixed = {
+        "htf_trend": _sc("htf_trend", 0.8, "long"),
+        "momentum": _sc("momentum", 0.7, "long"),
+        "cvd": _sc("cvd", 0.6, "short"),
+    }
+    assert synthesize(mixed, {}, _FEATURES, [], **{**_KW, "min_voting_agents": 3}) is None
+
+
+def test_min_voting_agents_neutral_voters_not_counted() -> None:
+    # 2 long voters + 6 neutral abstentions → passes at min=2 (neutrals don't count)
+    two_plus_neutral = {
+        "htf_trend": _sc("htf_trend", 0.8, "long"),
+        "momentum": _sc("momentum", 0.7, "long"),
+        "structure": _sc("structure", 0.0, "neutral"),
+        "funding": _sc("funding", 0.0, "neutral"),
+        "liquidity": _sc("liquidity", 0.0, "neutral"),
+        "price_action": _sc("price_action", 0.0, "neutral"),
+        "cross_venue": _sc("cross_venue", 0.0, "neutral"),
+        "basis": _sc("basis", 0.0, "neutral"),
+    }
+    sig = synthesize(two_plus_neutral, {}, _FEATURES, [], **{**_KW, "min_voting_agents": 2})
+    assert sig is not None and sig.direction == "long"

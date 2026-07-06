@@ -349,6 +349,35 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "min_stop_atr_mult": 1.5,         # WIDE stop: give the swing room to breathe through noise
             "reward_atr_mult": 4.0,           # FAR, conservative take-profit (a trend-leg target)
             "entry_pullback_atr_frac": 0.5,   # deeper pullback → better price near local exhaustion
+            # Iter 10 (NEW mechanism `conviction_sizing_*`, TESTED → REJECTED, left OFF): the
+            # sizing axis — the one lever untouched since i1. Every rejected lever since i1 was
+            # exit-side (harvest tiers, runner, pre-arm, giveback) or entry-filter-side (i4
+            # frequency, i5 pullback); sizing sidesteps all of them (no hold-length change → no
+            # i7 non-locality; no winner-clip → no i8/i9 expectancy leak; no selectivity change
+            # → no i4/i5 count-vs-quality; coin-agnostic by construction → no i2/i5 coin-split).
+            # The build is clean (12 conviction tests green, multiplier math verified working:
+            # Q1 SOL avg exec_size 0.82, Q4 SOL 1.18 — exactly the 0.7–1.4 band). The DIAGNOSIS
+            # is the killer: a TRAIN by-conviction-quartile table shows sl-rate is NOT monotone
+            # down with conviction on either coin — it drops at Q2 then climbs back. On SOL the
+            # top-conviction Q4 bucket is the WORST (34.3% sl, −$2.78 expectancy, −$97 sum),
+            # while ETH Q4 is mediocre (+$4.01). The ETH↔SOL split at the top is exactly the
+            # i2/i5 coin-split trap, and the pre-condition I named (universality + monotonicity)
+            # fails badly on both counts. STRUCTURAL REASON: on this profile high confidence
+            # (Q4, mostly conf=1.0) comes from SINGLE-AGENT agreement (one strong agent voting
+            # alone, the other seven abstaining) — weighted_mean of one voter = 1.0 with
+            # score_variance=0 so no alignment penalty fires. These lone-agent setups are
+            # precisely the over-confident whipsaws; sizing them up amplifies the worst bucket.
+            # i10 NUMBERS (conviction_sizing_enabled=True, min=0.7, max=1.4): TRAIN ETH +533.73
+            # (vol 9.44, sh 0.22, so 0.39, DD 6.88%), TRAIN SOL +274.25 (vol 9.73, sh 0.13, so
+            # 0.22, DD 10.13%), VAL ETH +283.17 (sh 0.26, so 0.50), VAL SOL +321.52 (sh 0.19,
+            # so 0.33). TRAIN aggregate degrades (SOL −$45, vol↑ everywhere, sortino↓ both,
+            # maxDD↑ both) — the i8 signature in a different costume (sizing-up high-conviction
+            # is expectancy-neutral with raised compounding vol). VAL improved on both coins
+            # (PnL↑, sharpe/sortino↑) but with vol/maxDD↑ too — not a "calmer curve", and the
+            # TRAIN failure already vetoes. conviction_sizing_* stays 0.0 (OFF) for swing.
+            "conviction_sizing_enabled": False,
+            "conviction_size_min": 0.7,
+            "conviction_size_max": 1.4,
         },
         "plan": {
             "max_setups_per_plan": 2,
@@ -379,6 +408,25 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "sideways_block_longs": True,     # trend-pullback longs have no edge in chop
             "sideways_block_shorts": False,   # keep the with-bias short side for trade volume
             "mr_enabled": False,              # mean-reversion is a scalp mechanism — off for swing
+            # Iter 11 (NEW mechanism `swing_min_voting_agents`, TESTED → REJECTED, left OFF):
+            # require ≥2 direction-aligned agents for a setup to be admissible. The i10
+            # conviction-sizing diagnosis showed the swing profile's highest-confidence bucket
+            # (Q4, conf≥0.90) is its WORST on SOL (34.3% sl, −$2.78 expectancy) — because high
+            # confidence comes from SINGLE-AGENT agreement (one strong voter, seven abstentions
+            # → conf=1.0 with zero alignment penalty). These lone-agent whipsaws are ~33%/28%
+            # of all ETH/SOL signals. Demanding ≥2 voters kills them at the source. The
+            # mechanism WORKED: 98/87 lone-agent signals rejected on ETH/SOL TRAIN, sortino UP
+            # on ALL 4 sets (TRAIN ETH 0.42→0.61, SOL 0.30→0.41 — large lifts), sharpe UP on
+            # all 4, maxDD DOWN on 3/4, VAL per-trade expectancy UP +30%/+34% (ETH $3.42→$4.43,
+            # SOL $2.77→$3.71). The filter removes the RIGHT trades. But it drops ~33% of
+            # signals → trade count below the 75 floor on 3 of 4 sets (TRAIN ETH 70, VAL ETH
+            # 44, VAL SOL 55) and aggregate PnL DOWN on all 4 (TRAIN ETH −$21, SOL −$15, VAL
+            # ETH −$41, SOL −$56). A Pareto improvement in trade QUALITY (sortino/expectancy/
+            # maxDD) paid for with trade QUANTITY — the gate protects both. The profile is
+            # deliberately sparse (107 trades TRAIN) and can't afford to drop 33% of signals.
+            # min_voting_agents is binary in effect (1 = no-op, 2 = drops 33%); no intermediate
+            # value exists. Code retained but disabled (default 0), honoring the contract.
+            "swing_min_voting_agents": 0,
         },
         "exits": {
             "max_hold_bars": 96,              # ~24h on 15m — swings marinate (vs scalper's 8 = ~2h)
@@ -393,6 +441,48 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "breakeven_arm_atr": 1.5,         # arm no-loss LATE (vs scalper 0.50) so the leg can develop
             "breakeven_arm_cost_mult": 1.0,
             "breakeven_lock_atr": 0.0,        # park at breakeven; let the wide trail do the harvesting
+            # Iter 1 (NEW mechanism): harvest 1/3 AT the breakeven arm (+1.5 ATR). TRAIN i0
+            # diagnosis: ~45% of trades reached the arm then round-tripped to EXACTLY +0.00%
+            # (dead-money bucket). Booking a third at the arm level monetizes that bucket while
+            # the 2/3 remainder still rides the wide trail to the +9% trail / +37% tp winners.
+            "breakeven_arm_harvest_frac": 0.33,
+            # Iter 12 (ACCEPTED): conditional loser-cut. The existing loss_cut_hold_frac /
+            # loss_cut_atr_mult mechanism (already shipping in scalper, default OFF in swing)
+            # tightens the stop on never-armed, still-red trades after a time threshold. The
+            # i1 diagnosis showed sl is the #1 remaining drag (~20% of trades, −10.4%, ~$550/
+            # coin). i8/i9 tried to harvest the sl bucket's MFE (REJECTED — winner-clip);
+            # i12 attacks the same bucket from a different angle: instead of banking the MFE,
+            # tighten the STOP after 6h so the loss is −1.0 ATR (≈−7%) instead of −1.5 ATR
+            # (≈−10.4%). Fires ONLY on never-armed, still-red trades (winners at breakeven or
+            # in profit are untouched) → doesn't clip winners. The 1.0-ATR tightened stop is
+            # BELOW the 1.5 min_stop_atr_mult noise floor, but that floor governs INITIAL
+            # stops (which need room to survive noise before reaching target). After 6h of
+            # failing to arm, the trade has proven it's a loser — the noise floor doesn't
+            # apply to a confirmed loser. Positive non-locality: shorter loser holds free the
+            # single-position slot sooner → more trades (135/104 vs 107/105), and the extra
+            # trades include winners. The largest TRAIN improvement since i1:
+            # ETH +$518→+$801 (sortino 0.42→0.56), SOL +$320→+$477 (sortino 0.30→0.46).
+            "loss_cut_hold_frac": 0.25,          # fire at 25% of 24h hold = 6h
+            "loss_cut_atr_mult": 1.0,            # tighten from 1.5 to 1.0 ATR
+            # Iter 9 (NEW mechanism `pre_arm_giveback_*`, TESTED → REJECTED, left OFF): the retrace-gated
+            # fix for i8 — bank 0.5 only on ROLLOVERS (peak ≥0.6 ATR then give back 0.4), sparing
+            # continuers. On TRAIN it worked (both coins sortino UP big — ETH 0.42→0.54, SOL 0.30→0.45 —
+            # with PnL ~flat, unlike i8's expectancy leak). But VAL SPLIT: SOL improves (17 sl losers
+            # saved) while VAL-ETH degrades hard (PnL 236→144, sortino 0.45→0.32) — an 87%-win window has
+            # only 8 sl losers to rescue, so the winner-clip dominates. The benefit is anti-correlated
+            # with win-rate → doesn't generalize (TRAIN↑/VAL-ETH↓ overfit). pre_arm_giveback_* stays OFF.
+            # Iter 8 (NEW mechanism `pre_arm_harvest_*`, TESTED → REJECTED, left OFF): skimming 0.25 at
+            # +0.5 ATR (below the arm, stop unchanged) shrank the universal sl give-back (ETH −10.5→
+            # −8.35%, saves +$135/coin) but banking 0.25 of EVERY winner too clipped the tail more
+            # (ETH tp/trail −$254) → TRAIN-ETH PnL +518→+381, sortino 0.42→0.40, and VAL expectancy
+            # fell on both coins. It's a Pareto move toward calm (vol −22%, DD↓, sharpe/sortino up on
+            # 3/4 sets) paid for with expectancy; the gate protects expectancy. Winner-clip and sl-save
+            # scale together, so no fraction rescues ETH. pre_arm_harvest_* stays 0.0 (OFF) for swing.
+            # Iter 7 (NEW mechanism `tp_runner_frac`, TESTED → REJECTED, left OFF): uncapping the far
+            # +4-ATR TP (bank 1/2 at target, ride 1/2 on the wide 3.0-ATR trail) DEGRADED TRAIN-ETH
+            # (PnL +518→+351, sortino 0.42→0.31, DD 6.0→8.7%). The ridden tranche gives back more
+            # under the wide trail than locking the +27% target, and the extended runner hold reshuffles
+            # the single-position sequence (non-locality). tp_runner_frac stays 0.0 (OFF) for swing.
             "sideways_early_stop_mode": "breakeven",
             "sideways_exit_mode": "trend",
         },

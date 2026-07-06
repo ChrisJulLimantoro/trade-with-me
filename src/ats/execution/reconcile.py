@@ -170,6 +170,9 @@ class TradeState:
     tp_index: int = 0  # index of the next take-profit to target
     breakeven: bool = False  # stop has been moved to (at least) entry
     trail_armed: bool = False  # pre-TP1 ATR trailing has armed
+    harvest_count: int = 0  # number of MFE-tier harvests banked (swing tiered-harvest mechanism)
+    pre_arm_harvested: bool = False  # sub-arm (+0.5 ATR) partial banked without moving the stop (swing)
+    tp_runner_banked: bool = False  # final-TP partial banked; remainder is a trailing runner (swing)
     max_favorable_pnl_pct: float = 0.0  # best signed return seen since entry
     max_adverse_pnl_pct: float = 0.0  # worst signed return seen since entry
     # High-water price extreme since entry — highest high (long) / lowest low (short). This is
@@ -188,6 +191,9 @@ class TradeState:
             tp_index=int(md.get("tp_index", 0)),
             breakeven=bool(md.get("breakeven", False)),
             trail_armed=bool(md.get("trail_armed", False)),
+            harvest_count=int(md.get("harvest_count", 0)),
+            pre_arm_harvested=bool(md.get("pre_arm_harvested", False)),
+            tp_runner_banked=bool(md.get("tp_runner_banked", False)),
             max_favorable_pnl_pct=float(md.get("max_favorable_pnl_pct", 0.0)),
             max_adverse_pnl_pct=float(md.get("max_adverse_pnl_pct", 0.0)),
             extreme_favorable_px=float(ext) if ext is not None else None,
@@ -202,6 +208,9 @@ class TradeState:
             "tp_index": self.tp_index,
             "breakeven": self.breakeven,
             "trail_armed": self.trail_armed,
+            "harvest_count": self.harvest_count,
+            "pre_arm_harvested": self.pre_arm_harvested,
+            "tp_runner_banked": self.tp_runner_banked,
             "max_favorable_pnl_pct": self.max_favorable_pnl_pct,
             "max_adverse_pnl_pct": self.max_adverse_pnl_pct,
             "extreme_favorable_px": self.extreme_favorable_px,
@@ -248,6 +257,15 @@ def step_trade(
     breakeven_arm_atr: float = 0.0,
     breakeven_arm_cost_mult: float = 0.0,
     breakeven_lock_atr: float = 0.0,
+    breakeven_arm_harvest_frac: float = 0.0,
+    breakeven_arm_harvest2_frac: float = 0.0,
+    breakeven_arm_harvest2_atr: float = 0.0,
+    pre_arm_harvest_frac: float = 0.0,
+    pre_arm_harvest_atr: float = 0.0,
+    pre_arm_giveback_frac: float = 0.0,
+    pre_arm_giveback_trigger_atr: float = 0.0,
+    pre_arm_giveback_retrace_atr: float = 0.0,
+    tp_runner_frac: float = 0.0,
     breakeven_requires_tp1: bool = False,
     trail_after_tp1_only: bool = False,
     cost_bps: float = 0.0,
@@ -308,6 +326,9 @@ def step_trade(
 
     favorable_px = high if direction == "long" else low
     adverse_px = low if direction == "long" else high
+    # Peak favorable price established by PRIOR (closed) bars only — the retrace-harvest below measures
+    # a give-back from this against the current bar, so it never assumes intrabar high/low ordering.
+    prior_extreme_px = state.extreme_favorable_px
     if state.extreme_favorable_px is None:
         extreme_favorable_px = favorable_px
     elif direction == "long":
@@ -331,6 +352,11 @@ def step_trade(
         sl_hit, tp_hit = low <= working_stop, high >= target
     else:
         sl_hit, tp_hit = high >= working_stop, low <= target
+    # Once the final TP has been converted to a trailing runner (tp-runner mechanism), the target
+    # no longer closes the trade — the runner exits only via its trail/stop. Suppress the re-hit so
+    # it can't bank the same target every subsequent bar.
+    if is_final_tp and state.tp_runner_banked:
+        tp_hit = False
 
     # Conservative: a bar that straddles both the stop and the target stops out first.
     if sl_hit:
@@ -356,6 +382,42 @@ def step_trade(
 
     if tp_hit:
         if is_final_tp:
+            # TP-runner (swing, default OFF): instead of closing the whole remainder at the far
+            # target, bank ``(1 - tp_runner_frac)`` here (an honest fill at a price the bar traded
+            # through) and convert ``tp_runner_frac`` into a breakeven+trailing runner that rides the
+            # wide trail toward the exceptional legs. Fires once (guarded by ``tp_runner_banked``);
+            # the trail block below then manages the surviving runner on subsequent bars.
+            if tp_runner_frac > 0 and not state.tp_runner_banked and state.remaining_frac > 0:
+                bank_frac = state.remaining_frac * (1.0 - tp_runner_frac)
+                realized = state.realized_pnl_pct + net_of_costs(
+                    bank_frac, pnl(target), cost_bps
+                )
+                # Protect the surviving runner: park its stop at (at least) cost-breakeven so the
+                # banked-at-TP gain can't turn the runner tranche into a loss. The trail ratchets up.
+                be_stop = breakeven_stop(direction, entry, cost_bps)
+                if state.working_stop is None:
+                    runner_stop = be_stop
+                elif direction == "long":
+                    runner_stop = max(state.working_stop, be_stop)
+                else:
+                    runner_stop = min(state.working_stop, be_stop)
+                new = replace(
+                    state,
+                    remaining_frac=state.remaining_frac - bank_frac,
+                    realized_pnl_pct=realized,
+                    working_stop=runner_stop,
+                    breakeven=True,
+                    tp_runner_banked=True,
+                )
+                return BarStep(
+                    state=new,
+                    partial=PartialFill(target, ts, bank_frac, pnl(target), tp_idx),
+                    notes=arm_notes
+                    + [
+                        f"tp-runner: banked {bank_frac:.2f} at final tp, riding "
+                        f"{tp_runner_frac:.2f} on the trail"
+                    ],
+                )
             return close_all(target, "tp")
         # Partial scale-out: bank a fraction, move stop to breakeven, advance the target.
         close_frac = state.remaining_frac * scale_out_frac
@@ -378,6 +440,82 @@ def step_trade(
     # straight to breakeven; breakeven mode preserves the legacy behavior for comparison.
     if atr and state.tp_index == 0:
         favorable = (high - entry) if direction == "long" else (entry - low)
+        # Pre-arm harvest (swing, default OFF): skim a small fraction at a sub-arm MFE level. Every
+        # never-armed sl loser first earns ~0.5 ATR then round-trips to the full stop; booking a slice
+        # at ``pre_arm_harvest_atr``·ATR (a price the bar traded through — favorable gates it, no
+        # look-ahead) shrinks those losers. Crucially it does NOT move the stop or set breakeven, so
+        # the remainder rides the SAME wide stop/trail and closes on the SAME bar (no hold-length change
+        # → no single-position non-locality). Fires once, before the arm; the arm harvest still fires
+        # later on the (smaller) remainder if MFE reaches ``breakeven_arm_atr``.
+        if (
+            pre_arm_harvest_frac > 0
+            and pre_arm_harvest_atr > 0
+            and not state.pre_arm_harvested
+            and not state.breakeven
+            and state.remaining_frac > 0
+            and favorable >= pre_arm_harvest_atr * atr
+        ):
+            pa_px = (
+                entry + pre_arm_harvest_atr * atr
+                if direction == "long"
+                else entry - pre_arm_harvest_atr * atr
+            )
+            close_frac = state.remaining_frac * pre_arm_harvest_frac
+            realized = state.realized_pnl_pct + net_of_costs(close_frac, pnl(pa_px), cost_bps)
+            new = replace(
+                state,
+                remaining_frac=state.remaining_frac - close_frac,
+                realized_pnl_pct=realized,
+                pre_arm_harvested=True,
+            )
+            return BarStep(
+                state=new,
+                partial=PartialFill(pa_px, ts, close_frac, pnl(pa_px), tp_idx),
+                notes=arm_notes
+                + [f"pre-arm harvest {close_frac:.2f} at {pre_arm_harvest_atr:g}x ATR (stop unchanged)"],
+            )
+        # Retrace-gated pre-arm harvest (swing, default OFF): fire ONLY on a rollover — a trade whose
+        # peak (from prior closed bars) reached the trigger and which now gives back the retrace amount.
+        # Spares continuers (they keep making new highs, never retracing enough), unlike the fixed-level
+        # skim above. Books at the retrace level the current bar traded through; moves no stop.
+        if (
+            pre_arm_giveback_frac > 0
+            and pre_arm_giveback_trigger_atr > 0
+            and pre_arm_giveback_retrace_atr > 0
+            and not state.pre_arm_harvested
+            and not state.breakeven
+            and state.remaining_frac > 0
+            and prior_extreme_px is not None
+        ):
+            peak_mfe = (
+                (prior_extreme_px - entry) if direction == "long" else (entry - prior_extreme_px)
+            )
+            retrace_px = (
+                prior_extreme_px - pre_arm_giveback_retrace_atr * atr
+                if direction == "long"
+                else prior_extreme_px + pre_arm_giveback_retrace_atr * atr
+            )
+            retraced = low <= retrace_px if direction == "long" else high >= retrace_px
+            if peak_mfe >= pre_arm_giveback_trigger_atr * atr and retraced:
+                close_frac = state.remaining_frac * pre_arm_giveback_frac
+                realized = state.realized_pnl_pct + net_of_costs(
+                    close_frac, pnl(retrace_px), cost_bps
+                )
+                new = replace(
+                    state,
+                    remaining_frac=state.remaining_frac - close_frac,
+                    realized_pnl_pct=realized,
+                    pre_arm_harvested=True,
+                )
+                return BarStep(
+                    state=new,
+                    partial=PartialFill(retrace_px, ts, close_frac, pnl(retrace_px), tp_idx),
+                    notes=arm_notes
+                    + [
+                        f"pre-arm giveback harvest {close_frac:.2f} "
+                        f"(peak {peak_mfe / atr:.2f}x ATR, gave back {pre_arm_giveback_retrace_atr:g}x)"
+                    ],
+                )
         if (
             early_stop_mode == "trail"
             and not state.trail_armed
@@ -406,6 +544,75 @@ def step_trade(
                     )
                 else:
                     arm_notes.append(f"armed breakeven early at {breakeven_arm_atr:g}x ATR")
+                # Partial harvest at the arm level (swing mechanism, default OFF). Book a fraction
+                # at ``entry ± breakeven_arm_atr*ATR`` — a price this bar demonstrably traded
+                # through (favorable >= that level gated the arm), so an honest limit-style fill
+                # with no look-ahead — then ride the untouched remainder on the same breakeven+trail.
+                # Tied to the once-only arm transition, so it can't re-fire. Returns early like the
+                # TP scale-out; the stop is already at breakeven, the trail resumes next bar.
+                if breakeven_arm_harvest_frac > 0 and state.remaining_frac > 0:
+                    arm_px = (
+                        entry + breakeven_arm_atr * atr
+                        if direction == "long"
+                        else entry - breakeven_arm_atr * atr
+                    )
+                    close_frac = state.remaining_frac * breakeven_arm_harvest_frac
+                    realized = state.realized_pnl_pct + net_of_costs(
+                        close_frac, pnl(arm_px), cost_bps
+                    )
+                    new = replace(
+                        state,
+                        remaining_frac=state.remaining_frac - close_frac,
+                        realized_pnl_pct=realized,
+                        harvest_count=1,
+                    )
+                    return BarStep(
+                        state=new,
+                        partial=PartialFill(arm_px, ts, close_frac, pnl(arm_px), tp_idx),
+                        notes=arm_notes
+                        + [
+                            f"harvested {close_frac:.2f} at breakeven arm "
+                            f"({breakeven_arm_atr:g}x ATR)"
+                        ],
+                    )
+
+        # Second harvest tier (swing): once armed and the FIRST harvest is banked, bank another
+        # slice when MFE reaches a higher fixed level (``breakeven_arm_harvest2_atr``·ATR). Medium
+        # runners that peak between the arm and the far TP otherwise give the whole remainder back
+        # to breakeven under the wide trail; this locks a second partial at a level the bar
+        # demonstrably traded through (honest, like tier 1). Fires once. Default 0.0 = OFF.
+        if (
+            breakeven_arm_harvest2_frac > 0
+            and breakeven_arm_harvest2_atr > 0
+            and state.harvest_count == 1
+            and state.remaining_frac > 0
+        ):
+            favorable = (high - entry) if direction == "long" else (entry - low)
+            if favorable >= breakeven_arm_harvest2_atr * atr:
+                h2_px = (
+                    entry + breakeven_arm_harvest2_atr * atr
+                    if direction == "long"
+                    else entry - breakeven_arm_harvest2_atr * atr
+                )
+                close_frac = state.remaining_frac * breakeven_arm_harvest2_frac
+                realized = state.realized_pnl_pct + net_of_costs(
+                    close_frac, pnl(h2_px), cost_bps
+                )
+                new = replace(
+                    state,
+                    remaining_frac=state.remaining_frac - close_frac,
+                    realized_pnl_pct=realized,
+                    harvest_count=2,
+                )
+                return BarStep(
+                    state=new,
+                    partial=PartialFill(h2_px, ts, close_frac, pnl(h2_px), tp_idx),
+                    notes=arm_notes
+                    + [
+                        f"harvested {close_frac:.2f} at 2nd tier "
+                        f"({breakeven_arm_harvest2_atr:g}x ATR)"
+                    ],
+                )
 
     if state.trail_armed and state.tp_index == 0 and early_trail_atr_mult and atr:
         cur_ws = state.working_stop if state.working_stop is not None else full_stop

@@ -61,6 +61,31 @@ class RiskConfig(BaseModel):
     # adverse stop-outs, bigger room to target) at the cost of fewer fills. 0.25 = the historical
     # default baked into sl_tp._PULLBACK_ATR_FRAC.
     entry_pullback_atr_frac: float = 0.25
+    # Conviction-based sizing (NEW mechanism, default OFF; every non-swing profile byte-
+    # unchanged). A parallel to ``vol_sizing_enabled``: instead of scaling the per-trade
+    # risk budget by local volatility (``pr_atr``), scale it by the SETUP's confidence —
+    # concentrate capital on the highest-conviction entries and starve the marginal-floor
+    # entries. Like vol-sizing, it applies AFTER admission: it changes *how much risk*
+    # each trade gets but never *which* setups trade (no selectivity erosion, no trade-
+    # count side-effect). And like vol-sizing it touches neither stop / TP / trail /
+    # harvest geometry NOR hold length → it sidesteps the entire failure-mode list the
+    # swing loop accumulated since i1: the i7 non-locality (hold reshuffle), the i8/i9
+    # expectancy-clip (geometry-clip), the i4/i5 count-vs-quality tradeoff, the i2/i5
+    # coin-split (a *multiplier* on the universal risk budget is coin-agnostic by
+    # construction). The pre-condition for this lever to LIFT sortino is that the entry
+    # conviction PREDICTS the sl-bucket — a TRAIN by-conviction-quartile diagnosis must
+    # show a monotone sl-rate down with conviction AND a >2x top-vs-bottom expectancy
+    # spread, near-identical on ETH and SOL; otherwise sizing-up high-conviction is
+    # expectancy-neutral with raised compounding vol (the i8 signature in a different
+    # costume). ``conviction_size_conf_floor`` is the confidence at which the *minimum*
+    # multiplier applies; the maximum applies at confidence=1.0. 0.0 falls back to
+    # ``plan.signal_min_confidence`` at the call site so a profile inherits its own floor
+    # without a duplicate knob. The combined (vol * conviction) multiplier is still capped
+    # at 2× base risk by ``risk.manager.assess``.
+    conviction_sizing_enabled: bool = False
+    conviction_size_min: float = 0.7
+    conviction_size_max: float = 1.4
+    conviction_size_conf_floor: float = 0.0
     # Round-trip trading costs charged at each leg-banking site (entry + exit), in basis
     # points. fee_bps = taker fee per side; slippage_bps = assumed adverse fill per side.
     fee_bps: float = 5.0
@@ -99,6 +124,64 @@ class ExitConfig(BaseModel):
     # retraces then exits at a small REAL gain (a win) rather than flat. 0 = legacy behavior
     # (park at cost-breakeven). The trail still ratchets above this floor as the runner extends.
     breakeven_lock_atr: float = 0.0
+    # Partial harvest AT the breakeven-arm point (NEW mechanism, default 0.0 = OFF; swing profile
+    # only). Diagnosis of the 1h/15m swing book: ~45% of trades reach the breakeven arm (MFE ≥
+    # ``breakeven_arm_atr`` ATR), then round-trip back through entry and exit at EXACTLY breakeven
+    # (+0.00%) — a huge dead-money bucket that banked real favorable excursion and gave it all back.
+    # Unlike ``breakeven_lock_atr`` (which RAISES the stop and so clips the runner's ridden
+    # remainder), this books ``breakeven_arm_harvest_frac`` of the position AT the arm level
+    # (``entry ± breakeven_arm_atr*ATR`` — a price the bar demonstrably traded through, an honest
+    # limit-style fill, no look-ahead) the moment breakeven arms, then lets the untouched remainder
+    # ride the SAME breakeven+trail geometry. Converts the round-trip bucket from +0.00% to a locked
+    # partial gain while preserving runner capture on the remainder. Fires once (tied to the arm
+    # transition, which is itself once-only). 0.0 keeps every other profile byte-unchanged.
+    breakeven_arm_harvest_frac: float = 0.0
+    # Second harvest tier (swing only, default 0.0 = OFF). After the arm harvest, a medium runner
+    # that peaks between the arm and the far TP otherwise gives its whole remainder back to
+    # breakeven under the wide 3.0-ATR trail. When set, bank ``breakeven_arm_harvest2_frac`` of the
+    # remaining position the first time MFE reaches ``breakeven_arm_harvest2_atr``·ATR (a higher
+    # fixed level the bar traded through — honest, like tier 1), then ride the final slice on the
+    # trail/TP. Fires once. Requires ``breakeven_arm_harvest_frac > 0`` (tier 1) to have any effect.
+    breakeven_arm_harvest2_frac: float = 0.0
+    breakeven_arm_harvest2_atr: float = 0.0
+    # Pre-arm harvest: a harvest tier BELOW the breakeven arm (NEW mechanism, default 0.0 = OFF; swing
+    # profile only). Candle-reconstructed diagnosis of the swing sl bucket: EVERY never-armed loser
+    # (0/44 go straight down) first earns ~0.5 ATR of favorable excursion (median 0.51/0.56 ATR on
+    # ETH/SOL — universal), then gives it ALL back to the −1.5 ATR stop for a full −10.5% loss. The
+    # arm-harvest (+1.5 ATR) and tier-2 (+2.5–3.0 ATR) both sit ABOVE this bucket and never touch it.
+    # When set, the first time MFE reaches ``pre_arm_harvest_atr``·ATR — a level BELOW ``breakeven_arm_atr``
+    # — bank ``pre_arm_harvest_frac`` of the position AT that level (an honest fill the bar traded
+    # through, no look-ahead) WITHOUT moving the stop: the remainder rides the SAME wide stop/trail and
+    # closes on the SAME bar as before, so this changes no entry, exit timing, or hold length (no
+    # single-position non-locality) — it only skims the universal +0.5-ATR give-back. Fires once
+    # (guarded by ``TradeState.pre_arm_harvested``). 0.0 keeps every other profile byte-unchanged.
+    pre_arm_harvest_frac: float = 0.0
+    pre_arm_harvest_atr: float = 0.0
+    # Retrace-gated pre-arm harvest (NEW mechanism, default 0.0 = OFF; swing profile only). i8 showed a
+    # FIXED-level pre-arm skim (+0.5 ATR) shrinks the sl bucket but clips EVERY winner on the way up
+    # (it fires the same on runners and round-trippers), trading expectancy for calm. This variant
+    # fires only on ROLLOVERS: a trade whose peak (prior-bar) MFE reached ``pre_arm_giveback_trigger_atr``
+    # ·ATR and which then gives back ``pre_arm_giveback_retrace_atr``·ATR from that peak on the current
+    # bar banks ``pre_arm_giveback_frac`` at the retrace level (a price the bar traded through — honest,
+    # peak from CLOSED bars so no intrabar-ordering assumption). Continuers that keep making new highs
+    # never retrace enough → their tail is untouched, unlike i8. Moves no stop → the remainder still
+    # closes on the same bar (no hold-length change / non-locality). Fires once (``pre_arm_harvested``).
+    pre_arm_giveback_frac: float = 0.0
+    pre_arm_giveback_trigger_atr: float = 0.0
+    pre_arm_giveback_retrace_atr: float = 0.0
+    # TP-runner: uncap the final take-profit (NEW mechanism, default 0.0 = OFF; swing profile only).
+    # Diagnosis of the 1h/15m swing book: the FAR TP (``reward_atr_mult`` ATR) hard-CLOSES the full
+    # remaining position — capping the handful of best trades (~5/coin on TRAIN, identical on both
+    # coins) at exactly the target (+27% margin) even though a trend-swing's thesis is that the
+    # strongest legs run much further. The mirror of ``breakeven_arm_harvest_frac`` (which monetized
+    # the dead-breakeven bucket): instead of closing at the final TP, bank ``(1-tp_runner_frac)`` of
+    # the remainder AT the target (a price the bar demonstrably traded through — honest, no
+    # look-ahead) and convert ``tp_runner_frac`` into a breakeven+trailing RUNNER that rides the same
+    # wide trail toward the exceptional multi-ATR legs. Only ever touches trades that already reached
+    # the far target (the best winners), so it extends the upside tail without touching the loss/
+    # breakeven geometry. Fires once per trade (guarded by ``TradeState.tp_runner_banked``). 0.0
+    # preserves the legacy full-close at the final TP for every other profile.
+    tp_runner_frac: float = 0.0
     # Trailing-stop distance as a multiple of atr_14, applied to the runner once the
     # stop is at breakeven. 0 disables trailing.
     trail_atr_mult: float = 1.5
@@ -271,6 +354,20 @@ class PlanConfig(BaseModel):
     # oversold 4h still permits a mean-reversion long). Kills the dominant BTC-replay loss
     # bucket: 15m "bull-low"/chop longs taken inside a 4h downtrend.
     htf_trend_filter: bool = False
+    # Minimum voting agents (NEW mechanism, default 0 = OFF; swing profile only). The i10
+    # conviction-sizing diagnosis showed the swing profile's highest-confidence bucket (Q4,
+    # conf≥0.90) is its WORST on SOL (34.3% sl, −$2.78 expectancy) and mediocre on ETH.
+    # Structural reason: on this profile high confidence comes from SINGLE-AGENT agreement —
+    # one strong agent voting alone (typically htf_trend or momentum), the other seven
+    # abstaining. The synthesizer's ``weighted_mean`` of one voter returns that voter's score
+    # verbatim, and ``score_variance`` returns 0 when <2 agents vote → no alignment penalty →
+    # conf=1.0 for a lone-agent setup. These are precisely the over-confident whipsaws.
+    # When >0, the synthesizer rejects any signal where fewer than this many agents voted in
+    # the chosen direction — demanding confirmation before a setup is admissible. A subtractive
+    # filter in the same class as ``htf_trend_filter`` / ``sideways_block_longs`` / the swing
+    # trend-strength gate (all already shipping). 0 = no minimum (every non-neutral direction
+    # vote is admissible, the legacy behavior).
+    swing_min_voting_agents: int = 0
     # Drop LONG setups in sideways ("side-*") regimes (default OFF). A trend-pullback strategy
     # has no long edge in low-vol chop: the pullback entries are just noise and get whipsawed.
     # In the full-2026 BTC replay, side-low LONGs were the single worst bucket (43t / 40% win /

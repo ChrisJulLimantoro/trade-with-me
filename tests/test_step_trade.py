@@ -92,6 +92,141 @@ def test_breakeven_runner_stops_flat_not_at_loss() -> None:
     assert step.exit_result.pnl_pct == pytest.approx(0.5 * 0.10)
 
 
+# --- Pre-arm harvest: skim a sub-arm slice without moving the stop (swing, default OFF) -------
+_PA = {"pre_arm_harvest_frac": 0.25, "pre_arm_harvest_atr": 0.5, "atr": 4.0, "breakeven_arm_atr": 1.5}
+
+
+def test_pre_arm_harvest_skims_at_half_atr_without_moving_stop() -> None:
+    # entry 100, atr 4 → +0.5 ATR = 102. A bar tagging 102 (but not the +1.5 arm at 106) skims 0.25.
+    step = _step(LONG1, _c(102, 99, 101), TradeState(), **_PA)
+    assert not step.closed
+    assert step.partial is not None
+    assert step.partial.frac == pytest.approx(0.25)
+    assert step.partial.price == pytest.approx(102.0)  # booked AT the +0.5 ATR level
+    assert step.state.remaining_frac == pytest.approx(0.75)
+    assert step.state.pre_arm_harvested is True
+    assert step.state.breakeven is False  # stop NOT moved — the whole point
+    assert step.state.working_stop is None  # remainder still rides the original wide stop
+
+
+def test_pre_arm_harvest_fires_once() -> None:
+    after = _step(LONG1, _c(102, 99, 101), TradeState(), **_PA).state
+    step = _step(LONG1, _c(103, 100, 102), after, **_PA)
+    assert step.partial is None  # already skimmed; does not re-fire
+    assert step.state.remaining_frac == pytest.approx(0.75)
+
+
+def test_pre_arm_harvest_then_full_stop_is_a_smaller_loss() -> None:
+    # Skim 0.25 at +0.5 ATR (102), then the remaining 0.75 hits the −1.5 ATR stop (95) → the loss
+    # is on 0.75, not the full position, and is offset by the banked +0.5-ATR slice.
+    after = _step(LONG1, _c(102, 99, 101), TradeState(), **_PA).state
+    step = _step(LONG1, _c(101, 94, 95), after, **_PA)
+    assert step.closed
+    assert step.exit_result.exit_reason == "sl"
+    # 0.25 banked at +2% (102/100) + 0.75 lost at -5% (95/100) = 0.005 - 0.0375
+    assert step.exit_result.pnl_pct == pytest.approx(0.25 * 0.02 + 0.75 * -0.05)
+    # strictly better than the full-position stop loss of -5%
+    assert step.exit_result.pnl_pct > -0.05
+
+
+def test_pre_arm_harvest_off_by_default() -> None:
+    step = _step(LONG1, _c(102, 99, 101), TradeState(), atr=4.0, breakeven_arm_atr=1.5)
+    assert step.partial is None  # no pre_arm_harvest_frac → inert
+
+
+# --- Retrace-gated pre-arm harvest: fire only on rollovers (swing, default OFF) --------------
+_GB = {
+    "pre_arm_giveback_frac": 0.5,
+    "pre_arm_giveback_trigger_atr": 0.6,
+    "pre_arm_giveback_retrace_atr": 0.4,
+    "atr": 4.0,
+    "breakeven_arm_atr": 1.5,
+}
+
+
+def test_giveback_harvest_fires_on_rollover_after_peak() -> None:
+    # Bar 1 peaks at +0.7 ATR (102.8), no retrace. Bar 2 (peak from bar 1) gives back 0.4 ATR
+    # (102.8 - 1.6 = 101.2) → bank 0.5 at that level.
+    after = _step(LONG1, _c(102.8, 100.0, 102.5), TradeState(), **_GB).state
+    assert after.extreme_favorable_px == pytest.approx(102.8)
+    assert not after.pre_arm_harvested  # no give-back yet on bar 1
+    step = _step(LONG1, _c(102.5, 101.0, 101.3), after, **_GB)
+    assert step.partial is not None
+    assert step.partial.price == pytest.approx(101.2)  # 102.8 - 0.4*4
+    assert step.partial.frac == pytest.approx(0.5)
+    assert step.state.pre_arm_harvested is True
+    assert step.state.working_stop is None  # stop untouched
+
+
+def test_giveback_harvest_spares_a_continuer() -> None:
+    # A trade that peaks +0.7 then keeps climbing (new highs, never gives back 0.4) is NOT clipped.
+    after = _step(LONG1, _c(102.8, 100.0, 102.6), TradeState(), **_GB).state
+    step = _step(LONG1, _c(104.0, 102.5, 103.8), after, **_GB)  # low 102.5 > retrace 101.2
+    assert step.partial is None
+    assert step.state.remaining_frac == pytest.approx(1.0)
+
+
+def test_giveback_harvest_inert_below_trigger_peak() -> None:
+    # Peak only +0.4 ATR (101.6 < 0.6-ATR trigger); a deep retrace does NOT bank (never a real runner).
+    after = _step(LONG1, _c(101.6, 100.0, 101.4), TradeState(), **_GB).state
+    step = _step(LONG1, _c(101.4, 99.5, 100.0), after, **_GB)
+    assert step.partial is None
+
+
+# --- TP-runner: uncap the final take-profit (swing mechanism, default OFF) -------------------
+# Single-target long so TP=110 is the FINAL target the runner mechanism acts on.
+LONG1 = {"direction": "long", "entry_price": 100.0, "stop_loss": 95.0, "take_profit": [110.0]}
+
+
+def test_final_tp_full_close_when_runner_off() -> None:
+    # Default tp_runner_frac=0.0 preserves the legacy full close at the final TP.
+    step = _step(LONG1, _c(111, 99, 110), TradeState())
+    assert step.closed
+    assert step.exit_result.exit_reason == "tp"
+    assert step.exit_result.pnl_pct == pytest.approx(0.10)
+
+
+def test_final_tp_runner_banks_partial_and_stays_open() -> None:
+    step = _step(LONG1, _c(111, 99, 110), TradeState(), tp_runner_frac=0.5)
+    assert not step.closed  # remainder rides on
+    assert step.partial is not None
+    assert step.partial.frac == pytest.approx(0.5)  # banked (1 - 0.5) of the full 1.0
+    assert step.state.remaining_frac == pytest.approx(0.5)
+    assert step.state.tp_runner_banked is True
+    assert step.state.breakeven is True
+    assert step.state.working_stop == pytest.approx(100.0)  # >= cost-breakeven (cost_bps=0 → entry)
+    assert step.state.realized_pnl_pct == pytest.approx(0.5 * 0.10)
+
+
+def test_tp_runner_does_not_rebank_on_a_later_touch() -> None:
+    # A banked runner must NOT re-close at the target every subsequent bar; it rides the trail.
+    after = _step(LONG1, _c(111, 99, 110), TradeState(), tp_runner_frac=0.5).state
+    step = _step(LONG1, _c(120, 109, 118), after, tp_runner_frac=0.5)
+    assert not step.closed  # high 120 >= target 110 but the re-hit is suppressed
+    assert step.partial is None
+    assert step.state.remaining_frac == pytest.approx(0.5)
+
+
+def test_tp_runner_rides_higher_then_trails_out_above_target() -> None:
+    # The whole point: the surviving tranche can exit ABOVE the target after riding the wide trail.
+    after = _step(LONG1, _c(111, 99, 110), TradeState(), tp_runner_frac=0.5).state
+    # Runner extends to 130; a 3-ATR (atr=1) trail off the 130 extreme parks the stop at 127.
+    after2 = _step(
+        LONG1, _c(130, 118, 129), after, tp_runner_frac=0.5, trail_atr_mult=3.0, atr=1.0,
+        trail_mode="chandelier",
+    ).state
+    assert after2.working_stop == pytest.approx(127.0)
+    # Next bar pulls back through 127 → runner exits as a trail win, banked +TP leg + runner leg.
+    step = _step(
+        LONG1, _c(128, 126, 126), after2, tp_runner_frac=0.5, trail_atr_mult=3.0, atr=1.0,
+        trail_mode="chandelier",
+    )
+    assert step.closed
+    assert step.exit_result.exit_reason == "trail"
+    # 0.5 banked at +10% + 0.5 ridden to +27% (127) = 0.05 + 0.135
+    assert step.exit_result.pnl_pct == pytest.approx(0.5 * 0.10 + 0.5 * 0.27)
+
+
 def test_first_bar_full_stop_is_a_loss() -> None:
     step = _step(LONG, _c(101, 94, 96), TradeState())
     assert step.closed and step.exit_result.exit_reason == "sl"

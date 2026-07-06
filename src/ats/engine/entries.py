@@ -25,6 +25,51 @@ from ats.risk.manager import assess
 from ats.synthesis.sl_tp import adaptive_stop_mult
 
 
+def _f_confidence(s: Setup) -> float | None:
+    """Setup's post-adjudication confidence, or ``None`` when not persisted.
+
+    Stored on ``setup_metadata["confidence"]`` by ``create_plan._persist``. ``None`` covers
+    both legacy pre-field setups and vetoed-signal plans (no valid confidence to size on).
+    """
+    raw = (s.setup_metadata or {}).get("confidence")
+    if raw is None:
+        return None
+    try:
+        return float(raw)
+    except (TypeError, ValueError):
+        return None
+
+
+def conviction_size_multiplier(
+    confidence: float | None,
+    *,
+    enabled: bool,
+    size_min: float,
+    size_max: float,
+    conf_floor: float,
+    fallback_floor: float,
+) -> float:
+    """Linear conviction→risk multiplier in ``[size_min, size_max]`` (1.0 = OFF).
+
+    Linear on the confidence band ``[conf_floor, 1.0]``: a marginal setup sitting at the
+    admission floor (``signal_min_confidence``) receives ``size_min`` (starved), a peak-
+    conviction setup at confidence=1.0 receives ``size_max`` (concentrated). ``conf_floor``
+    defaults to ``fallback_floor`` (the profile's ``signal_min_confidence``) when 0 — so the
+    profile inherits its own floor without a duplicate knob. ``confidence=None`` (legacy
+    or vetoed-signal setups with no confidence stored) → 1.0 (no-op); never gate-kill on
+    missing data. Pure & deterministic; the same arguments give the byte-identical result.
+    """
+    if not enabled or confidence is None:
+        return 1.0
+    floor = conf_floor if conf_floor > 0.0 else fallback_floor
+    if floor >= 1.0:
+        return size_max
+    span = 1.0 - floor
+    c = min(1.0, max(0.0, confidence))
+    frac = (c - floor) / span  # ∈ [0, 1] after clamp; below-floor setups clamp to 0
+    return size_min + (size_max - size_min) * max(0.0, frac)
+
+
 def setup_dict(s: Setup) -> dict[str, Any]:
     return {
         "setup_id": s.setup_id,
@@ -41,6 +86,10 @@ def setup_dict(s: Setup) -> dict[str, Any]:
         "soft_rules": s.soft_rules,
         "invalidation_rules": s.invalidation_rules,
         "expires_at": s.expires_at,
+        # Post-adjudication confidence persisted at _persist (create_plan.py) so the entry
+        # path can modulate risk by conviction (see RiskConfig.conviction_sizing_*). ``None``
+        # for setups persisted before this field existed or when the signal was vetoed.
+        "confidence": _f_confidence(s),
     }
 
 
@@ -80,6 +129,23 @@ async def execute_setup(
         size_mult = settings.risk.vol_size_min + (
             settings.risk.vol_size_max - settings.risk.vol_size_min
         ) * p
+    # Conviction-based sizing (NEW mechanism, default OFF; sibling to vol-sizing): scale the
+    # per-trade risk budget by the SETUP's confidence — concentrate capital on high-conviction
+    # entries, starve marginal-floor entries. Sibling, not override: the two multipliers compose
+    # multiplicatively (so vol-sizing-ON × conviction-ON with both ~1.4 lifts a peak, peak-vol
+    # entry ~2.0 — the assess() cap). ``confidence`` is read off the setup's persisted metadata
+    # (written at create_plan._persist from the Signal) so the *post-adjudication* confidence is
+    # what drives sizing. None → setups persisted before this field existed or vetoed-signal
+    # plans → conviction_size_multiplier returns 1.0 (no-op; never gate-kill on missing data).
+    conv_mult = conviction_size_multiplier(
+        setup_d.get("confidence"),
+        enabled=settings.risk.conviction_sizing_enabled,
+        size_min=settings.risk.conviction_size_min,
+        size_max=settings.risk.conviction_size_max,
+        conf_floor=settings.risk.conviction_size_conf_floor,
+        fallback_floor=settings.plan.signal_min_confidence,
+    )
+    size_mult *= conv_mult
     # Noise-stop admission floor must TRACK the adaptive stop width (built in the synthesizer from
     # the same pr_atr) — otherwise a widened chop stop clears a fixed floor and the chop trades the
     # widening was meant to protect get ADMITTED instead (the iter-11 confound). With the floor
