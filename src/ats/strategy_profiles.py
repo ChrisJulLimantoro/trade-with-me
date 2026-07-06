@@ -45,6 +45,12 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             # cost 4.5 bps reproduces the correct 9 bps total. Exit stays full taker+slippage
             # (conservative: TP/trail limit exits are also maker but not credited here). This
             # removed ~5 bps notional ≈ 1% margin of PHANTOM cost per trade (~$2/trade × 264).
+            # NOTE (live↔sim gap fix): this maker model is JUSTIFIED, not optimistic — live
+            # execution now places a genuine post-only resting LIMIT entry (execution.live
+            # place_entry_limit → binance_futures.limit_order, timeInForce=GTX) and native
+            # STOP/TP exits, so the fills these bps assume are the fills live actually gets. Do
+            # NOT "correct" this back up to taker: that was only warranted under the old
+            # market-order mirror, which this change abandons.
             "fee_bps": 3.5,
             "slippage_bps": 1.0,
             "min_rr": 1.0,                 # accept ~1:1 — scalps take quick, nearby targets

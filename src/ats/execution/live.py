@@ -2,10 +2,13 @@
 
 When ``--live-execute`` is on, the CLI builds a :class:`LiveContext` (holding the testnet
 client + a structured order-log writer) and installs it in the ``live_ctx`` ContextVar. The
-paper executor (``execution.executor``) keeps writing ``paper_trades`` exactly as before and
-ADDITIONALLY consults ``live_ctx``: on open/scale/close it fires the matching market
-(reduce-only) order on the exchange. The deterministic exit machine remains the sole
-decision-maker — the exchange is a dumb mirror, no resting stop/TP orders.
+paper executor (``execution.executor``) keeps writing ``paper_trades`` and ADDITIONALLY drives
+the exchange through ``live_ctx``. To make live *achieve* the fills the sim assumes (rather than
+mirror them one-way with market orders): entries rest as real LIMIT orders at the zone edge and
+are booked on their actual fill (``place_entry_limit`` + the executor's pending machine), and
+exits rest as native STOP_MARKET/TAKE_PROFIT_MARKET protection (``place_protection``) that the
+deterministic exit machine cancels/replaces as the stop moves. Scale-outs and forced closes
+still use reduce-only market orders.
 
 ``live_ctx`` is None on every non-live path (replay, tick, paper run), so the existing
 behavior is byte-unchanged.
@@ -23,6 +26,12 @@ from ats.execution.binance_futures import BinanceFuturesTestnet, OrderError, Ord
 from ats.logging import get_logger
 
 log = get_logger(__name__)
+
+# Binance: "Order would immediately trigger." Raised when a STOP_MARKET trigger sits on the wrong
+# side of the current mark — i.e. the level is ALREADY breached, so the stop can't rest and the
+# position should be flat now. On a stop RAISE (trail/breakeven) this means price has run back
+# through the new stop; the safe response is to market-close, not to leave the position naked.
+_ERR_WOULD_IMMEDIATELY_TRIGGER = -2021
 
 
 def _side_for_open(direction: str) -> str:
@@ -46,10 +55,38 @@ class LiveContext:
         # Engine-synced model: SL+TP are placed at entry as a safety net (closePosition=true) and
         # the deterministic exit machine cancels/replaces them as the stop moves / trade closes.
         self._protection: dict[str, dict[str, str]] = {}
+        # Pending resting-limit ENTRIES, keyed by exchange order id -> booking payload (see
+        # executor.open_paper_trade). A limit rests here until executor.poll_live_entries books it
+        # on fill or drops it on the fill-or-cancel timeout — this is what makes the live entry a
+        # real resting order (matching the sim) instead of a market-order mirror.
+        self._pending: dict[str, dict[str, Any]] = {}
+        # Last known USDT wallet balance, used to mark position sizing to the real account (Fix 4).
+        # Seeded from the user-data ACCOUNT_UPDATE stream (live_ws) and refreshed on the poll
+        # cadence via ``wallet_equity``. None until first fetched → sizing falls back to config.
+        self._wallet_equity: float | None = None
 
     @property
     def client(self) -> BinanceFuturesTestnet:
         return self._client
+
+    # --- wallet equity (mark sizing to the real account) ------------------------------
+
+    def set_wallet_equity(self, value: float) -> None:
+        """Cache the latest USDT wallet balance (from the ACCOUNT_UPDATE stream)."""
+        self._wallet_equity = value
+
+    async def wallet_equity(self, *, refresh: bool = True) -> float | None:
+        """Return the USDT wallet balance to size on; refresh via REST unless disabled.
+
+        Falls back to the last cached value on a failed/empty fetch (never raises), and to None
+        if never seen — the caller then uses the config default, preserving old behavior.
+        """
+        if refresh:
+            acct = await self._client.account_state()
+            wb = acct.get("wallet_balance") if acct else None
+            if wb:
+                self._wallet_equity = float(wb)
+        return self._wallet_equity
 
     # The recorder the client calls before/after every exchange interaction.
     def record(self, action: str, payload: dict[str, Any]) -> None:
@@ -65,11 +102,17 @@ class LiveContext:
 
     # --- mirror-order helpers (called from the executor seam) -------------------------
 
-    async def open_position(
+    async def place_entry_limit(
         self, symbol: str, direction: str, *, notional_usd: float, entry_price: float,
         leverage: float | None,
     ) -> OrderResult | None:
-        """Set leverage and place the entry market order. Returns None on reject (caller skips)."""
+        """Set leverage + place a RESTING LIMIT entry at ``entry_price``. None on reject/too-small.
+
+        The returned order is ``NEW`` (resting), not necessarily filled — the caller registers it
+        as pending and ``executor.poll_live_entries`` resolves the fill. This is the entry half of
+        "make live match sim": the sim assumes a fill at the zone edge, so we rest a real
+        (maker-only) limit there rather than crossing the spread with a market order.
+        """
         await self._client.load_filters(symbol)
         qty = self._client.round_qty(symbol, notional_usd / entry_price) if entry_price > 0 else 0.0
         if qty <= 0:
@@ -89,14 +132,32 @@ class LiveContext:
                 )
             if leverage is not None:
                 await self._client.set_leverage(symbol, int(leverage))
-            return await self._client.market_order(
-                symbol, _side_for_open(direction), qty, intended_price=entry_price
+            return await self._client.limit_order(
+                symbol, _side_for_open(direction), qty, entry_price
             )
         except OrderError as exc:
             log.warning(
                 "live_open_rejected", symbol=symbol, qty=qty, notional=notional_usd, error=str(exc)
             )
             return None
+
+    # --- pending resting-limit entry tracking -----------------------------------------
+
+    def register_pending(self, key: str, record: dict[str, Any]) -> None:
+        """Track a resting-limit entry (keyed by exchange order id) awaiting its fill."""
+        self._pending[key] = record
+
+    def pop_pending(self, key: str) -> dict[str, Any] | None:
+        """Remove and return a pending entry (booked on fill or dropped on timeout)."""
+        return self._pending.pop(key, None)
+
+    def has_pending(self, symbol: str) -> bool:
+        """True if a resting-limit entry for ``symbol`` is awaiting a fill (blocks new entries)."""
+        return any(r["symbol"] == symbol for r in self._pending.values())
+
+    def pending_snapshot(self, symbol: str) -> list[dict[str, Any]]:
+        """A copy of the pending entries for ``symbol`` (safe to iterate while mutating)."""
+        return [dict(r) for r in self._pending.values() if r["symbol"] == symbol]
 
     async def reduce_position(
         self, symbol: str, direction: str, *, notional_usd: float, entry_price: float, frac: float,
@@ -177,28 +238,54 @@ class LiveContext:
     async def replace_stop(
         self, trade_id: str, symbol: str, direction: str, new_stop: float
     ) -> None:
-        """Cancel the existing SL and place a new STOP_MARKET at ``new_stop`` (trail / breakeven)."""
+        """Move the protective stop to ``new_stop`` (trail / breakeven) without ever going naked.
+
+        Place-new-BEFORE-cancel-old: the previous stop stays live until the replacement is
+        confirmed, so a failed placement never leaves the position unprotected (the old bug
+        cancelled first, then a -2021 on the place left a naked position). Two failure paths:
+        - ``-2021`` on a stop RAISE = the new level is already breached, so the position should
+          be flat NOW → market-close and let the next tick reconcile.
+        - any other reject → keep the old stop untouched and log; the position stays protected
+          at the prior level and the trail retries next tick.
+        """
         prot = self._protection.get(trade_id)
         if prot is None:
             return
         old = prot.get("sl")
-        if old:
-            await self._client.cancel_conditional(symbol, old)
         try:
-            prot["sl"] = await self._client.place_conditional(
+            new_sl = await self._client.place_conditional(
                 symbol, _side_for_reduce(direction), "STOP_MARKET",
                 trigger_price=new_stop, close_position=True,
             )
-            self._protection[trade_id] = prot
-            log.info(
-                "live_stop_replaced",
-                symbol=symbol,
-                trade_id=trade_id,
-                new_stop=new_stop,
-                sl_id=prot.get("sl"),
-            )
         except OrderError as exc:
-            log.warning("live_replace_stop_failed", symbol=symbol, trade_id=trade_id, error=str(exc))
+            if exc.code == _ERR_WOULD_IMMEDIATELY_TRIGGER:
+                # Trail already breached: flatten now (old stop still active until this closes).
+                log.warning(
+                    "live_stop_raise_breached",
+                    symbol=symbol, trade_id=trade_id, new_stop=new_stop, error=str(exc),
+                )
+                self.record("replace_stop", {"trade_id": trade_id, "status": "breached_flattening"})
+                await self.close_position(symbol, direction, intended_price=new_stop)
+                return
+            # Non-2021 reject: keep the existing stop; do NOT cancel it.
+            log.warning(
+                "live_replace_stop_failed",
+                symbol=symbol, trade_id=trade_id, new_stop=new_stop,
+                code=exc.code, error=str(exc),
+            )
+            return
+        # New stop confirmed — now it's safe to cancel the previous one.
+        if old:
+            await self._client.cancel_conditional(symbol, old)
+        prot["sl"] = new_sl
+        self._protection[trade_id] = prot
+        log.info(
+            "live_stop_replaced",
+            symbol=symbol,
+            trade_id=trade_id,
+            new_stop=new_stop,
+            sl_id=new_sl,
+        )
 
     async def cancel_protection(self, trade_id: str, symbol: str) -> None:
         """Cancel any remaining SL/TP for a trade (on close)."""

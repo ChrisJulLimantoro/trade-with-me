@@ -28,6 +28,8 @@ from ats.engine.quantities import _f
 from ats.engine.reports import ClosedTradeInfo, TickReport
 from ats.engine.rule_engine import entry_confirmed, evaluate_setup
 from ats.engine.timeframes import timeframe_to_timedelta
+from ats.execution.executor import poll_live_entries
+from ats.execution.live import live_ctx
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.risk.manager import regime_allows
@@ -57,6 +59,16 @@ def _post_fill_candles(
         if float(c["low"]) <= hi and float(c["high"]) >= lo:
             return candles[i + 1 :]
     return []
+
+
+def _live_entry_pending(symbol: str) -> bool:
+    """True when live execution has a resting-limit entry for ``symbol`` awaiting a fill.
+
+    A pending entry blocks placing another (one position per symbol) and stops the per-tick
+    setup loop after it arms one resting order. No-op (False) in replay/paper (no live_ctx).
+    """
+    ctx = live_ctx.get()
+    return ctx is not None and ctx.has_pending(symbol)
 
 
 def _arm_limit_price(direction: str, zone_low: float, zone_high: float) -> float:
@@ -191,6 +203,11 @@ async def evaluate_now(
     now = now or feature_row["open_time"]
     report = TickReport(now=now)
 
+    # Live only (no-op in replay/paper): resolve resting-limit entries placed on a prior tick —
+    # book the ones that filled (so they're reconciled below) and drop the ones that timed out —
+    # BEFORE reconciling/evaluating, so a just-filled entry is managed the same tick it fills.
+    await poll_live_entries(session, symbol, now)
+
     candle = {
         "open_time": feature_row["open_time"],
         "high": feature_row["high"],
@@ -226,9 +243,10 @@ async def evaluate_now(
         return report
 
     open_positions = await state.open_positions(session, symbol=symbol, run_id=run_id)
-    if open_positions:
-        # One position per symbol: no new entry is possible this bar. Existing trades are
-        # still reconciled above; any armed resting orders simply keep waiting.
+    if open_positions or _live_entry_pending(symbol):
+        # One position per symbol: no new entry is possible this bar. Existing trades are still
+        # reconciled above; a live resting-limit entry already placed (pending fill) likewise
+        # blocks a second entry until it fills or times out. Any armed setups keep waiting.
         report.notes.append("position open: skipping new entries")
         return report
 
@@ -270,6 +288,8 @@ async def evaluate_now(
                     f"setup {setup.setup_id} resting-limit filled at {limit:g}"
                 )
                 break
+            if _live_entry_pending(symbol):
+                break  # a live resting-limit entry was placed — don't arm a second this tick
 
     if not report.opened:
         for setup in setups:
@@ -328,7 +348,7 @@ async def evaluate_now(
                 session, plan, setup, setup_d, ev.price, feature_row, now,
                 open_positions, report, tf=tf, equity_usd=equity_usd,
             )
-            if report.opened > opened_before:
+            if report.opened > opened_before or _live_entry_pending(symbol):
                 break
 
     # A trade opened above is otherwise blind until the next bar; walk the rest of its own

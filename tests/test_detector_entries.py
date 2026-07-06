@@ -124,6 +124,9 @@ async def _patch_detector(
 
     async def open_trade(_session: Any, _setup: dict[str, Any], **kwargs: Any) -> uuid.UUID:
         opened_entries.append(float(kwargs["entry_price"]))
+        # The real open_paper_trade persists trade_metadata at insert time; mirror that so
+        # the metadata-persistence assertions inspect what would be written to the row.
+        _session.trade.trade_metadata = kwargs.get("trade_metadata") or {}
         return uuid.uuid4()
 
     monkeypatch.setattr(orchestrator.state, "active_plan", active_plan)

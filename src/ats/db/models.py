@@ -295,6 +295,13 @@ class PaperTrade(Base):
     venue: Mapped[str] = mapped_column(String, nullable=False, default="paper")
     entry_order_id: Mapped[str | None] = mapped_column(String, nullable=True)
     exit_order_id: Mapped[str | None] = mapped_column(String, nullable=True)
+    # Reality track (live/testnet only; NULL for paper rows). The simulated entry_price/
+    # exit_price/pnl_usd above stay the analytics source of truth (mirror model); these record
+    # what the EXCHANGE actually did, so live-vs-sim can be diffed per trade instead of one-way.
+    entry_fill_price: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    exit_fill_price: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    commission_usd: Mapped[float | None] = mapped_column(Numeric, nullable=True)
+    realized_pnl_usd: Mapped[float | None] = mapped_column(Numeric, nullable=True)
     trade_metadata: Mapped[dict[str, object]] = mapped_column(
         "metadata", JSONB, nullable=False, default=dict
     )

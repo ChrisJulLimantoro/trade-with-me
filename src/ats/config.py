@@ -214,6 +214,13 @@ class PlanConfig(BaseModel):
     #    close (look-ahead), which inflated backtest win rate and did not survive live. The
     #    arm→pending→fill split removes it; re-baseline any tuning done before this change.
     entry_trigger_mode: Literal["close", "wick_limit"] = "wick_limit"
+    # Live-only fill-or-cancel window for a resting LIMIT entry, in DECISION bars. When live
+    # execution places a real limit at the zone edge (see execution.live), it may fill later,
+    # partially, or never. If the order is still unfilled this many bars after placement, it is
+    # cancelled and no trade is booked — the honest "no fill" outcome the market-order mirror used
+    # to paper over. Paper/replay ignore this (the sim resolves fills deterministically). 0 = never
+    # time out (rest until filled).
+    live_entry_fill_or_cancel_bars: int = 1
     # Deterministic entry-confirmation gate (#1, default OFF). When on, a detected setup only
     # fills if, on the decision bar's close, price is actually turning in the trade's direction
     # (close moved with-trade) AND at least one order-flow signal (cvd_slope_10 or macd_hist)

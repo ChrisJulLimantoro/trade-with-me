@@ -20,6 +20,7 @@ from ats.engine.orchestrator import evaluate_now
 from ats.engine.reports import ReplayReport, TickReport, TradeOutcome
 from ats.engine.timeframes import timeframe_to_timedelta
 from ats.execution.executor import RunTag, current_run
+from ats.execution.live import live_ctx
 from ats.llm.client import LlmClient
 from ats.logging import get_logger
 from ats.planning.create_plan import create_plan
@@ -245,9 +246,16 @@ async def run_tick(
         session, client, symbol=symbol, tf=tf, now=now,
         bars_since_plan=0,
     )
+    # Live: mark sizing to the real wallet (refreshed once per tick on the poll cadence) instead
+    # of the static config equity. None (paper/tick with no live_ctx, or a failed fetch) leaves
+    # evaluate_now on the settings.risk.paper_equity_usd fallback — behavior unchanged.
+    equity_usd: float | None = None
+    ctx = live_ctx.get()
+    if ctx is not None:
+        equity_usd = await ctx.wallet_equity()
     tick = await evaluate_now(
         session, client, symbol=symbol, tf=tf, feature_row=latest, prev_row=prev,
-        candle_closed=True, now=now,
+        candle_closed=True, now=now, equity_usd=equity_usd,
     )
     if settings.plan.replan_on_close and tick.closed > 0:
         await state.supersede_active_plan(session, symbol)

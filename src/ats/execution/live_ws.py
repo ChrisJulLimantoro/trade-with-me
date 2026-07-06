@@ -12,6 +12,7 @@ Falls back to the REST poll loop (``run_live``) if the socket can't be establish
 from __future__ import annotations
 
 import asyncio
+import contextlib
 from collections.abc import Awaitable, Callable
 
 from binance import BinanceSocketManager
@@ -133,6 +134,10 @@ async def _consume_user(bsm: BinanceSocketManager, ctx: LiveContext) -> None:
                 event = msg.get("e")
                 if event == "ORDER_TRADE_UPDATE":
                     o = msg.get("o", {})
+                    # Keep the commission (n) + asset (N) fields — the reality track that the
+                    # close-time income reconcile (executor.close_paper_trade) folds into
+                    # commission_usd/realized_pnl_usd. Dropping them lost the largest, most
+                    # deterministic piece of the live↔sim gap.
                     ctx.record(
                         "fill",
                         {
@@ -143,10 +148,27 @@ async def _consume_user(bsm: BinanceSocketManager, ctx: LiveContext) -> None:
                             "last_filled_qty": o.get("l"),
                             "last_filled_price": o.get("L"),
                             "realized_pnl": o.get("rp"),
+                            "commission": o.get("n"),
+                            "commission_asset": o.get("N"),
                         },
                     )
                 elif event == "ACCOUNT_UPDATE":
-                    ctx.record("account_update", {"reason": msg.get("a", {}).get("m")})
+                    a = msg.get("a", {})
+                    # Snapshot the USDT wallet balance from the account-update payload so sizing can
+                    # mark to the real wallet (see LiveContext.wallet_equity / loop.run_live).
+                    usdt = next(
+                        (b for b in a.get("B", []) if b.get("a") == "USDT"), None
+                    )
+                    if usdt is not None:
+                        with contextlib.suppress(TypeError, ValueError):
+                            ctx.set_wallet_equity(float(usdt.get("wb")))
+                    ctx.record(
+                        "account_update",
+                        {
+                            "reason": a.get("m"),
+                            "wallet_balance": (usdt or {}).get("wb"),
+                        },
+                    )
     except asyncio.CancelledError:
         raise
     except Exception as exc:

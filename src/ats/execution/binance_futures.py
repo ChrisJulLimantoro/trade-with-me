@@ -28,7 +28,27 @@ Recorder = Callable[[str, dict[str, Any]], None]
 
 
 class OrderError(RuntimeError):
-    """A testnet order/REST call was rejected. Callers log and skip (never open on failure)."""
+    """A testnet order/REST call was rejected. Callers log and skip (never open on failure).
+
+    ``code`` carries the Binance numeric error code (e.g. -2021 "Order would immediately
+    trigger", -1111 "Precision is over the maximum", -2011 "Unknown order") when the reject
+    originated from a ``BinanceAPIException``; None for locally-raised guards (bad symbol,
+    filters not loaded, mainnet refusal). Callers branch on ``code`` instead of matching the
+    message string.
+    """
+
+    def __init__(self, message: str, *, code: int | None = None) -> None:
+        super().__init__(message)
+        self.code = code
+
+
+def _api_code(exc: BinanceAPIException) -> int | None:
+    """Best-effort numeric code off a python-binance API exception (int or None)."""
+    raw = getattr(exc, "code", None)
+    try:
+        return int(raw) if raw is not None else None
+    except (TypeError, ValueError):
+        return None
 
 
 @dataclass(frozen=True)
@@ -159,7 +179,7 @@ class BinanceFuturesTestnet:
             await self._client.futures_change_leverage(symbol=symbol, leverage=lev)
         except BinanceAPIException as exc:
             self._record("set_leverage", {"symbol": symbol, "leverage": lev, "error": str(exc)})
-            raise OrderError(f"set_leverage failed: {exc}") from exc
+            raise OrderError(f"set_leverage failed: {exc}", code=_api_code(exc)) from exc
 
     async def position_risk(self, symbol: str) -> dict[str, Any] | None:
         """Return the open position for ``symbol`` (positionAmt != 0), else None."""
@@ -241,7 +261,9 @@ class BinanceFuturesTestnet:
             resp = await self._client.futures_create_order(**params)
         except BinanceAPIException as exc:
             self._record(action, {"request": params, "status": "rejected", "error": str(exc)})
-            raise OrderError(f"market_order {side} {qty} {symbol} rejected: {exc}") from exc
+            raise OrderError(
+                f"market_order {side} {qty} {symbol} rejected: {exc}", code=_api_code(exc)
+            ) from exc
         latency_ms = round((time.perf_counter() - t0) * 1000, 1)
         avg = float(resp.get("avgPrice") or 0.0)
         if avg == 0.0:
@@ -288,6 +310,91 @@ class BinanceFuturesTestnet:
             status=result.status,
         )
         return result
+
+    async def limit_order(
+        self,
+        symbol: str,
+        side: str,
+        qty: float,
+        price: float,
+        *,
+        reduce_only: bool = False,
+        post_only: bool = True,
+        tif: str = "GTC",
+    ) -> OrderResult:
+        """Place a resting LIMIT order at ``price`` (snapped to tick). Returns the NEW order.
+
+        This is the entry primitive for the "make live match sim" model: the sim assumes a
+        fill at the zone edge, so the live entry rests a real limit there rather than crossing
+        the spread with a market order. ``post_only`` sends ``timeInForce=GTX`` (maker-only:
+        the exchange rejects/expires it rather than let it take), which is what justifies the
+        maker fee model — a normal ``GTC`` limit could still cross and pay taker. The order does
+        NOT necessarily fill on placement; the caller polls ``get_order`` for the fill.
+        """
+        px = self.round_price(symbol, price)
+        params: dict[str, Any] = {
+            "symbol": symbol,
+            "side": side,
+            "type": "LIMIT",
+            "quantity": qty,
+            "price": px,
+            "timeInForce": "GTX" if post_only else tif,
+            "newOrderRespType": "RESULT",
+        }
+        if reduce_only:
+            params["reduceOnly"] = "true"
+        self._record("open", {"request": params, "status": "submitting"})
+        try:
+            resp = await self._client.futures_create_order(**params)
+        except BinanceAPIException as exc:
+            self._record("open", {"request": params, "status": "rejected", "error": str(exc)})
+            raise OrderError(
+                f"limit_order {side} {qty} {symbol}@{px} rejected: {exc}", code=_api_code(exc)
+            ) from exc
+        result = OrderResult(
+            order_id=str(resp.get("orderId", "")),
+            side=side,
+            qty=float(resp.get("origQty") or qty),
+            avg_price=float(resp.get("avgPrice") or 0.0) or px,
+            status=str(resp.get("status", "NEW")),
+            raw=resp,
+        )
+        self._record(
+            "open",
+            {
+                "request": params,
+                "status": result.status,
+                "order_id": result.order_id,
+                "limit_price": px,
+            },
+        )
+        log.info(
+            "testnet_limit_order",
+            symbol=symbol, side=side, qty=qty, limit_price=px, order_id=result.order_id,
+            status=result.status,
+        )
+        return result
+
+    async def get_order(self, symbol: str, order_id: str) -> dict[str, Any]:
+        """Fetch the current state of a single order (for pending-entry fill polling)."""
+        try:
+            return await self._client.futures_get_order(symbol=symbol, orderId=order_id)
+        except BinanceAPIException as exc:
+            raise OrderError(
+                f"get_order {order_id} {symbol} failed: {exc}", code=_api_code(exc)
+            ) from exc
+
+    async def cancel_order(self, symbol: str, order_id: str) -> None:
+        """Cancel a resting order (pending entry timeout). A gone order is logged, not raised."""
+        self._record("cancel_order", {"symbol": symbol, "order_id": order_id})
+        try:
+            await self._client.futures_cancel_order(symbol=symbol, orderId=order_id)
+        except BinanceAPIException as exc:
+            # Already filled/cancelled between poll and cancel — fine, the poller handles the fill.
+            log.info("order_cancel_noop", symbol=symbol, order_id=order_id, error=str(exc))
+            self._record(
+                "cancel_order", {"symbol": symbol, "order_id": order_id, "noop": str(exc)}
+            )
 
     # --- conditional (algo) orders: SL / TP / trailing ---------------------------------
     # Binance migrated conditional orders OFF /fapi/v1/order to POST /fapi/v1/algoOrder
@@ -353,7 +460,9 @@ class BinanceFuturesTestnet:
                 tick_decimals=(max(0, -int(math.floor(math.log10(tick)))) if tick else None),
                 error=str(exc),
             )
-            raise OrderError(f"conditional {order_type} {symbol} rejected: {exc}") from exc
+            raise OrderError(
+                f"conditional {order_type} {symbol} rejected: {exc}", code=_api_code(exc)
+            ) from exc
         algo_id = str(resp.get("algoId") or resp.get("orderId") or "")
         self._record(
             "protect",

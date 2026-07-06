@@ -15,12 +15,12 @@ from sqlalchemy.ext.asyncio import AsyncSession
 
 from ats import trace
 from ats.config import settings
-from ats.db.models import PaperTrade, Plan, Setup
+from ats.db.models import Plan, Setup
 from ats.engine.exits.policy import exit_policy_for_regime, exit_policy_metadata
 from ats.engine.quantities import _f
 from ats.engine.reports import TickReport
 from ats.engine.timeframes import timeframe_to_timedelta
-from ats.execution.executor import open_paper_trade
+from ats.execution.executor import PENDING, open_paper_trade
 from ats.risk.manager import assess
 from ats.synthesis.sl_tp import adaptive_stop_mult
 
@@ -117,9 +117,30 @@ async def execute_setup(
     effective_equity = equity_usd if equity_usd is not None else settings.risk.paper_equity_usd
     trace.outcome(f"sizing on equity=${effective_equity:.2f}")
     policy = exit_policy_for_regime(plan.regime_cell)
-    trade_id = await open_paper_trade(
+    # Build the exit-policy / entry-zone / time-stop metadata BEFORE opening, so it is set at
+    # insert time (the live book-on-fill path has no post-insert step to attach it). Time-stop
+    # the OPEN trade from its own entry bar, not the setup's entry-window expiry: a trade that
+    # triggers late in a plan's life still gets a full hold budget.
+    md = exit_policy_metadata(policy)
+    md.update(
+        entry_zone_low=_f(setup.entry_zone_low),
+        entry_zone_high=_f(setup.entry_zone_high),
+    )
+    if settings.exits.max_hold_bars > 0:
+        hold = timeframe_to_timedelta(tf) * settings.exits.max_hold_bars
+        md.update(
+            expires_at=(now + hold).isoformat(),
+            # Window length each thesis-review extension grants (see advance_trade).
+            hold_window_seconds=hold.total_seconds(),
+        )
+    # Live-only fill-or-cancel window for the resting-limit entry (absolute deadline).
+    foc_bars = settings.plan.live_entry_fill_or_cancel_bars
+    entry_expires_at = (
+        now + timeframe_to_timedelta(tf) * foc_bars if foc_bars > 0 else None
+    )
+    result = await open_paper_trade(
         session,
-        {**setup_d, "trade_metadata": None},
+        setup_d,
         entry_price=entry_price,
         entry_time=now,
         size_pct=decision.size_pct,
@@ -129,30 +150,23 @@ async def execute_setup(
         notional_usd=decision.notional_usd,
         liq_price=decision.liq_price,
         risk_usd=decision.risk_usd,
+        trade_metadata=md,
+        entry_expires_at=entry_expires_at,
     )
-    if trade_id is None:
+    if result is PENDING:
+        # Live: a real resting LIMIT entry was placed. The trade is booked later when the
+        # exchange fills it (executor.poll_live_entries); consume the setup so a second limit
+        # isn't placed next bar, and record NO open position yet.
+        setup.status = "realized"
+        setup.detected_at = now
+        report.notes.append(f"setup {setup.setup_id} resting-limit entry placed (awaiting fill)")
+        await session.flush()
+        return
+    if result is None:
         # Live execution on and the testnet entry order was rejected/too small: do not open
         # an internal trade. open_paper_trade already traced the reason.
         report.notes.append(f"setup {setup.setup_id} live entry order not filled")
         return
-    # Time-stop the OPEN trade from its own entry bar, not the setup's entry-window
-    # expiry: a trade that triggers late in a plan's life still gets a full hold budget,
-    # so a healthy, still-running position is no longer cut short by the plan clock.
-    trade = await session.get(PaperTrade, trade_id)
-    if trade is not None:
-        md = exit_policy_metadata(policy)
-        md.update(
-            entry_zone_low=_f(setup.entry_zone_low),
-            entry_zone_high=_f(setup.entry_zone_high),
-        )
-        if settings.exits.max_hold_bars > 0:
-            hold = timeframe_to_timedelta(tf) * settings.exits.max_hold_bars
-            md.update(
-                expires_at=(now + hold).isoformat(),
-                # Window length each thesis-review extension grants (see advance_trade).
-                hold_window_seconds=hold.total_seconds(),
-            )
-        trade.trade_metadata = md
     setup.status = "realized"
     setup.detected_at = now
     open_positions.append(
