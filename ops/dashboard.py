@@ -195,8 +195,8 @@ async def load_data() -> dict:
             "WHERE status='open' ORDER BY entry_time DESC"
         )
         closed_rows = await conn.fetch(
-            "SELECT symbol, direction, entry_price, exit_price, exit_reason, pnl_usd, pnl_pct, "
-            "venue, exit_time FROM paper_trades WHERE status='closed' "
+            "SELECT symbol, direction, entry_price, exit_price, exit_fill_price, exit_reason, "
+            "pnl_usd, pnl_pct, venue, exit_time FROM paper_trades WHERE status='closed' "
             "ORDER BY exit_time DESC LIMIT 50"
         )
         agg = await conn.fetchrow(
@@ -287,10 +287,14 @@ def render(data: dict) -> str:
     closed_html = ""
     for r in data["closed"]:
         when = r["exit_time"].strftime("%m-%d %H:%M") if r["exit_time"] else "—"
+        fill = r["exit_fill_price"]
+        exit_str = f"{_fnum(r['exit_price']):g}"
+        if fill is not None:
+            exit_str += f" <span class=dim>({_fnum(fill):g})</span>"
         closed_html += (
             f"<tr><td class=dim>{when}</td><td>{html.escape(r['symbol'])}</td>"
             f"<td>{html.escape(r['direction'] or '')}</td>"
-            f"<td>{_fnum(r['entry_price']):g} → {_fnum(r['exit_price']):g}</td>"
+            f"<td>{_fnum(r['entry_price']):g} → {exit_str}</td>"
             f"<td>{html.escape(r['exit_reason'] or '')}</td>"
             f"<td>{money(_fnum(r['pnl_usd']))}</td>"
             f"<td>{_fnum(r['pnl_pct'])*100:+.2f}%</td></tr>"

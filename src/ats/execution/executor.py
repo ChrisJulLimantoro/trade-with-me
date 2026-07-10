@@ -460,6 +460,11 @@ async def close_paper_trade(
         native_reason = exit_result.exit_reason in _NATIVE_EXIT_REASONS
         still_open = await ctx.client.position_risk(trade.symbol) if native_reason else None
         exit_fill_price: float | None = None
+        if native_reason and still_open is None:
+            # Look up the real fill BEFORE cancel_protection clears the order-id bookkeeping.
+            exit_fill_price = await ctx.native_exit_fill_price(
+                str(trade_id), trade.symbol, exit_result.exit_reason
+            )
         await ctx.cancel_protection(str(trade_id), trade.symbol)
         if native_reason and still_open is None:
             # Native STOP/TP already closed it — no market lag to reconcile.

@@ -255,3 +255,50 @@ async def test_place_protection_retries_before_flattening():
     assert ctx._client.place_calls == 3
     assert ctx._client.closed is False
     assert "t1" in ctx._protection
+
+
+class _GetOrderClient:
+    """Fake exchange client: returns a filled order with a fixed avgPrice for get_order."""
+
+    def __init__(self, avg_price: float | None) -> None:
+        self._avg_price = avg_price
+        self.get_order_calls: list[tuple[str, str]] = []
+
+    async def get_order(self, symbol, order_id):
+        self.get_order_calls.append((symbol, order_id))
+        return {"status": "FILLED", "avgPrice": self._avg_price}
+
+
+@pytest.mark.asyncio
+async def test_native_exit_fill_price_reads_sl_slot_for_sl_reason():
+    from ats.execution.live import LiveContext
+
+    ctx = LiveContext.__new__(LiveContext)
+    ctx._client = _GetOrderClient(78.16)
+    ctx._protection = {"t1": {"direction": "long", "sl": "algo-sl", "tp": "algo-tp"}}
+    price = await ctx.native_exit_fill_price("t1", "SOLUSDT", "sl")
+    assert price == 78.16
+    assert ctx._client.get_order_calls == [("SOLUSDT", "algo-sl")]
+
+
+@pytest.mark.asyncio
+async def test_native_exit_fill_price_reads_tp_slot_for_tp_reason():
+    from ats.execution.live import LiveContext
+
+    ctx = LiveContext.__new__(LiveContext)
+    ctx._client = _GetOrderClient(82.5)
+    ctx._protection = {"t1": {"direction": "long", "sl": "algo-sl", "tp": "algo-tp"}}
+    price = await ctx.native_exit_fill_price("t1", "SOLUSDT", "tp")
+    assert price == 82.5
+    assert ctx._client.get_order_calls == [("SOLUSDT", "algo-tp")]
+
+
+@pytest.mark.asyncio
+async def test_native_exit_fill_price_none_when_trade_untracked():
+    from ats.execution.live import LiveContext
+
+    ctx = LiveContext.__new__(LiveContext)
+    ctx._client = _GetOrderClient(78.16)
+    ctx._protection = {}
+    assert await ctx.native_exit_fill_price("t1", "SOLUSDT", "sl") is None
+    assert ctx._client.get_order_calls == []

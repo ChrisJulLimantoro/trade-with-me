@@ -287,6 +287,36 @@ class LiveContext:
             sl_id=new_sl,
         )
 
+    async def native_exit_fill_price(
+        self, trade_id: str, symbol: str, reason: str
+    ) -> float | None:
+        """Real avg fill price of whichever protective order closed the trade natively.
+
+        Must be called BEFORE ``cancel_protection`` — that pops the order-id bookkeeping
+        this depends on. ``breakeven``/``trail`` ride the SL slot (``replace_stop`` keeps
+        it current), so only an explicit ``tp`` reason reads the TP id.
+        """
+        prot = self._protection.get(trade_id)
+        if not prot:
+            return None
+        order_id = prot.get("tp" if reason == "tp" else "sl")
+        if not order_id:
+            return None
+        try:
+            order = await self._client.get_order(symbol, order_id)
+        except OrderError as exc:
+            log.warning(
+                "live_native_fill_lookup_failed",
+                symbol=symbol, trade_id=trade_id, order_id=order_id, error=str(exc),
+            )
+            return None
+        avg = order.get("avgPrice")
+        try:
+            avg_price = float(avg) if avg is not None else None
+        except (TypeError, ValueError):
+            return None
+        return avg_price if avg_price else None
+
     async def cancel_protection(self, trade_id: str, symbol: str) -> None:
         """Cancel any remaining SL/TP for a trade (on close)."""
         prot = self._protection.pop(trade_id, None)
