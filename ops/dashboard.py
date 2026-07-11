@@ -326,14 +326,16 @@ def render(data: dict) -> str:
             )
         else:
             setup_cell = "<span class=dim>stand-aside</span>"
-        rat = (p["rationale"] or "")[:90]
+        rat = p["rationale"] or ""
+        # Stand-aside rationales carry the full per-agent breakdown — let that cell wrap.
+        rat_cls = "dim rat" if rat.startswith("stand-aside") else "dim"
         plan_html += (
             f"<tr><td class=dim>{when}</td><td>{html.escape(p['symbol'])}</td>"
             f"<td class={bias_cls}>{bias}</td>"
             f"<td class=dim>{html.escape(p['regime_cell'] or '—')}</td>"
             f"<td>{html.escape(p['status'])}</td>"
             f"<td>{setup_cell}</td>"
-            f"<td class=dim>{html.escape(rat)}</td></tr>"
+            f"<td class={rat_cls}>{html.escape(rat)}</td></tr>"
         )
     if not plan_html:
         plan_html = "<tr><td colspan=7 class=dim>no plans yet</td></tr>"
@@ -411,6 +413,7 @@ def render(data: dict) -> str:
  th,td{{padding:7px 10px;text-align:left;border-bottom:1px solid #232733;white-space:nowrap}}
  th{{color:#9aa0aa;font-weight:600;font-size:12px}}
  .pos{{color:#34d399}} .neg{{color:#f87171}} .dim{{color:#6b7280}} .warn{{color:#fbbf24}}
+ .rat{{white-space:normal;max-width:42em;font-size:12px;line-height:1.35}}
  .foot{{color:#6b7280;margin-top:18px;font-size:12px}}
 </style></head><body>
 <h1>ATS — Binance Testnet</h1>

@@ -486,7 +486,7 @@ async def create_plan(
     from ats.strategy.bridge import signal_to_plan
     from ats.strategy.deterministic import propose_signal
 
-    signal = propose_signal(envelope, symbol=symbol)
+    signal, agent_scores = propose_signal(envelope, symbol=symbol)
 
     adj_llm: LlmResult | None = None
     if signal is not None and settings.adjudication_enabled:
@@ -500,7 +500,9 @@ async def create_plan(
             # Degrade to the deterministic baseline (delta 0) rather than trust a bad parse.
             log.warning("adjudication_parse_failed", symbol=symbol, model=adj_llm.model)
 
-    plan_out = signal_to_plan(signal, envelope.get("features") or {})
+    plan_out = signal_to_plan(
+        signal, envelope.get("features") or {}, agent_scores=agent_scores
+    )
     llm = LlmResult(
         parse_ok=True,
         model="deterministic",

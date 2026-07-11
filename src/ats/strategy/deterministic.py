@@ -12,11 +12,11 @@ from __future__ import annotations
 from typing import Any
 
 from ats.agents import AGENTS
-from ats.agents.base import AgentInput
+from ats.agents.base import AgentInput, AgentScore
 from ats.config import settings
 from ats.llm.schemas import LlmResult, PlanOutput
 from ats.logging import get_logger
-from ats.orchestration.weights import WEIGHTS
+from ats.orchestration.weights import WEIGHTS, weights_with_htf
 from ats.agents.base import f
 from ats.strategy.bridge import signal_to_plan
 from ats.synthesis.mean_reversion import propose_mean_reversion
@@ -37,12 +37,15 @@ def _agent_input(envelope: dict[str, Any], symbol: str) -> AgentInput:
     )
 
 
-def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
+def propose_signal(
+    envelope: dict[str, Any], *, symbol: str
+) -> tuple[Signal | None, dict[str, AgentScore]]:
     """Run the 8 agents + synthesizer over the envelope and apply the hard regime gate.
 
-    Returns the synthesized ``Signal`` (which still carries the raw deterministic confidence
-    ``C`` the Part-2 judge will adjudicate), or ``None`` when no signal qualifies. Pure: the
-    same envelope yields a byte-identical Signal.
+    Returns ``(signal, agent_scores)``. ``signal`` is the synthesized ``Signal`` (which still
+    carries the raw deterministic confidence ``C`` the Part-2 judge will adjudicate), or
+    ``None`` when no signal qualifies. ``agent_scores`` is always populated so stand-aside
+    plans can surface per-agent detail. Pure: the same envelope yields a byte-identical Signal.
     """
     ai = _agent_input(envelope, symbol)
     features = ai.features
@@ -94,7 +97,7 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
             if mr is not None:
                 mr_allowed = risk_limits.get("mr_allowed_directions")
                 if mr_allowed is None or mr.direction in mr_allowed:
-                    return mr
+                    return mr, scores
                 log.info(
                     "signal_rejected",
                     reason="mr_regime_gate",
@@ -107,7 +110,11 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
         ai.regime,
         features,
         ai.recent_ohlcv,
-        weights=WEIGHTS,
+        weights=(
+            weights_with_htf(settings.plan.htf_trend_weight)
+            if settings.plan.htf_trend_weight is not None
+            else WEIGHTS
+        ),
         min_rr=settings.risk.min_rr,
         min_confidence=settings.plan.signal_min_confidence,
         chop_atr_pct_max=settings.plan.chop_atr_pct_max,
@@ -134,8 +141,8 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
             direction=signal.direction,
             allowed_directions=allowed,
         )
-        return None
-    return signal
+        return None, scores
+    return signal, scores
 
 
 def propose_plan(envelope: dict[str, Any], *, symbol: str) -> tuple[PlanOutput, LlmResult]:
@@ -144,8 +151,8 @@ def propose_plan(envelope: dict[str, Any], *, symbol: str) -> tuple[PlanOutput, 
     This is the unadjudicated baseline — the Part-2 bounded judge is layered on top in
     ``planning.create_plan``, never here, so this stays the pure deterministic control.
     """
-    signal = propose_signal(envelope, symbol=symbol)
-    plan = signal_to_plan(signal, envelope.get("features") or {})
+    signal, scores = propose_signal(envelope, symbol=symbol)
+    plan = signal_to_plan(signal, envelope.get("features") or {}, agent_scores=scores)
     result = LlmResult(
         parse_ok=True,
         model="deterministic",

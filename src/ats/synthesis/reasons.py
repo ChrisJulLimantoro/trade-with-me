@@ -44,6 +44,17 @@ def render_reasons(
     return reasons[:5]
 
 
+def format_agent_detail(s: AgentScore) -> str:
+    """Compact one-liner: ``agent:direction score (why)`` — for stand-aside rationales."""
+    base = f"{s.agent}:{s.direction} {s.score:.2f}"
+    reason = (s.metadata or {}).get("reason")
+    if isinstance(reason, str) and reason:
+        return f"{base} ({reason})"
+    if s.direction != "neutral" and s.score > 0:
+        return f"{base} ({_agent_phrase(s)})"
+    return base
+
+
 def _agent_phrase(s: AgentScore) -> str:
     """One concrete phrase per agent, citing its driving number when present.
 

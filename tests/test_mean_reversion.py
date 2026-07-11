@@ -104,7 +104,7 @@ def _envelope(close, rsi, regime_cell="side-low"):
 def test_router_fires_in_lowvol_sideways_and_bypasses_trend_block() -> None:
     apply_profile("scalper")
     try:
-        sig = propose_signal(_envelope(92.0, 30.0), symbol="BTCUSDT")
+        sig, _ = propose_signal(_envelope(92.0, 30.0), symbol="BTCUSDT")
         assert sig is not None and sig.direction == "long"
         assert sig.metadata.get("strategy") == "mean_reversion"
     finally:
@@ -115,7 +115,7 @@ def test_router_inert_when_disabled() -> None:
     apply_profile("scalper")
     settings.plan.mr_enabled = False
     try:
-        sig = propose_signal(_envelope(92.0, 30.0), symbol="BTCUSDT")
+        sig, _ = propose_signal(_envelope(92.0, 30.0), symbol="BTCUSDT")
         # With MR off, the bar falls through to the trend path (no MR signal returned).
         assert sig is None or sig.metadata.get("strategy") != "mean_reversion"
     finally:
@@ -127,7 +127,7 @@ def test_router_respects_mr_regime_gate() -> None:
     try:
         env = _envelope(92.0, 30.0)
         env["risk_limits"]["mr_allowed_directions"] = ["short"]  # long now hard-gated out
-        sig = propose_signal(env, symbol="BTCUSDT")
+        sig, _ = propose_signal(env, symbol="BTCUSDT")
         assert sig is None or sig.metadata.get("strategy") != "mean_reversion"
     finally:
         apply_profile("baseline")
