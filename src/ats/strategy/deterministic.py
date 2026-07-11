@@ -51,7 +51,13 @@ def propose_signal(envelope: dict[str, Any], *, symbol: str) -> Signal | None:
     for agent in AGENTS:
         s = agent.run(ai)
         scores[agent.name] = s
-        log.info("agent_score", agent=agent.name, score=round(s.score, 6), direction=s.direction)
+        log.info(
+            "agent_score",
+            agent=agent.name,
+            score=round(s.score, 6),
+            direction=s.direction,
+            reason=s.metadata.get("reason"),
+        )
 
     risk_limits = envelope.get("risk_limits") or {}
     preferred = risk_limits.get("preferred_direction")

@@ -395,7 +395,8 @@ async def run_once(
         funding_df = await _fetch_funding(session, symbol)
         xvenue_df = await _fetch_xvenue(session, symbol)
         for tf in timeframes:
-            candles_df = await _fetch_candles(session, symbol, tf, bars=500)
+            lookback = PR_LOOKBACK.get(tf, 720)
+            candles_df = await _fetch_candles(session, symbol, tf, bars=lookback + 210)
             if candles_df.empty:
                 continue
             features_df = compute_features_frame(

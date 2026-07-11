@@ -525,12 +525,17 @@ def run(
 
     client = get_client()
 
+    first_refresh = [True]
+
     async def _refresh() -> None:
         from ats.ingestion.backfill import run as bf_run
         from ats.processing.features import run_once
 
+        backfill_window = timedelta(days=31) if first_refresh[0] else timedelta(days=2)
+        first_refresh[0] = False
+
         async with SessionLocal() as session:
-            await bf_run(session, timedelta(days=2), [symbol])
+            await bf_run(session, backfill_window, [symbol])
             await run_once(session, [symbol])
             await session.commit()
 

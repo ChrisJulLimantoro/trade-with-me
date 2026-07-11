@@ -63,6 +63,45 @@ def test_funding_columns_nan_without_funding_df() -> None:
     assert out["funding_z_30d"].isna().all()
 
 
+def _funding_spanning(periods: int = 400, start: str = "2025-10-01") -> pd.DataFrame:
+    """8h funding boundaries with varying rates (nonzero std) spanning ~130 days."""
+    ftimes = pd.date_range(start, periods=periods, freq="8h", tz="UTC")
+    rates = [0.0001 * math.sin(i / 5) for i in range(periods)]
+    return pd.DataFrame({"funding_time": ftimes, "rate": rates})
+
+
+def test_funding_z_30d_populated_with_full_lookback() -> None:
+    """Regression: live `run_once` used to fetch only 500 candles, but funding_z_30d
+    is a rolling z-score over PR_LOOKBACK['15m'] == 2880 bars (closed='left'), so it
+    needed >=2881 bars and was NaN on every live row. Same starvation NaNs the pr_*
+    percentile-rank features, which need the lookback window plus indicator warm-up
+    (e.g. ema_200) fully populated with non-null values -- mirrors the production fetch
+    size `PR_LOOKBACK[tf] + 210` used by the fixed `run_once`.
+    """
+    candles = _make_candles(2880 + 210 + 1)
+    funding = _funding_spanning()
+
+    out = compute_features_frame(candles, tf="15m", funding_df=funding)
+
+    last = out.iloc[-1]
+    assert not math.isnan(float(last["funding_z_30d"]))
+    assert not math.isnan(float(last["pr_atr"]))
+
+
+def test_funding_z_30d_nan_with_only_500_candles() -> None:
+    """Inverse guard pinning the failure mode: with only ~500 candles (the old live
+    fetch size), funding_z_30d on the last row is NaN even though funding data is
+    available for the whole window.
+    """
+    candles = _make_candles(500)
+    funding = _funding_spanning()
+
+    out = compute_features_frame(candles, tf="15m", funding_df=funding)
+
+    last = out.iloc[-1]
+    assert math.isnan(float(last["funding_z_30d"]))
+
+
 # ── B. cross-venue funding divergence ──────────────────────────────────────────
 
 
