@@ -42,3 +42,20 @@ def renormalize(active: set[str]) -> dict[str, float]:
     if total <= 0:
         raise ValueError(f"no positive weight in active set {sorted(active)}")
     return {k: v / total for k, v in kept.items()}
+
+
+def weights_with_htf(w: float) -> dict[str, float]:
+    """Return WEIGHTS with ``htf_trend`` overridden to ``w``.
+
+    Mirrors how the current 0.25 was introduced: the eight base weights are scaled by
+    ``(1 - w) / (their current sum)`` so their *relative* shape is untouched, and the
+    freed/reclaimed mass goes to ``htf_trend``. Replay-only override (plan.htf_trend_weight).
+    """
+    if not 0 < w < 1:
+        raise ValueError(f"htf_trend weight must be in (0, 1), got {w}")
+    base = {k: v for k, v in WEIGHTS.items() if k != "htf_trend"}
+    base_total = sum(base.values())
+    scale = (1 - w) / base_total
+    out = {k: v * scale for k, v in base.items()}
+    out["htf_trend"] = w
+    return out

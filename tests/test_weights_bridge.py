@@ -5,7 +5,7 @@ from __future__ import annotations
 import pytest
 
 from ats.llm.schemas import SetupOutput
-from ats.orchestration.weights import WEIGHTS, renormalize
+from ats.orchestration.weights import WEIGHTS, renormalize, weights_with_htf
 from ats.risk.manager import reward_risk
 from ats.strategy.bridge import signal_to_plan, signal_to_setup
 from ats.synthesis.synthesizer import Signal
@@ -28,6 +28,27 @@ def test_renormalize_after_drop_sums_to_one() -> None:
 def test_renormalize_empty_raises() -> None:
     with pytest.raises(ValueError):
         renormalize(set())
+
+
+def test_weights_with_htf_sums_to_one_and_sets_htf() -> None:
+    w = weights_with_htf(0.15)
+    assert round(sum(w.values()), 9) == 1.0
+    assert w["htf_trend"] == 0.15
+    assert set(w) == set(WEIGHTS)
+
+
+def test_weights_with_htf_preserves_relative_shape() -> None:
+    w = weights_with_htf(0.15)
+    # Base (non-htf_trend) weights are uniformly scaled, so their pairwise ratios match WEIGHTS.
+    for a, b in (("structure", "momentum"), ("momentum", "funding"), ("basis", "cvd")):
+        assert w[a] / w[b] == pytest.approx(WEIGHTS[a] / WEIGHTS[b])
+
+
+def test_weights_with_htf_rejects_out_of_range() -> None:
+    with pytest.raises(ValueError):
+        weights_with_htf(0.0)
+    with pytest.raises(ValueError):
+        weights_with_htf(1.0)
 
 
 def _signal() -> Signal:

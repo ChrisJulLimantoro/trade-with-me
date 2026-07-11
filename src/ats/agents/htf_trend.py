@@ -1,12 +1,14 @@
 """HTF trend — the dominant higher-timeframe trend as a first-class voter.
 
-The other eight agents read the 15m row, so on an intraday bounce inside a 4h downtrend
-they vote long and the synthesizer fills a fade that the larger trend reverses — the
-dominant BTC-replay loss bucket. This agent injects the slow-chart direction (4h, then 1h:
-close vs EMA50) into the weighted vote so the synthesizer is biased with the macro trend:
-it suppresses counter-trend bounce signals and reinforces with-trend ones (so more genuine
-trend continuations clear the confidence floor). Conviction scales with how far price sits
-from the slow EMA in ATR units — a price riding far from the mean is a strong trend.
+The other eight agents read the 15m row, so on an intraday bounce inside a slow
+downtrend they vote long and the synthesizer fills a fade that the larger trend
+reverses — the dominant BTC-replay loss bucket. This agent injects a mid-chart
+direction (1h first, then 4h: close vs EMA50) into the weighted vote so the
+synthesizer is biased with the trend without waiting for the ~8-day 4h EMA50 to
+flip. Conviction scales with how far price sits from the EMA in ATR units.
+
+The plan-time ``htf_trend_filter`` gate remains on the slower 4h EMA50/EMA200
+stack — this agent only changes the vote, not ``allowed_directions``.
 """
 
 from __future__ import annotations
@@ -25,7 +27,7 @@ class HtfTrendAgent:
 
     def run(self, ai: AgentInput) -> AgentScore:
         htf = ai.higher_timeframes or {}
-        for tf in ("4h", "1h"):
+        for tf in ("1h", "4h"):
             feats = (htf.get(tf) or {}).get("features") or {}
             close = f(feats.get("close")) or f(feats.get("price"))
             ema50 = f(feats.get("ema_50"))
