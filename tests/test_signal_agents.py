@@ -10,6 +10,7 @@ from ats.agents.basis import BasisAgent
 from ats.agents.cross_venue import CrossVenueAgent
 from ats.agents.cvd import CvdAgent
 from ats.agents.funding import FundingAgent
+from ats.agents.htf_trend import HtfTrendAgent
 from ats.agents.liquidity import LiquidityAgent
 from ats.agents.momentum import MomentumAgent
 from ats.agents.price_action import PriceActionAgent
@@ -162,3 +163,31 @@ def test_liquidity_proxy_is_honest_and_bounded() -> None:
     s = LiquidityAgent().run(_ai({"close": 98, "atr_14": 2.0}, bars))
     assert s.metadata.get("proxy") is True
     assert 0.0 <= s.score <= 0.6
+
+
+# --- HTF trend ---------------------------------------------------------------------
+
+
+def test_htf_trend_prefers_1h_over_conflicting_4h() -> None:
+    """1h short must win even when 4h is long — agent order is 1h then 4h."""
+    s = HtfTrendAgent().run(
+        _ai(
+            {},
+            htf={
+                "1h": {"features": {"close": 90.0, "ema_50": 100.0, "atr_14": 2.0}},
+                "4h": {"features": {"close": 110.0, "ema_50": 100.0, "atr_14": 4.0}},
+            },
+        )
+    )
+    assert s.direction == "short"
+    assert s.metadata["tf"] == "1h"
+    assert s.score > 0.5
+
+
+def test_htf_trend_falls_back_to_4h_when_1h_missing() -> None:
+    s = HtfTrendAgent().run(
+        _ai({}, htf={"4h": {"features": {"close": 110.0, "ema_50": 100.0, "atr_14": 4.0}}})
+    )
+    assert s.direction == "long"
+    assert s.metadata["tf"] == "4h"
+    assert s.score > 0.5

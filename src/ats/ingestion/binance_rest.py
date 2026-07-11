@@ -9,6 +9,7 @@ import httpx
 from sqlalchemy import text
 from sqlalchemy.ext.asyncio import AsyncSession
 
+from ats.ingestion.xvenue_funding import _align_8h
 from ats.logging import get_logger
 
 log = get_logger(__name__)
@@ -60,10 +61,50 @@ async def fetch_klines(
 
 
 async def fetch_funding(
-    client: httpx.AsyncClient, symbol: str, limit: int = 1000
+    client: httpx.AsyncClient,
+    symbol: str,
+    *,
+    start_time_ms: int | None = None,
+    end_time_ms: int | None = None,
+    limit: int = 1000,
 ) -> list[dict[str, Any]]:
-    data, _ = await _get(client, "/fapi/v1/fundingRate", {"symbol": symbol, "limit": limit})
-    return data  # type: ignore[return-value]
+    """Fetch Binance USDT-M funding history, optionally paginating a time window.
+
+    Without ``start_time_ms``, returns the most recent ``limit`` rows (legacy behaviour).
+    With ``start_time_ms``, pages forward until ``end_time_ms`` (default: now).
+    """
+    if start_time_ms is None:
+        params: dict[str, Any] = {"symbol": symbol, "limit": limit}
+        if end_time_ms is not None:
+            params["endTime"] = end_time_ms
+        data, _ = await _get(client, "/fapi/v1/fundingRate", params)
+        return data  # type: ignore[return-value]
+
+    end_ms = end_time_ms if end_time_ms is not None else _now_ms_local()
+    cursor = start_time_ms
+    all_rows: list[dict[str, Any]] = []
+    while cursor <= end_ms:
+        data, _ = await _get(
+            client,
+            "/fapi/v1/fundingRate",
+            {"symbol": symbol, "startTime": cursor, "endTime": end_ms, "limit": limit},
+        )
+        batch = data if isinstance(data, list) else []
+        if not batch:
+            break
+        all_rows.extend(batch)  # type: ignore[arg-type]
+        last_t = int(batch[-1]["fundingTime"])  # type: ignore[index]
+        if len(batch) < limit or last_t >= end_ms:
+            break
+        next_cursor = last_t + 1
+        if next_cursor <= cursor:
+            break
+        cursor = next_cursor
+    return all_rows
+
+
+def _now_ms_local() -> int:
+    return int(datetime.now(tz=UTC).timestamp() * 1000)
 
 
 async def fetch_open_interest(client: httpx.AsyncClient, symbol: str) -> dict[str, Any]:
@@ -132,7 +173,9 @@ async def upsert_funding(
     values = []
     xvenue_values = []
     for r in rows:
-        ft = _ms_to_dt(int(r["fundingTime"]))
+        # Snap to 00/08/16 UTC so the xvenue pivot joins Binance with Bybit/OKX/HL
+        # (raw Binance fundingTime often carries a few ms past the boundary).
+        ft = _align_8h(_ms_to_dt(int(r["fundingTime"])))
         rate = Decimal(str(r["fundingRate"]))
         values.append({"symbol": symbol, "funding_time": ft, "rate": rate})
         xvenue_values.append(

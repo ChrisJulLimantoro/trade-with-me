@@ -112,6 +112,42 @@ def test_divergence_needs_two_peers() -> None:
     assert out["funding_divergence"].isna().all()
 
 
+def test_divergence_z_poisoned_by_misaligned_binance_ms() -> None:
+    """Binance fundingTime ms offsets that don't match peer stamps split the pivot
+    index and leave funding_divergence_z_30d empty — the live cross_venue death mode.
+    """
+    from datetime import timedelta
+
+    candles = _make_candles(200)
+    boundaries = pd.date_range("2025-11-01", periods=220, freq="8h", tz="UTC")
+    rows = []
+    for i, t in enumerate(boundaries):
+        base = 0.0001 * math.sin(i / 5)
+        # Every other boundary: binance carries +5ms → separate pivot row from peers.
+        bt = t + timedelta(milliseconds=5) if i % 2 == 0 else t
+        rows += [
+            {"exchange": "binance", "funding_time": bt, "rate": base + 0.00005},
+            {"exchange": "bybit", "funding_time": t, "rate": base},
+            {"exchange": "okx", "funding_time": t, "rate": base - 0.00002},
+        ]
+    misaligned = compute_features_frame(candles, tf="15m", xvenue_df=pd.DataFrame(rows))
+    assert misaligned["funding_divergence_z_30d"].isna().all()
+
+    # Same data with aligned stamps → z populates.
+    aligned_rows = []
+    for i, t in enumerate(boundaries):
+        base = 0.0001 * math.sin(i / 5)
+        aligned_rows += [
+            {"exchange": "binance", "funding_time": t, "rate": base + 0.00005},
+            {"exchange": "bybit", "funding_time": t, "rate": base},
+            {"exchange": "okx", "funding_time": t, "rate": base - 0.00002},
+        ]
+    aligned = compute_features_frame(
+        candles, tf="15m", xvenue_df=pd.DataFrame(aligned_rows)
+    )
+    assert aligned["funding_divergence_z_30d"].notna().any()
+
+
 # ── C1. envelope pruning ────────────────────────────────────────────────────────
 
 

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 import re
-from datetime import timedelta
+from datetime import UTC, datetime, timedelta
 
 import typer
 
@@ -27,6 +27,14 @@ def _parse_since(s: str) -> timedelta:
     return timedelta(minutes=n)
 
 
+def _parse_date(s: str) -> datetime:
+    """Parse YYYY-MM-DD (UTC midnight) for historical windows."""
+    try:
+        return datetime.strptime(s.strip(), "%Y-%m-%d").replace(tzinfo=UTC)
+    except ValueError as exc:
+        raise typer.BadParameter(f"Cannot parse date '{s}'. Use YYYY-MM-DD.") from exc
+
+
 @app.command()
 def backfill(
     since: str = typer.Option("120d", "--since", help="How far back to backfill, e.g. 7d, 120d."),
@@ -49,16 +57,23 @@ def backfill(
 @app.command("xvenue-funding")
 def xvenue_funding(
     symbols: str = typer.Option("", "--symbols", help=_SYMBOLS_HELP),
+    since: str = typer.Option(
+        "",
+        "--since",
+        help="UTC date YYYY-MM-DD for historical pagination (e.g. 2025-01-01). "
+        "Omit for the short recent-page live pull.",
+    ),
 ) -> None:
     """One-shot cross-venue funding pull from Bybit + OKX + Hyperliquid (Tier 1)."""
     from ats.ingestion.xvenue_funding import pull_all
 
     sym_list = [s.strip() for s in symbols.split(",") if s.strip()] or load_m1_universe()
     mapping = load_xvenue_mapping()
+    since_dt = _parse_date(since) if since.strip() else None
 
     async def _run() -> None:
         async with SessionLocal() as session:
-            await pull_all(session, sym_list, mapping)
+            await pull_all(session, sym_list, mapping, since=since_dt)
 
     asyncio.run(_run())
     typer.echo("Cross-venue funding pull complete.")
