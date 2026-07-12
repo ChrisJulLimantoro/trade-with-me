@@ -19,10 +19,20 @@ from __future__ import annotations
 from collections.abc import Mapping
 from typing import Any
 
+from ats.agents.base import AgentScore
 from ats.llm.schemas import InvalidationRule, MarketBias, PlanOutput, Rule, SetupOutput
+from ats.synthesis.reasons import format_agent_detail
 from ats.synthesis.synthesizer import Signal
 
 _BIAS_BY_DIRECTION: dict[str, MarketBias] = {"long": "bullish", "short": "bearish"}
+
+
+def _stand_aside_rationale(agent_scores: Mapping[str, AgentScore] | None) -> str:
+    """Per-agent breakdown when the synthesizer stands aside (no qualifying signal)."""
+    if not agent_scores:
+        return "Deterministic synthesizer found no qualifying signal."
+    details = "; ".join(format_agent_detail(s) for s in agent_scores.values())
+    return f"stand-aside — {details}"
 
 
 def _soft_rules(direction: str, features: Mapping[str, Any]) -> list[Rule]:
@@ -66,12 +76,21 @@ def signal_to_setup(signal: Signal, features: Mapping[str, Any]) -> SetupOutput:
     )
 
 
-def signal_to_plan(signal: Signal | None, features: Mapping[str, Any]) -> PlanOutput:
-    """Map a Signal (or None → stand-aside plan) onto a PlanOutput."""
+def signal_to_plan(
+    signal: Signal | None,
+    features: Mapping[str, Any],
+    *,
+    agent_scores: Mapping[str, AgentScore] | None = None,
+) -> PlanOutput:
+    """Map a Signal (or None → stand-aside plan) onto a PlanOutput.
+
+    When ``signal`` is None, ``agent_scores`` (if provided) become the rationale so the
+    dashboard/audit trail shows *why* each agent stood aside rather than a generic line.
+    """
     if signal is None:
         return PlanOutput(
             market_bias="neutral",
-            rationale="Deterministic synthesizer found no qualifying signal.",
+            rationale=_stand_aside_rationale(agent_scores),
             allowed_setups=[],
         )
     bias = _BIAS_BY_DIRECTION[signal.direction]

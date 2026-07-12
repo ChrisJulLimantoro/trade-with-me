@@ -83,6 +83,34 @@ def test_signal_to_plan_none_is_stand_aside() -> None:
     plan = signal_to_plan(None, {})
     assert plan.market_bias == "neutral"
     assert plan.allowed_setups == []
+    assert "no qualifying signal" in plan.rationale
+
+
+def test_signal_to_plan_none_surfaces_agent_details() -> None:
+    from ats.agents.base import AgentScore
+
+    scores = {
+        "structure": AgentScore(
+            agent="structure",
+            score=0.0,
+            direction="neutral",
+            deterministic_score=0.0,
+            metadata={"reason": "no breakout"},
+        ),
+        "momentum": AgentScore(
+            agent="momentum",
+            score=0.62,
+            direction="long",
+            deterministic_score=0.62,
+            metadata={"rsi_14": 58.0, "macd_hist": 0.12},
+        ),
+    }
+    plan = signal_to_plan(None, {}, agent_scores=scores)
+    assert plan.market_bias == "neutral"
+    assert plan.allowed_setups == []
+    assert plan.rationale.startswith("stand-aside — ")
+    assert "structure:neutral 0.00 (no breakout)" in plan.rationale
+    assert "momentum:long 0.62" in plan.rationale
 
 
 def test_signal_to_plan_carries_setup_and_bias() -> None:
