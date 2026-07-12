@@ -175,6 +175,12 @@ class PlanConfig(BaseModel):
     # Minimum synthesized confidence for the deterministic proposer to emit a setup, and the
     # floor the adjudicated (post-delta) confidence must still clear or the trade is vetoed.
     signal_min_confidence: float = 0.55
+    # Replay-only override for the ``htf_trend`` agent's share of the direction vote. When set,
+    # the synthesizer uses ``weights_with_htf(htf_trend_weight)`` (the other 8 weights scaled to
+    # preserve their relative shape) instead of the baked ``WEIGHTS``. None = use ``WEIGHTS`` as-is.
+    # This is the A/B harness for tuning the dominant trend weight; the chosen value is baked back
+    # into ``WEIGHTS`` when finalized.
+    htf_trend_weight: float | None = None
     # Volatility-conditional confidence floor (LOOP6). The strategy is a trend-pullback system
     # with no edge in low-volatility CHOP — the bleed is the quiet, compressed bars where
     # pullback entries whipsaw (~54–62% win vs 74–83% in trend). Rather than subtract a regime
