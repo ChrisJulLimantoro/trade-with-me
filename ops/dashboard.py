@@ -313,6 +313,7 @@ def render(data: dict) -> str:
         when = p["as_of"].strftime("%m-%d %H:%M") if p["as_of"] else "—"
         bias = p["market_bias"] or "—"
         bias_cls = "pos" if bias == "bullish" else ("neg" if bias == "bearish" else "dim")
+        rat = p["rationale"] or ""
         if setups:
             s0 = setups[0]
             d = s0["direction"]
@@ -324,18 +325,23 @@ def render(data: dict) -> str:
                 f"{zone} · sl {_fnum(s0['stop_loss']):g} · tp {tps} "
                 f"<span class=dim>[{html.escape(s0['status'])}]</span>"
             )
+        elif rat.startswith("stand-aside — "):
+            # Per-agent breakdown is stored in rationale by signal_to_plan; surface it here.
+            details = rat[len("stand-aside — ") :]
+            setup_cell = (
+                f'<span class="dim rat">no setup, agent scores: '
+                f"{html.escape(details)}</span>"
+            )
+            rat = ""  # already shown in setup — avoid duplicating the long cell
         else:
-            setup_cell = "<span class=dim>stand-aside</span>"
-        rat = p["rationale"] or ""
-        # Stand-aside rationales carry the full per-agent breakdown — let that cell wrap.
-        rat_cls = "dim rat" if rat.startswith("stand-aside") else "dim"
+            setup_cell = "<span class=dim>no setup</span>"
         plan_html += (
             f"<tr><td class=dim>{when}</td><td>{html.escape(p['symbol'])}</td>"
             f"<td class={bias_cls}>{bias}</td>"
             f"<td class=dim>{html.escape(p['regime_cell'] or '—')}</td>"
             f"<td>{html.escape(p['status'])}</td>"
             f"<td>{setup_cell}</td>"
-            f"<td class={rat_cls}>{html.escape(rat)}</td></tr>"
+            f"<td class=dim>{html.escape(rat)}</td></tr>"
         )
     if not plan_html:
         plan_html = "<tr><td colspan=7 class=dim>no plans yet</td></tr>"
