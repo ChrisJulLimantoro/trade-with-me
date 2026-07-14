@@ -170,7 +170,9 @@ PROFILES: dict[str, dict[str, dict[str, Any]]] = {
             "entry_confirmation_enabled": False,
             # Drop trades that fight the 4h trend — the biggest BTC-replay loss bucket was
             # 15m longs taken inside a 4h downtrend (bull-low/chop drift).
-            "htf_trend_filter": True,
+            # Disabled: the HTF allowed_directions gate is off; the strategist may propose
+            # both directions subject only to the macro regime gate.
+            "htf_trend_filter": False,
             # Iter 2: the HTF-exhaustion relief re-opened mean-reversion longs on every
             # oversold bounce inside the 4h downtrend — knife-catches that were the single
             # worst loss bucket (-92.8% margin). Turn it off so the gate stays trend-aligned.
