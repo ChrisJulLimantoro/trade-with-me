@@ -68,6 +68,34 @@ async def reconcile_on_start(
         # "adopt": leave the position; the operator accepts it (no internal row created here —
         # the mirror model will manage the NEXT entry, this one rides unmanaged by design).
 
+    # Case A2: no position, but protective algo orders are still resting → orphaned protection.
+    # reduceOnly SL/TP do not get Binance's free closePosition OCO auto-cancel, so if the process
+    # died between a native fill and `cancel_protection`, the sibling stays live and would arm
+    # itself against the NEXT position. Sweep them whenever the exchange is flat.
+    if pos is None:
+        try:
+            resting = await client.open_algo_orders(symbol)
+        except Exception as exc:  # observability only — never block startup
+            log.warning("live_orphan_algo_sweep_failed", symbol=symbol, error=str(exc))
+        else:
+            for order in resting:
+                algo_id = str(order.get("algoId") or "")
+                if not algo_id:
+                    continue
+                log.warning(
+                    "live_orphan_conditional",
+                    symbol=symbol, algo_id=algo_id, type=order.get("type"),
+                )
+                await client.cancel_conditional(symbol, algo_id)
+                ctx.record(
+                    "reconcile",
+                    {
+                        "symbol": symbol,
+                        "action": "cancelled_orphan_conditional",
+                        "algo_id": algo_id,
+                    },
+                )
+
     # Case B: internal open trade(s) but the exchange is flat → drifted (manual/liq close).
     if pos is None and internal_live:
         for t in internal_live:

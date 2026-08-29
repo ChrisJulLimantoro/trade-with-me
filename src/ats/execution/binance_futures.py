@@ -42,6 +42,16 @@ class OrderError(RuntimeError):
         self.code = code
 
 
+def _avg_fill(resp: dict[str, Any]) -> float:
+    """Average fill price off an order payload: ``avgPrice``, else ``cumQuote/executedQty``."""
+    avg = float(resp.get("avgPrice") or 0.0)
+    if avg == 0.0:
+        executed = float(resp.get("executedQty") or 0.0)
+        quote = float(resp.get("cumQuote") or 0.0)
+        avg = quote / executed if executed > 0 else 0.0
+    return avg
+
+
 def _api_code(exc: BinanceAPIException) -> int | None:
     """Best-effort numeric code off a python-binance API exception (int or None)."""
     raw = getattr(exc, "code", None)
@@ -265,11 +275,25 @@ class BinanceFuturesTestnet:
                 f"market_order {side} {qty} {symbol} rejected: {exc}", code=_api_code(exc)
             ) from exc
         latency_ms = round((time.perf_counter() - t0) * 1000, 1)
-        avg = float(resp.get("avgPrice") or 0.0)
-        if avg == 0.0:
-            executed = float(resp.get("executedQty") or 0.0)
-            quote = float(resp.get("cumQuote") or 0.0)
-            avg = quote / executed if executed > 0 else 0.0
+        avg = _avg_fill(resp)
+        if avg == 0.0 and resp.get("orderId"):
+            # The create response can come back with neither avgPrice nor cumQuote populated
+            # (observed on testnet MARKET closes with newOrderRespType=RESULT: status FILLED,
+            # executedQty set, fill 0.0). A single re-query resolves the real fill; without it
+            # `avg_price` is 0.0, slippage is skipped, and the caller stores exit_fill_price=None.
+            try:
+                fetched = await self._client.futures_get_order(
+                    symbol=symbol, orderId=resp["orderId"]
+                )
+            except BinanceAPIException as exc:
+                log.warning(
+                    "live_fill_requery_failed",
+                    symbol=symbol, order_id=str(resp.get("orderId")), error=str(exc),
+                )
+            else:
+                avg = _avg_fill(fetched)
+                if avg > 0.0:
+                    resp = {**resp, **fetched}
         result = OrderResult(
             order_id=str(resp.get("orderId", "")),
             side=side,
@@ -434,7 +458,9 @@ class BinanceFuturesTestnet:
             params["closePosition"] = "true"
         else:
             if quantity is not None:
-                params["quantity"] = quantity
+                # Step the quantity exactly as the trigger is snapped to the tick — an
+                # unsteppable size is a -1111 reject, the quantity-side twin of the trigger bug.
+                params["quantity"] = self.round_qty(symbol, quantity)
             if reduce_only:
                 params["reduceOnly"] = "true"
         if callback_rate is not None:
@@ -470,6 +496,20 @@ class BinanceFuturesTestnet:
         )
         log.info("testnet_conditional", symbol=symbol, type=order_type, algo_id=algo_id)
         return algo_id
+
+    async def get_algo_order(self, symbol: str, algo_id: str) -> dict[str, Any]:
+        """Fetch a single CONDITIONAL algo order by ``algoId``.
+
+        The algo surface is a SEPARATE endpoint from regular orders: an ``algoId`` passed to
+        ``get_order`` (``/fapi/v1/order``) answers -2013 "Order does not exist", which is what
+        silently defeated the native exit-fill lookup.
+        """
+        try:
+            return await self._client.futures_get_algo_order(symbol=symbol, algoId=algo_id)
+        except BinanceAPIException as exc:
+            raise OrderError(
+                f"get_algo_order {algo_id} {symbol} failed: {exc}", code=_api_code(exc)
+            ) from exc
 
     async def cancel_conditional(self, symbol: str, algo_id: str) -> None:
         """Cancel a single conditional algo order. Non-fatal: a gone order is logged, not raised."""
