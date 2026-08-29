@@ -28,6 +28,9 @@ class _FakeClient:
         self.cancelled_orders: list[str] = []
         self.get_order_result: dict = {}
         self.position: dict | None = {"positionAmt": "1.0"}
+        # Conditionals currently resting on the "exchange", algo_id -> params. Lets the fake
+        # enforce the closePosition uniqueness rule that produced -4130 live.
+        self._live_conditionals: dict[str, dict] = {}
         # place_conditional behavior: None = succeed; else an OrderError to raise once.
         self._raise_once: OrderError | None = None
 
@@ -38,11 +41,29 @@ class _FakeClient:
         if self._raise_once is not None:
             exc, self._raise_once = self._raise_once, None
             raise exc
-        self.placed_conditionals.append({"type": order_type, **kw})
-        return f"algo{len(self.placed_conditionals)}"
+        # Enforce the real exchange rule: only ONE closePosition order of a given type may rest
+        # per direction. Without this the fake happily accepts a second closePosition STOP_MARKET
+        # and `replace_stop` looks correct in tests while failing 100% of the time live (-4130).
+        if kw.get("close_position"):
+            live = {(o["type"], o["side"]) for o in self._live_conditionals.values()
+                    if o.get("close_position")}
+            if (order_type, side) in live:
+                raise OrderError(
+                    "APIError(code=-4130): An open stop or take profit order with GTE and "
+                    "closePosition in the direction is existing.",
+                    code=-4130,
+                )
+        self.placed_conditionals.append({"type": order_type, "side": side, **kw})
+        algo_id = f"algo{len(self.placed_conditionals)}"
+        self._live_conditionals[algo_id] = {"type": order_type, "side": side, **kw}
+        return algo_id
 
     async def cancel_conditional(self, symbol, algo_id):
         self.cancelled_conditionals.append(algo_id)
+        self._live_conditionals.pop(algo_id, None)
+
+    async def load_filters(self, symbol):
+        return None
 
     async def position_risk(self, symbol):
         return self.position
@@ -132,6 +153,94 @@ async def test_replace_stop_success_cancels_old_after_new_confirmed():
     assert client.cancelled_conditionals == ["old_sl"]
     assert ctx._protection["t1"]["sl"] == "algo1"
     assert client.market_orders == []
+
+
+@pytest.mark.asyncio
+async def test_protection_then_stop_move_end_to_end():
+    """THE regression test: the stop must actually move against a real resting SL+TP pair.
+
+    This is the path that failed 15/15 times live. It passes only because protective orders are
+    reduceOnly — with closePosition the second STOP_MARKET is rejected -4130 and the stop is pinned
+    at its original level for the life of the trade.
+    """
+    client = _FakeClient()
+    ctx = _ctx(client)
+
+    await ctx.place_protection(
+        "t1", "SOLUSDT", "long", stop_loss=100.0, take_profit=110.0
+    )
+    sl_id = ctx._protection["t1"]["sl"]
+
+    # Protective orders must be reduceOnly with an explicit size, never closePosition.
+    for placed in client.placed_conditionals:
+        assert placed.get("reduce_only") is True
+        assert placed.get("close_position") is not True
+        assert placed["quantity"] == 1.0  # from position_risk positionAmt
+
+    await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)
+
+    assert ctx._protection["t1"]["sl"] != sl_id       # the stop actually moved
+    assert client.cancelled_conditionals == [sl_id]   # old cancelled only after the new confirmed
+    assert client.placed_conditionals[-1]["trigger_price"] == 105.0
+    assert client.market_orders == []                 # nothing flattened
+
+
+@pytest.mark.asyncio
+async def test_replace_stop_4130_logs_and_keeps_old_stop():
+    client = _FakeClient()
+    client.raise_conditional_once(OrderError("closePosition conflict", code=-4130))
+    ctx = _ctx(client)
+    ctx._protection["t1"] = {"sl": "old_sl", "tp": "tp1", "direction": "long"}
+
+    await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)
+
+    assert "old_sl" not in client.cancelled_conditionals
+    assert ctx._protection["t1"]["sl"] == "old_sl"
+    assert client.market_orders == []          # a -4130 must never flatten
+    assert ctx._protection["t1"]["sl_fails"] == "1"
+
+
+@pytest.mark.asyncio
+async def test_replace_stop_skips_when_flat():
+    client = _FakeClient()
+    client.position = None  # exchange already flat
+    ctx = _ctx(client)
+    ctx._protection["t1"] = {"sl": "old_sl", "tp": "tp1", "direction": "long"}
+
+    await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)
+
+    assert client.placed_conditionals == []     # no zero-qty order
+    assert client.cancelled_conditionals == []  # old stop untouched
+    assert ctx._protection["t1"]["sl"] == "old_sl"
+
+
+@pytest.mark.asyncio
+async def test_replace_stop_skips_when_qty_rounds_to_zero():
+    client = _FakeClient()
+    client.position = {"positionAmt": "0.0000001"}
+    client.round_qty = lambda symbol, qty: 0.0  # below minQty
+    ctx = _ctx(client)
+    ctx._protection["t1"] = {"sl": "old_sl", "tp": "tp1", "direction": "long"}
+
+    await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)
+
+    assert client.placed_conditionals == []
+    assert ctx._protection["t1"]["sl"] == "old_sl"
+
+
+@pytest.mark.asyncio
+async def test_replace_stop_repeated_failures_track_and_reset():
+    client = _FakeClient()
+    ctx = _ctx(client)
+    ctx._protection["t1"] = {"sl": "old_sl", "tp": "tp1", "direction": "long"}
+
+    for expected in ("1", "2", "3"):
+        client.raise_conditional_once(OrderError("transient", code=-1111))
+        await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)
+        assert ctx._protection["t1"]["sl_fails"] == expected
+
+    await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)  # finally succeeds
+    assert "sl_fails" not in ctx._protection["t1"]
 
 
 # --------------------------------------------------------------------------------------

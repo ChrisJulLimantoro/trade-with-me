@@ -6,6 +6,7 @@ exchange client here: the system is paper-only by design.
 
 from __future__ import annotations
 
+import asyncio
 import uuid
 from contextvars import ContextVar
 from dataclasses import dataclass
@@ -48,6 +49,39 @@ class RunTag:
 # trades persist with NULL run columns. ContextVar keeps the shared executor/detector
 # signatures untouched.
 current_run: ContextVar[RunTag | None] = ContextVar("current_run", default=None)
+
+
+# Binance income history is eventually consistent: the close-side REALIZED_PNL/COMMISSION rows do
+# not exist yet when we ask ~90ms after the closing order fills, so the pull sums to 0.0 and a real
+# win/loss is persisted as "$0.00 realized". Poll a few times before believing a zero.
+_REALIZED_RETRY_DELAYS = (0.5, 1.5, 3.0)
+
+
+async def _realized_costs_settled(
+    client: Any, symbol: str, start_ms: int, *, expect_nonzero: bool
+) -> dict[str, float]:
+    """``realized_costs`` with a bounded retry while the exchange has not posted the close rows.
+
+    Only retries when the paper book says this trade moved (``expect_nonzero``) but the exchange
+    reports exactly 0.0 realized — a genuinely flat trade is legitimately 0.0 and returns at once.
+    Emits ``live_realized_costs_unsettled`` if it is still zero after the last attempt, so a false
+    zero is visible rather than silently persisted.
+    """
+    costs = await client.realized_costs(symbol, start_ms)
+    if not expect_nonzero or costs["realized_pnl"] != 0.0:
+        return costs
+    for delay in _REALIZED_RETRY_DELAYS:
+        await asyncio.sleep(delay)
+        costs = await client.realized_costs(symbol, start_ms)
+        if costs["realized_pnl"] != 0.0:
+            return costs
+    log.warning(
+        "live_realized_costs_unsettled",
+        symbol=symbol,
+        commission_usd=costs["commission"],
+        waited_s=sum(_REALIZED_RETRY_DELAYS),
+    )
+    return costs
 
 
 def margin_close_values(
@@ -484,7 +518,9 @@ async def close_paper_trade(
             if entry_dt.tzinfo is None:
                 entry_dt = entry_dt.replace(tzinfo=UTC)
             start_ms = int(entry_dt.timestamp() * 1000) - 60_000  # 1-min buffer for clock skew
-            costs = await ctx.client.realized_costs(trade.symbol, start_ms)
+            costs = await _realized_costs_settled(
+                ctx.client, trade.symbol, start_ms, expect_nonzero=pnl_usd != 0.0
+            )
             trade.realized_pnl_usd = costs["realized_pnl"]
             trade.commission_usd = costs["commission"]
             if exit_fill_price is not None:

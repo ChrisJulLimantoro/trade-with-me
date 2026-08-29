@@ -33,6 +33,18 @@ log = get_logger(__name__)
 # through the new stop; the safe response is to market-close, not to leave the position naked.
 _ERR_WOULD_IMMEDIATELY_TRIGGER = -2021
 
+# Binance: "An open stop or take profit order with GTE and closePosition in the direction is
+# existing." Only ONE closePosition STOP_MARKET may rest per direction, so the place-new-BEFORE-
+# cancel-old ordering below is impossible with closePosition orders — it rejected 100% of the time
+# (15/15 over 8 live days, 0 successes) and the stop never trailed. Protective orders are therefore
+# reduceOnly+quantity, which CAN coexist. If this code is ever seen again it means something has
+# re-introduced a closePosition protective order.
+_ERR_CLOSEPOSITION_CONFLICT = -4130
+
+# Escalate to error once a trade's stop has failed to move this many times in a row: a stop that is
+# permanently stuck is a silent loss of protection, not a transient reject.
+_STOP_FAIL_ESCALATE_AFTER = 2
+
 
 def _side_for_open(direction: str) -> str:
     return "BUY" if direction == "long" else "SELL"
@@ -52,8 +64,9 @@ class LiveContext:
         self._path.parent.mkdir(parents=True, exist_ok=True)
         self._fh: TextIO = self._path.open("a", encoding="utf-8")
         # Per-trade protective algo-order ids: trade_id -> {"sl": id, "tp": id, "direction": str}.
-        # Engine-synced model: SL+TP are placed at entry as a safety net (closePosition=true) and
-        # the deterministic exit machine cancels/replaces them as the stop moves / trade closes.
+        # Engine-synced model: SL+TP are placed at entry as a safety net (reduceOnly for the full
+        # position) and the deterministic exit machine cancels/replaces them as the stop moves /
+        # trade closes. Also carries "sl_fails": consecutive failed stop-move attempts.
         self._protection: dict[str, dict[str, str]] = {}
         # Pending resting-limit ENTRIES, keyed by exchange order id -> booking payload (see
         # executor.open_paper_trade). A limit rests here until executor.poll_live_entries books it
@@ -180,16 +193,42 @@ class LiveContext:
 
     # --- protective SL+TP (OCO-like, engine-synced) -----------------------------------
 
+    async def _protective_qty(self, symbol: str) -> float:
+        """Live remaining position size, stepped — the quantity for a reduce-only protective order.
+
+        ``_protection`` stores no quantity and the remaining size is not exactly recoverable from
+        ``notional/entry`` after a scale-out (``reduce_position`` rounds independently), so the
+        exchange position is the only correct source. Returns 0.0 when flat or below minQty.
+
+        An oversized quantity is the SAFE direction: Binance caps a reduce-only order at the live
+        position size, so a slightly stale value still closes the whole remaining position exactly
+        as ``closePosition`` did.
+        """
+        await self._client.load_filters(symbol)
+        pos = await self._client.position_risk(symbol)
+        if pos is None:
+            return 0.0
+        return self._client.round_qty(symbol, abs(float(pos.get("positionAmt", 0))))
+
     async def place_protection(
         self, trade_id: str, symbol: str, direction: str, *, stop_loss: float, take_profit: float
     ) -> None:
-        """Place a STOP_MARKET (SL) + TAKE_PROFIT_MARKET (TP), both closePosition=true.
+        """Place a STOP_MARKET (SL) + TAKE_PROFIT_MARKET (TP), both reduceOnly for the full size.
 
-        Both close the whole remaining position; when either triggers, Binance auto-cancels the
-        other (the futures equivalent of OCO). ``take_profit`` is the FINAL target — intermediate
+        Both close the whole remaining position. ``take_profit`` is the FINAL target — intermediate
         scale-outs are handled by the engine firing reduce-only market orders.
+
+        These are reduceOnly rather than closePosition so that ``replace_stop`` can place the
+        replacement before cancelling the old stop (see ``_ERR_CLOSEPOSITION_CONFLICT``). The
+        trade-off is that reduceOnly orders do NOT get Binance's free OCO auto-cancel, so the pair
+        is cleaned up explicitly by ``cancel_protection`` on close and by the orphan sweep in
+        ``live_tracker.reconcile_on_start`` after a crash.
         """
         side = _side_for_reduce(direction)
+        qty = await self._protective_qty(symbol)
+        if qty <= 0:
+            log.warning("live_protection_skipped_flat", symbol=symbol, trade_id=trade_id)
+            return
         # Try once, then retry once on failure before giving up — a transient reject shouldn't
         # cost us a good entry. Only the FINAL failure flattens (never hold unprotected).
         last_exc: OrderError | None = None
@@ -197,11 +236,12 @@ class LiveContext:
             prot: dict[str, str] = {"direction": direction}
             try:
                 prot["sl"] = await self._client.place_conditional(
-                    symbol, side, "STOP_MARKET", trigger_price=stop_loss, close_position=True
+                    symbol, side, "STOP_MARKET", trigger_price=stop_loss,
+                    reduce_only=True, quantity=qty,
                 )
                 prot["tp"] = await self._client.place_conditional(
                     symbol, side, "TAKE_PROFIT_MARKET", trigger_price=take_profit,
-                    close_position=True,
+                    reduce_only=True, quantity=qty,
                 )
                 self._protection[trade_id] = prot
                 log.info(
@@ -242,9 +282,17 @@ class LiveContext:
 
         Place-new-BEFORE-cancel-old: the previous stop stays live until the replacement is
         confirmed, so a failed placement never leaves the position unprotected (the old bug
-        cancelled first, then a -2021 on the place left a naked position). Two failure paths:
+        cancelled first, then a -2021 on the place left a naked position).
+
+        This ordering REQUIRES reduceOnly protective orders. With ``closePosition=true`` the
+        exchange refuses the second stop (-4130) and the replacement can never land — the bug this
+        method shipped with, which silently pinned every stop at its original level for 8 days.
+
+        Three failure paths:
         - ``-2021`` on a stop RAISE = the new level is already breached, so the position should
           be flat NOW → market-close and let the next tick reconcile.
+        - ``-4130`` = a closePosition protective order is resting; the replacement can never
+          succeed. Logged at error, since it means the reduceOnly invariant has been broken.
         - any other reject → keep the old stop untouched and log; the position stays protected
           at the prior level and the trail retries next tick.
         """
@@ -252,10 +300,16 @@ class LiveContext:
         if prot is None:
             return
         old = prot.get("sl")
+        qty = await self._protective_qty(symbol)
+        if qty <= 0:
+            # Already flat (or dust below minQty): nothing to protect. Don't place a zero-qty
+            # order; the close path will reconcile the book on the next tick.
+            log.info("live_replace_stop_skipped_flat", symbol=symbol, trade_id=trade_id)
+            return
         try:
             new_sl = await self._client.place_conditional(
                 symbol, _side_for_reduce(direction), "STOP_MARKET",
-                trigger_price=new_stop, close_position=True,
+                trigger_price=new_stop, reduce_only=True, quantity=qty,
             )
         except OrderError as exc:
             if exc.code == _ERR_WOULD_IMMEDIATELY_TRIGGER:
@@ -268,16 +322,37 @@ class LiveContext:
                 await self.close_position(symbol, direction, intended_price=new_stop)
                 return
             # Non-2021 reject: keep the existing stop; do NOT cancel it.
-            log.warning(
-                "live_replace_stop_failed",
-                symbol=symbol, trade_id=trade_id, new_stop=new_stop,
-                code=exc.code, error=str(exc),
-            )
+            fails = int(prot.get("sl_fails", 0)) + 1
+            prot["sl_fails"] = str(fails)
+            self._protection[trade_id] = prot
+            if exc.code == _ERR_CLOSEPOSITION_CONFLICT:
+                # Unreachable once every protective order is reduceOnly. If it fires, the stop is
+                # pinned at its original level for the life of the trade — never a warning.
+                log.error(
+                    "live_replace_stop_unsupported",
+                    symbol=symbol, trade_id=trade_id, new_stop=new_stop, code=exc.code,
+                    error=str(exc),
+                    hint="a closePosition protective order is resting; protective orders must be "
+                         "reduceOnly for place-before-cancel to work",
+                )
+            elif fails > _STOP_FAIL_ESCALATE_AFTER:
+                log.error(
+                    "live_replace_stop_stuck",
+                    symbol=symbol, trade_id=trade_id, new_stop=new_stop,
+                    code=exc.code, consecutive_failures=fails, error=str(exc),
+                )
+            else:
+                log.warning(
+                    "live_replace_stop_failed",
+                    symbol=symbol, trade_id=trade_id, new_stop=new_stop,
+                    code=exc.code, consecutive_failures=fails, error=str(exc),
+                )
             return
         # New stop confirmed — now it's safe to cancel the previous one.
         if old:
             await self._client.cancel_conditional(symbol, old)
         prot["sl"] = new_sl
+        prot.pop("sl_fails", None)
         self._protection[trade_id] = prot
         log.info(
             "live_stop_replaced",
@@ -303,7 +378,9 @@ class LiveContext:
         if not order_id:
             return None
         try:
-            order = await self._client.get_order(symbol, order_id)
+            # These ids are algoIds. The regular /fapi/v1/order endpoint answers -2013 for them,
+            # which is why this lookup silently returned None on every native exit.
+            order = await self._client.get_algo_order(symbol, order_id)
         except OrderError as exc:
             log.warning(
                 "live_native_fill_lookup_failed",
