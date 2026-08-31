@@ -12,6 +12,7 @@ Two jobs:
 
 from __future__ import annotations
 
+import asyncio
 from datetime import UTC, datetime
 from typing import Literal
 
@@ -73,28 +74,7 @@ async def reconcile_on_start(
     # died between a native fill and `cancel_protection`, the sibling stays live and would arm
     # itself against the NEXT position. Sweep them whenever the exchange is flat.
     if pos is None:
-        try:
-            resting = await client.open_algo_orders(symbol)
-        except Exception as exc:  # observability only — never block startup
-            log.warning("live_orphan_algo_sweep_failed", symbol=symbol, error=str(exc))
-        else:
-            for order in resting:
-                algo_id = str(order.get("algoId") or "")
-                if not algo_id:
-                    continue
-                log.warning(
-                    "live_orphan_conditional",
-                    symbol=symbol, algo_id=algo_id, type=order.get("type"),
-                )
-                await client.cancel_conditional(symbol, algo_id)
-                ctx.record(
-                    "reconcile",
-                    {
-                        "symbol": symbol,
-                        "action": "cancelled_orphan_conditional",
-                        "algo_id": algo_id,
-                    },
-                )
+        await _sweep_orphan_conditionals(client, ctx, symbol)
 
     # Case B: internal open trade(s) but the exchange is flat → drifted (manual/liq close).
     if pos is None and internal_live:
@@ -108,6 +88,34 @@ async def reconcile_on_start(
                     "action": "internal_open_but_exchange_flat",
                 },
             )
+
+
+async def _resting_algo_orders(client, symbol: str) -> list[dict]:
+    try:
+        return await client.open_algo_orders(symbol)
+    except Exception as exc:  # observability only — never block startup
+        log.warning("live_orphan_algo_sweep_failed", symbol=symbol, error=str(exc))
+        return []
+
+
+def _report_orphans(symbol: str, owned: list[dict], foreign: list[dict]) -> None:
+    for o in owned:
+        log.warning("live_orphan_conditional", symbol=symbol, algo_id=str(o["algoId"]), type=o.get("type"))
+    for o in foreign:
+        log.info("live_foreign_algo_skipped", symbol=symbol, algo_id=str(o["algoId"]))
+
+
+async def _sweep_orphan_conditionals(client, ctx: LiveContext, symbol: str) -> None:
+    """Cancel only OUR resting protection on a flat symbol; leave foreign/manual orders untouched."""
+    tagged = [o for o in await _resting_algo_orders(client, symbol) if o.get("algoId")]
+    owned = [o for o in tagged if client.owns_algo_order(o)]
+    _report_orphans(symbol, owned, [o for o in tagged if not client.owns_algo_order(o)])
+    await asyncio.gather(*(client.cancel_conditional(symbol, str(o["algoId"])) for o in owned))
+    for o in owned:
+        ctx.record(
+            "reconcile",
+            {"symbol": symbol, "action": "cancelled_orphan_conditional", "algo_id": str(o["algoId"])},
+        )
 
 
 async def _expected_qty(session: AsyncSession, ctx: LiveContext, symbol: str) -> float:

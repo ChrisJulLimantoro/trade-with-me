@@ -67,13 +67,11 @@ async def _realized_costs_settled(
     Emits ``live_realized_costs_unsettled`` if it is still zero after the last attempt, so a false
     zero is visible rather than silently persisted.
     """
-    costs = await client.realized_costs(symbol, start_ms)
-    if not expect_nonzero or costs["realized_pnl"] != 0.0:
-        return costs
-    for delay in _REALIZED_RETRY_DELAYS:
-        await asyncio.sleep(delay)
+    for delay in (0.0, *_REALIZED_RETRY_DELAYS):
+        if delay:
+            await asyncio.sleep(delay)
         costs = await client.realized_costs(symbol, start_ms)
-        if costs["realized_pnl"] != 0.0:
+        if not expect_nonzero or costs["realized_pnl"] != 0.0:
             return costs
     log.warning(
         "live_realized_costs_unsettled",

@@ -13,6 +13,7 @@ from __future__ import annotations
 
 import math
 import time
+import uuid
 from dataclasses import dataclass
 from typing import Any, Callable
 
@@ -25,6 +26,15 @@ log = get_logger(__name__)
 
 # Callback signature: ``recorder(action: str, payload: dict) -> None``.
 Recorder = Callable[[str, dict[str, Any]], None]
+
+# Tags every conditional order this bot places (``clientAlgoId`` prefix), so the orphan sweep in
+# ``live_tracker.reconcile_on_start`` cancels ONLY our own resting protection — never a manual
+# hedge or another instance's SL/TP on the same symbol.
+_ALGO_CLIENT_ID_PREFIX = "atsx-"
+
+# Fields the post-close fill re-query is allowed to overlay onto the create response — the
+# authoritative ``orderId`` must NOT be overwritable by the re-query.
+_REQUERY_FILL_FIELDS = ("avgPrice", "cumQuote", "executedQty", "status")
 
 
 class OrderError(RuntimeError):
@@ -293,7 +303,7 @@ class BinanceFuturesTestnet:
             else:
                 avg = _avg_fill(fetched)
                 if avg > 0.0:
-                    resp = {**resp, **fetched}
+                    resp = {**resp, **{k: fetched[k] for k in _REQUERY_FILL_FIELDS if k in fetched}}
         result = OrderResult(
             order_id=str(resp.get("orderId", "")),
             side=side,
@@ -449,6 +459,7 @@ class BinanceFuturesTestnet:
             "side": side,
             "type": order_type,
             "workingType": working_type,
+            "clientAlgoId": _ALGO_CLIENT_ID_PREFIX + uuid.uuid4().hex[:16],
         }
         sent_trigger: float | None = None
         if trigger_price is not None:
@@ -523,3 +534,8 @@ class BinanceFuturesTestnet:
 
     async def open_algo_orders(self, symbol: str) -> list[dict[str, Any]]:
         return await self._client.futures_get_open_algo_orders(symbol=symbol)
+
+    @staticmethod
+    def owns_algo_order(order: dict[str, Any]) -> bool:
+        """True only for conditional orders this bot placed (tagged ``clientAlgoId`` prefix)."""
+        return str(order.get("clientAlgoId") or "").startswith(_ALGO_CLIENT_ID_PREFIX)

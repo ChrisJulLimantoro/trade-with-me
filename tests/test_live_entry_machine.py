@@ -55,7 +55,9 @@ class _FakeClient:
                 )
         self.placed_conditionals.append({"type": order_type, "side": side, **kw})
         algo_id = f"algo{len(self.placed_conditionals)}"
-        self._live_conditionals[algo_id] = {"type": order_type, "side": side, **kw}
+        self._live_conditionals[algo_id] = {
+            "type": order_type, "side": side, "close_position": kw.get("close_position"),
+        }
         return algo_id
 
     async def cancel_conditional(self, symbol, algo_id):
@@ -88,6 +90,7 @@ def _ctx(client: _FakeClient) -> LiveContext:
     ctx = LiveContext.__new__(LiveContext)
     ctx._client = client
     ctx._protection = {}
+    ctx._stop_fails = {}
     ctx._pending = {}
     ctx._fh = io.StringIO()  # record() writes here
     return ctx
@@ -197,7 +200,7 @@ async def test_replace_stop_4130_logs_and_keeps_old_stop():
     assert "old_sl" not in client.cancelled_conditionals
     assert ctx._protection["t1"]["sl"] == "old_sl"
     assert client.market_orders == []          # a -4130 must never flatten
-    assert ctx._protection["t1"]["sl_fails"] == "1"
+    assert ctx._stop_fails["t1"] == 1
 
 
 @pytest.mark.asyncio
@@ -234,13 +237,13 @@ async def test_replace_stop_repeated_failures_track_and_reset():
     ctx = _ctx(client)
     ctx._protection["t1"] = {"sl": "old_sl", "tp": "tp1", "direction": "long"}
 
-    for expected in ("1", "2", "3"):
+    for expected in (1, 2, 3):
         client.raise_conditional_once(OrderError("transient", code=-1111))
         await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)
-        assert ctx._protection["t1"]["sl_fails"] == expected
+        assert ctx._stop_fails["t1"] == expected
 
     await ctx.replace_stop("t1", "SOLUSDT", "long", 105.0)  # finally succeeds
-    assert "sl_fails" not in ctx._protection["t1"]
+    assert "t1" not in ctx._stop_fails
 
 
 # --------------------------------------------------------------------------------------

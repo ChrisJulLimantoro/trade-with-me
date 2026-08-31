@@ -66,8 +66,11 @@ class LiveContext:
         # Per-trade protective algo-order ids: trade_id -> {"sl": id, "tp": id, "direction": str}.
         # Engine-synced model: SL+TP are placed at entry as a safety net (reduceOnly for the full
         # position) and the deterministic exit machine cancels/replaces them as the stop moves /
-        # trade closes. Also carries "sl_fails": consecutive failed stop-move attempts.
+        # trade closes.
         self._protection: dict[str, dict[str, str]] = {}
+        # Consecutive failed stop-move attempts per trade; escalates logging and cleared on the
+        # first success or on close. Separate from _protection so the id map stays str-typed.
+        self._stop_fails: dict[str, int] = {}
         # Pending resting-limit ENTRIES, keyed by exchange order id -> booking payload (see
         # executor.open_paper_trade). A limit rests here until executor.poll_live_entries books it
         # on fill or drops it on the fill-or-cancel timeout — this is what makes the live entry a
@@ -322,9 +325,8 @@ class LiveContext:
                 await self.close_position(symbol, direction, intended_price=new_stop)
                 return
             # Non-2021 reject: keep the existing stop; do NOT cancel it.
-            fails = int(prot.get("sl_fails", 0)) + 1
-            prot["sl_fails"] = str(fails)
-            self._protection[trade_id] = prot
+            fails = self._stop_fails.get(trade_id, 0) + 1
+            self._stop_fails[trade_id] = fails
             if exc.code == _ERR_CLOSEPOSITION_CONFLICT:
                 # Unreachable once every protective order is reduceOnly. If it fires, the stop is
                 # pinned at its original level for the life of the trade — never a warning.
@@ -352,8 +354,7 @@ class LiveContext:
         if old:
             await self._client.cancel_conditional(symbol, old)
         prot["sl"] = new_sl
-        prot.pop("sl_fails", None)
-        self._protection[trade_id] = prot
+        self._stop_fails.pop(trade_id, None)
         log.info(
             "live_stop_replaced",
             symbol=symbol,
@@ -392,10 +393,11 @@ class LiveContext:
             avg_price = float(avg) if avg is not None else None
         except (TypeError, ValueError):
             return None
-        return avg_price if avg_price else None
+        return avg_price
 
     async def cancel_protection(self, trade_id: str, symbol: str) -> None:
         """Cancel any remaining SL/TP for a trade (on close)."""
+        self._stop_fails.pop(trade_id, None)
         prot = self._protection.pop(trade_id, None)
         if not prot:
             return

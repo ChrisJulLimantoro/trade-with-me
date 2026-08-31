@@ -397,12 +397,37 @@ async def test_native_exit_fill_price_none_when_trade_untracked():
     assert ctx._client.get_order_calls == []
 
 
+@pytest.mark.asyncio
+async def test_native_exit_fill_price_keeps_zero_fill():
+    # A 0.0 avgPrice is a real (if anomalous) fill, not "missing" — it must not be swallowed to None.
+    from ats.execution.live import LiveContext
+
+    ctx = LiveContext.__new__(LiveContext)
+    ctx._client = _GetOrderClient(0.0)
+    ctx._protection = {"t1": {"direction": "long", "sl": "algo-sl", "tp": "algo-tp"}}
+    price = await ctx.native_exit_fill_price("t1", "SOLUSDT", "sl")
+    assert price == 0.0 and price is not None
+
+
+@pytest.mark.asyncio
+async def test_market_order_requery_preserves_authoritative_order_id():
+    # The re-query must overlay only fill fields — a stray orderId in the re-query response must
+    # never overwrite the authoritative id from the create response.
+    raw = _RequeryRaw(
+        {"status": "FILLED", "executedQty": "160.53", "avgPrice": "103.42", "orderId": 111}
+    )
+    c = _market_client(raw)
+    result = await c.market_order("SOLUSDT", "SELL", 160.53, reduce_only=True)
+    assert result.avg_price == 103.42
+    assert result.order_id == "4185769521"  # from the create response, not the re-query's 111
+
+
 # ---------------------------------------------------------------------------------------
 # realized_costs settling — Binance income history is eventually consistent
 # ---------------------------------------------------------------------------------------
 
 
-async def _no_sleep(_seconds):
+async def _mock_no_sleep(_seconds):
     """Collapse the retry backoff so the tests don't actually wait 5 seconds."""
     return None
 
@@ -428,7 +453,7 @@ async def test_realized_costs_retries_until_income_posts(monkeypatch):
     # the paper book showed a real win. The close-side rows simply had not posted yet.
     from ats.execution import executor
 
-    monkeypatch.setattr(executor.asyncio, "sleep", _no_sleep)
+    monkeypatch.setattr(executor.asyncio, "sleep", _mock_no_sleep)
     client = _IncomeClient(3, {"realized_pnl": 78.51, "commission": -10.09, "funding": 0.0})
     costs = await executor._realized_costs_settled(
         client, "SOLUSDT", 0, expect_nonzero=True
@@ -454,7 +479,7 @@ async def test_realized_costs_no_retry_for_a_genuinely_flat_trade():
 async def test_realized_costs_gives_up_and_returns_zero(monkeypatch):
     from ats.execution import executor
 
-    monkeypatch.setattr(executor.asyncio, "sleep", _no_sleep)
+    monkeypatch.setattr(executor.asyncio, "sleep", _mock_no_sleep)
     client = _IncomeClient(99, {})
     costs = await executor._realized_costs_settled(
         client, "SOLUSDT", 0, expect_nonzero=True
@@ -462,3 +487,54 @@ async def test_realized_costs_gives_up_and_returns_zero(monkeypatch):
     # Still zero after every retry — returned as-is, but logged as unsettled rather than silent.
     assert costs["realized_pnl"] == 0.0
     assert client.calls == 1 + len(executor._REALIZED_RETRY_DELAYS)
+
+
+# ---------------------------------------------------------------------------------------
+# orphan protection sweep — cancel only OUR resting SL/TP, never a foreign order
+# ---------------------------------------------------------------------------------------
+
+
+def test_owns_algo_order_matches_only_our_prefix():
+    tagged = {"clientAlgoId": "atsx-deadbeef", "algoId": 1}
+    assert BinanceFuturesTestnet.owns_algo_order(tagged) is True
+    assert BinanceFuturesTestnet.owns_algo_order({"clientAlgoId": "x-manualhedge", "algoId": 2}) is False
+    assert BinanceFuturesTestnet.owns_algo_order({"algoId": 3}) is False
+
+
+class _SweepClient:
+    """open_algo_orders returns a mix of ours + a foreign order; records cancellations."""
+
+    def __init__(self, resting: list[dict]) -> None:
+        self._resting = resting
+        self.cancelled: list[str] = []
+
+    owns_algo_order = staticmethod(BinanceFuturesTestnet.owns_algo_order)
+
+    async def open_algo_orders(self, symbol):
+        return self._resting
+
+    async def cancel_conditional(self, symbol, algo_id):
+        self.cancelled.append(algo_id)
+
+
+class _RecordingCtx:
+    def __init__(self) -> None:
+        self.records: list[dict] = []
+
+    def record(self, action, payload):
+        self.records.append(payload)
+
+
+@pytest.mark.asyncio
+async def test_orphan_sweep_cancels_only_owned_conditionals():
+    from ats.execution import live_tracker
+
+    client = _SweepClient([
+        {"algoId": 10, "clientAlgoId": "atsx-aaa", "type": "STOP_MARKET"},
+        {"algoId": 11, "clientAlgoId": "atsx-bbb", "type": "TAKE_PROFIT_MARKET"},
+        {"algoId": 99, "clientAlgoId": "x-someoneelse", "type": "STOP_MARKET"},
+    ])
+    ctx = _RecordingCtx()
+    await live_tracker._sweep_orphan_conditionals(client, ctx, "SOLUSDT")
+    assert client.cancelled == ["10", "11"]  # foreign 99 left untouched
+    assert [r["algo_id"] for r in ctx.records] == ["10", "11"]
